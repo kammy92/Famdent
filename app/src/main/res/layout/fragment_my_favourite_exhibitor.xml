@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/clMain"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:background="@color/text_color_white">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/appBar"
+        android:layout_centerInParent="true"
+        android:animateLayoutChanges="true">
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:animateLayoutChanges="true">
+
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rvExhibitorList"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_alignParentBottom="true"
+                    android:fillViewport="true"
+                    android:scrollbarStyle="insideOverlay" />
+
+                <RelativeLayout
+                    android:id="@+id/rlInit"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:animateLayoutChanges="true">
+
+                    <TextView
+                        android:id="@+id/tvNoResult"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:gravity="center"
+                        android:padding="@dimen/edittext_padding"
+                        android:text="@string/activity_exhibitor_list_text_no_exhibitor_found"
+                        android:textSize="@dimen/text_size_large"
+                        android:visibility="gone" />
+                </RelativeLayout>
+            </RelativeLayout>
+        </android.support.v4.widget.SwipeRefreshLayout>
+    </RelativeLayout>
+
+</android.support.design.widget.CoordinatorLayout>

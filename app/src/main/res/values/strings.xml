@@ -1,0 +1,129 @@
+<resources>
+    <string name="app_name">Famdent</string>
+
+
+    <!-- EditText Error Strings -->
+    <string name="please_enter_name">Please enter Username</string>
+    <string name="please_enter_email">Please enter Email</string>
+    <string name="please_enter_mobile">Please enter Mobile</string>
+    <string name="please_enter_valid_email">Please enter valid Mobile</string>
+    <string name="please_enter_valid_mobile">Please enter valid Mobile</string>
+    <string name="otp_didnt_match">OTP didn\'t match</string>
+
+    <string name="activity_login_hint_full_name">Full Name</string>
+    <string name="activity_login_hint_email">Email Address</string>
+    <string name="activity_login_hint_mobile">Mobile</string>
+    <string name="activity_login_button_submit">SUBMIT</string>
+
+
+    <string name="activity_main_text_no_service_found">No Services Found</string>
+
+
+
+    <string name="activity_exhibitor_list_title">EXHIBITOR LIST</string>
+    <string name="activity_exhibitor_list_text_no_exhibitor_found">No Exhibitor Found</string>
+
+
+    <string name="activity_programme_list_title">PROGRAMME LIST</string>
+    <string name="activity_programme_list_text_no_programme_found">No Programme Found</string>
+
+    <string name="activity_hall_plan_title">HALL PLAN</string>
+
+    <string name="activity_my_favourites_title">MY FAVOURITES</string>
+
+    <string name="activity_exhibitor_detail_title">EXHIBITOR DETAIL</string>
+
+
+    <string name="activity_information_title">INFORMATION</string>
+    <string name="activity_information_text_1">The House of FAMDENT swears by its mission of
+        ‘Bringing Dentistry Alive’
+    </string>
+    <string name="activity_information_text_2">Founded by Dr. Anil Arora in 1999 as a publication on
+        Clinical Dentistry based on international standards, FAMDENT now has multiple offerings with
+        a strong foothold in the Indian Dental Industry. FAMDENT ventures include Famdent Shows,
+        Famdent Publications, Famdent Awards, Corporate Solutions &amp; more – a brand of repute that
+        now resonates with almost every Dentist in the country.
+\n
+        The scientific content at all times is carefully chosen to quench the thirst of the
+        clinicians with contemporary and pragmatic techniques and technology prevalent globally.
+\n
+        A BIG THANKS to our esteemed Exhibitors – who have helped make The Famdent Show into iconic
+        events –where both Science &amp; Trade have seamlessly blended and succeeded on the same
+        platform.
+\n
+        Constant innovation and excellent user experience are key to the FAMDENT value system and we
+        continue to strive to achieve excellence in and contribute to the growth of the Dental
+        industry in India. FAMDENT has been instrumental in raising the bar of Indian Dentistry.
+    </string>
+    <string name="activity_information_text_3">Contact Us</string>
+    <string name="activity_information_text_4">
+        Corporate Address:
+            7/102, Sapphire Court, Azad Nagar, Behind Apna Bazaar, J. P. Road, Andheri (West), Mumbai -
+        400053, India.
+\n
+\n        Tel: +91 22 2673 2260 / 2674 2425
+\n        Mobile: +91 98672 84470 / 9833383511
+\n        Email: info@famdent.com
+\n        Website: www.famdent.com
+    </string>
+
+
+
+
+
+
+    <string name="dialog_text_quit_application">Do you want to quit the application?</string>
+    <string name="dialog_text_auto_fill">Do you want to auto fill the details?</string>
+    <string name="dialog_text_remove_favourite">Do you want to remove this exhibitor from your
+        favourites?
+    </string>
+    <string name="dialog_text_add_favourite">Do you want to add this exhibitor to your
+        favourites?
+    </string>
+    <string name="dialog_text_add_notes">Add Notes</string>
+    <string name="dialog_text_enter_otp">Enter the OTP sent to your mobile number</string>
+
+
+    <string name="progress_dialog_text_loading">Loading&#8230;</string>
+    <string name="progress_dialog_text_generating_survey">Generating Survey&#8230;</string>
+    <string name="progress_dialog_text_logging_out">Logging Out&#8230;</string>
+    <string name="progress_dialog_text_logging_in">Logging In&#8230;</string>
+    <string name="progress_dialog_text_please_wait">Please wait&#8230;</string>
+    <string name="progress_dialog_text_sending_request">Sending Request&#8230;</string>
+    <string name="progress_dialog_text_submitting_responses">Submitting Responses&#8230;</string>
+    <string name="progress_dialog_text_initializing">Initializing Application&#8230;</string>
+
+    <string name="snackbar_text_no_internet_connection_available">No Internet Connection available
+    </string>
+    <string name="snackbar_text_error_occurred">Error Occurred</string>
+    <string name="snackbar_text_exception_occurred">Exception Occurred</string>
+    <string name="snackbar_text_invalid_access_pin">Invalid Access PIN</string>
+
+    <string name="snackbar_action_go_to_settings">GO TO SETTINGS</string>
+    <string name="snackbar_action_dismiss">DISMISS</string>
+    <string name="snackbar_action_retry">RETRY</string>
+
+
+
+    <string name="dialog_text_new_version_available">New version of the application is available.
+        Please update
+    </string>
+
+
+    <string name="dialog_hint_optional">optional</string>
+
+    <string name="dialog_action_yes">YES</string>
+    <string name="dialog_action_no">NO</string>
+    <string name="dialog_action_ok">OK</string>
+    <string name="dialog_action_cancel">CANCEL</string>
+    <string name="dialog_action_save">SAVE</string>
+    <string name="dialog_action_logout">LOGOUT</string>
+    <string name="dialog_action_submit">SUBMIT</string>
+    <string name="dialog_action_resend_otp">RESEND OTP</string>
+    <string name="dialog_action_proceed">PROCEED</string>
+    <string name="dialog_action_ignore">IGNORE</string>
+    <string name="dialog_action_update">UPDATE</string>
+    <string name="dialog_action_close">CLOSE</string>
+
+
+</resources>

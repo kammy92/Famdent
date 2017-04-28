@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "557686604968",
+    "firebase_url": "https://famdent-83ed1.firebaseio.com",
+    "project_id": "famdent-83ed1",
+    "storage_bucket": "famdent-83ed1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:557686604968:android:937a115873d88ce0",
+        "android_client_info": {
+          "package_name": "com.actiknow.famdent"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "557686604968-qf0kjcfgsthvtmlips5qd8h3sbvb47vb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAuwVoffszvs3sDIn3szSAFJs_GsghGaz4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

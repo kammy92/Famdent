@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/clMain"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:background="@color/text_color_white">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:theme="@style/AppTheme.AppBarOverlay"
+            android:visibility="visible">
+
+            <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/toolbar1"
+                style="@style/Widget.MyApp.ActionBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:background="@color/colorPrimary">
+
+                <RelativeLayout
+                    android:id="@+id/toolbar_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/ivBack"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_back"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:gravity="center"
+                        android:text="ORAL SURGERY WORKSHOP"
+                        android:textColor="@color/text_color_white"
+                        android:textSize="@dimen/text_size_large"
+                        android:textStyle="bold" />
+
+
+                </RelativeLayout>
+            </android.support.v7.widget.Toolbar>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/appBar"
+            android:orientation="vertical">
+
+
+            <com.actiknow.famdent.utils.WrappingViewPager
+                android:id="@+id/viewpager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+
+
+            <LinearLayout
+                android:id="@+id/layoutDots"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_below="@+id/viewpager"></LinearLayout>
+            <RelativeLayout
+                android:id="@+id/rr2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/layoutDots">
+
+                <ImageView
+                    android:id="@+id/ivServiceIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_list"
+                    android:background="@color/app_background_grey"/>
+
+                <TextView
+                    android:id="@+id/tvServiceName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/ivServiceIcon"
+                    android:background="@color/primary"
+                    android:padding="10dp"
+                    android:text="TOPICS COVERED"
+                    android:textColor="@color/text_color_white"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvImpaction"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvServiceName"
+                    android:layout_toRightOf="@+id/ivServiceIcon"
+                    android:gravity="left"
+                    android:paddingTop="5dp"
+                    android:text="Impaction"
+                    android:textColor="@color/text_color_black"
+                    android:textSize="15sp"
+                    android:layout_marginTop="10dp"/>
+
+                <TextView
+                    android:id="@+id/tvImpantology"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvImpaction"
+                    android:layout_toRightOf="@+id/ivServiceIcon"
+                    android:gravity="left"
+                    android:paddingTop="5dp"
+                    android:text="Implantology"
+                    android:textColor="@color/text_color_black"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/tvSurgery"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvImpantology"
+                    android:layout_toRightOf="@+id/ivServiceIcon"
+                    android:gravity="left"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="Tmj Surgery"
+                    android:textColor="@color/text_color_black"
+                    android:textSize="15sp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rr3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/rr2"
+                android:layout_marginTop="10dp">
+
+                <ImageView
+                    android:id="@+id/ivSchedule"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_time"
+                    android:background="@color/app_background_grey"/>
+
+                <TextView
+                    android:id="@+id/tvSchedule"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/ivSchedule"
+                    android:layout_toRightOf="@+id/ivSchedule"
+                    android:background="@color/primary"
+                    android:gravity="left"
+                    android:padding="10dp"
+                    android:text="SCHEDULE"
+                    android:textColor="@color/text_color_white"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvSchedule"
+                    android:layout_toRightOf="@+id/ivSchedule"
+                    android:paddingTop="5dp"
+                    android:text="Date : 27th May"
+                    android:textColor="@color/text_color_black"
+                    android:textSize="15sp"
+                    android:layout_marginTop="10dp"/>
+
+                <TextView
+                    android:id="@+id/tvTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvDate"
+                    android:layout_toRightOf="@+id/ivSchedule"
+                    android:gravity="left"
+                    android:paddingTop="5dp"
+                    android:text="Time : 12 Noon"
+                    android:textColor="@color/text_color_black"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/tvDuration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvTime"
+                    android:layout_toRightOf="@+id/ivSchedule"
+                    android:gravity="left"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="Duration : 3 hours"
+                    android:textColor="@color/text_color_black"
+                    android:textSize="15sp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rr4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/rr3"
+                android:layout_marginTop="10dp">
+
+
+                <ImageView
+                    android:id="@+id/ivFees"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_fee"
+                    android:background="@color/app_background_grey"/>
+
+                <TextView
+                    android:id="@+id/tvFees"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/ivFees"
+                    android:layout_toRightOf="@+id/ivFees"
+                    android:background="@color/primary"
+                    android:gravity="left"
+                    android:padding="10dp"
+                    android:text="FEES"
+                    android:textColor="@color/text_color_white"
+
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvSeminar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvFees"
+                    android:layout_toRightOf="@+id/ivFees"
+                    android:gravity="left"
+                    android:paddingTop="5dp"
+                    android:text="The Seminar costs Rs 10,000."
+                    android:textColor="@color/text_color_black"
+                    android:textSize="15sp"
+                    android:layout_marginTop="10dp"/>
+            </RelativeLayout>
+
+        </RelativeLayout>
+    </RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

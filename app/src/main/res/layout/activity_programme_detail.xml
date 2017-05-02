@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
+    android:id="@+id/clMain"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/clMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:background="@color/text_color_white">
+    android:background="@color/app_background"
+>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -21,9 +22,10 @@
             android:theme="@style/AppTheme.AppBarOverlay"
             android:visibility="visible">
 
-            <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+            <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar1"
                 style="@style/Widget.MyApp.ActionBar"
+                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:animateLayoutChanges="true"
@@ -41,225 +43,266 @@
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
+                        android:paddingBottom="@dimen/activity_margin_small"
+                        android:paddingTop="@dimen/activity_margin_small"
                         android:src="@drawable/ic_back"
-                        android:visibility="visible" />
+                        android:visibility="visible"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
-                        android:gravity="center"
-                        android:text="ORAL SURGERY WORKSHOP"
+                        android:layout_marginLeft="@dimen/activity_margin"
+                        android:layout_marginRight="@dimen/activity_margin"
+                        android:layout_toEndOf="@+id/ivBack"
+                        android:layout_toLeftOf="@+id/ivFavourite"
+                        android:layout_toRightOf="@+id/ivBack"
+                        android:layout_toStartOf="@+id/ivFavourite"
+                        android:gravity="left"
+                        android:text="@string/activity_programme_detail_title"
                         android:textColor="@color/text_color_white"
                         android:textSize="@dimen/text_size_large"
-                        android:textStyle="bold" />
-
+                        android:textStyle="bold"/>
+                    <ImageView
+                        android:id="@+id/ivFavourite"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_star_border"
+                        android:visibility="visible"/>
 
                 </RelativeLayout>
             </android.support.v7.widget.Toolbar>
 
         </android.support.design.widget.AppBarLayout>
 
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/appBar"
             android:orientation="vertical">
-
-
-            <com.actiknow.famdent.utils.WrappingViewPager
+            <android.support.v4.view.ViewPager
                 android:id="@+id/viewpager"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="120dp"
                 android:visibility="visible"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-
-
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
             <LinearLayout
                 android:id="@+id/layoutDots"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/viewpager"
+                android:layout_marginBottom="@dimen/activity_margin_small"
+                android:layout_marginTop="@dimen/activity_margin_small"
                 android:gravity="center"
-                android:orientation="horizontal"
-                android:layout_below="@+id/viewpager"></LinearLayout>
+                android:orientation="horizontal"/>
             <RelativeLayout
-                android:id="@+id/rr2"
+                android:id="@+id/rl1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_below="@+id/layoutDots">
 
                 <ImageView
                     android:id="@+id/ivServiceIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_list"
-                    android:background="@color/app_background_grey"/>
-
+                    android:background="@color/text_color_grey_light2"
+                    android:padding="@dimen/activity_margin_small"
+                    android:src="@drawable/ic_list"/>
                 <TextView
                     android:id="@+id/tvServiceName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/ivServiceIcon"
+                    android:layout_alignTop="@+id/ivServiceIcon"
+                    android:layout_toEndOf="@+id/ivServiceIcon"
                     android:layout_toRightOf="@+id/ivServiceIcon"
                     android:background="@color/primary"
-                    android:padding="10dp"
+                    android:gravity="center_vertical"
+                    android:paddingEnd="@dimen/activity_margin_small"
+                    android:paddingLeft="@dimen/activity_margin_small"
+                    android:paddingRight="@dimen/activity_margin_small"
+                    android:paddingStart="@dimen/activity_margin_small"
                     android:text="TOPICS COVERED"
                     android:textColor="@color/text_color_white"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
+                    android:textSize="@dimen/text_size_large"
+                    android:textStyle="bold"/>
 
-                <TextView
-                    android:id="@+id/tvImpaction"
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:id="@+id/llTopics"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/tvServiceName"
+                    android:layout_marginTop="@dimen/activity_margin_small"
+                    android:layout_toEndOf="@+id/ivServiceIcon"
                     android:layout_toRightOf="@+id/ivServiceIcon"
-                    android:gravity="left"
-                    android:paddingTop="5dp"
-                    android:text="Impaction"
-                    android:textColor="@color/text_color_black"
-                    android:textSize="15sp"
-                    android:layout_marginTop="10dp"/>
+                    android:orientation="vertical">
+                </LinearLayout>
+                <!--
+                                <TextView
+                                    android:id="@+id/tvImpaction"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/tvServiceName"
+                                    android:layout_marginTop="@dimen/activity_margin_small"
+                                    android:layout_toEndOf="@+id/ivServiceIcon"
+                                    android:layout_toRightOf="@+id/ivServiceIcon"
+                                    android:gravity="start"
+                                    android:text="Impaction"
+                                    android:textColor="@color/text_color_black"
+                                    android:textSize="15sp"/>
 
-                <TextView
-                    android:id="@+id/tvImpantology"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/tvImpaction"
-                    android:layout_toRightOf="@+id/ivServiceIcon"
-                    android:gravity="left"
-                    android:paddingTop="5dp"
-                    android:text="Implantology"
-                    android:textColor="@color/text_color_black"
-                    android:textSize="15sp" />
+                                <TextView
+                                    android:id="@+id/tvImpantology"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/tvImpaction"
+                                    android:layout_toRightOf="@+id/ivServiceIcon"
+                                    android:gravity="left"
+                                    android:paddingTop="5dp"
+                                    android:text="Implantology"
+                                    android:textColor="@color/text_color_black"
+                                    android:textSize="15sp"/>
 
-                <TextView
-                    android:id="@+id/tvSurgery"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/tvImpantology"
-                    android:layout_toRightOf="@+id/ivServiceIcon"
-                    android:gravity="left"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
-                    android:text="Tmj Surgery"
-                    android:textColor="@color/text_color_black"
-                    android:textSize="15sp" />
+                                <TextView
+                                    android:id="@+id/tvSurgery"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/tvImpantology"
+                                    android:layout_toRightOf="@+id/ivServiceIcon"
+                                    android:gravity="left"
+                                    android:paddingBottom="5dp"
+                                    android:paddingTop="5dp"
+                                    android:text="Tmj Surgery"
+                                    android:textColor="@color/text_color_black"
+                                    android:textSize="15sp"/>
+
+                                -->
             </RelativeLayout>
-
             <RelativeLayout
-                android:id="@+id/rr3"
+                android:id="@+id/rl2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/rr2"
-                android:layout_marginTop="10dp">
+                android:layout_below="@+id/rl1"
+                android:layout_marginTop="@dimen/activity_margin_small">
 
                 <ImageView
                     android:id="@+id/ivSchedule"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_time"
-                    android:background="@color/app_background_grey"/>
+                    android:background="@color/text_color_grey_light2"
+                    android:padding="@dimen/activity_margin_small"
+                    android:src="@drawable/ic_time"/>
 
                 <TextView
                     android:id="@+id/tvSchedule"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/ivSchedule"
+                    android:layout_alignTop="@+id/ivSchedule"
                     android:layout_toEndOf="@+id/ivSchedule"
                     android:layout_toRightOf="@+id/ivSchedule"
                     android:background="@color/primary"
-                    android:gravity="left"
-                    android:padding="10dp"
+                    android:gravity="center_vertical"
+                    android:paddingEnd="@dimen/activity_margin_small"
+                    android:paddingLeft="@dimen/activity_margin_small"
+                    android:paddingRight="@dimen/activity_margin_small"
+                    android:paddingStart="@dimen/activity_margin_small"
                     android:text="SCHEDULE"
                     android:textColor="@color/text_color_white"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
+                    android:textSize="@dimen/text_size_large"
+                    android:textStyle="bold"/>
 
                 <TextView
                     android:id="@+id/tvDate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/tvSchedule"
+                    android:layout_marginTop="@dimen/activity_margin_small"
+                    android:layout_toEndOf="@+id/ivSchedule"
                     android:layout_toRightOf="@+id/ivSchedule"
-                    android:paddingTop="5dp"
                     android:text="Date : 27th May"
                     android:textColor="@color/text_color_black"
-                    android:textSize="15sp"
-                    android:layout_marginTop="10dp"/>
+                    android:textSize="@dimen/text_size_medium"/>
 
                 <TextView
                     android:id="@+id/tvTime"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/tvDate"
+                    android:layout_marginTop="@dimen/activity_margin_extra_small"
+                    android:layout_toEndOf="@+id/ivSchedule"
                     android:layout_toRightOf="@+id/ivSchedule"
-                    android:gravity="left"
-                    android:paddingTop="5dp"
+                    android:gravity="start"
                     android:text="Time : 12 Noon"
                     android:textColor="@color/text_color_black"
-                    android:textSize="15sp" />
+                    android:textSize="@dimen/text_size_medium"/>
 
                 <TextView
                     android:id="@+id/tvDuration"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/tvTime"
+                    android:layout_marginTop="@dimen/activity_margin_extra_small"
+                    android:layout_toEndOf="@+id/ivSchedule"
                     android:layout_toRightOf="@+id/ivSchedule"
-                    android:gravity="left"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
+                    android:gravity="start"
                     android:text="Duration : 3 hours"
                     android:textColor="@color/text_color_black"
-                    android:textSize="15sp" />
+                    android:textSize="@dimen/text_size_medium"/>
             </RelativeLayout>
-
             <RelativeLayout
-                android:id="@+id/rr4"
+                android:id="@+id/rl3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/rr3"
-                android:layout_marginTop="10dp">
-
-
+                android:layout_below="@+id/rl2"
+                android:layout_marginTop="@dimen/activity_margin_small">
                 <ImageView
                     android:id="@+id/ivFees"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_fee"
-                    android:background="@color/app_background_grey"/>
+                    android:background="@color/text_color_grey_light2"
+                    android:padding="@dimen/activity_margin_small"
+                    android:src="@drawable/ic_fee"/>
 
                 <TextView
                     android:id="@+id/tvFees"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/ivFees"
+                    android:layout_alignTop="@+id/ivFees"
                     android:layout_toEndOf="@+id/ivFees"
                     android:layout_toRightOf="@+id/ivFees"
                     android:background="@color/primary"
-                    android:gravity="left"
-                    android:padding="10dp"
+                    android:gravity="center_vertical"
+                    android:paddingEnd="@dimen/activity_margin_small"
+                    android:paddingLeft="@dimen/activity_margin_small"
+                    android:paddingRight="@dimen/activity_margin_small"
+                    android:paddingStart="@dimen/activity_margin_small"
                     android:text="FEES"
                     android:textColor="@color/text_color_white"
+                    android:textSize="@dimen/text_size_large"
+                    android:textStyle="bold"/>
 
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tvSeminar"
+                    android:id="@+id/tvCost"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/tvFees"
+                    android:layout_marginTop="@dimen/activity_margin_small"
+                    android:layout_toEndOf="@+id/ivFees"
                     android:layout_toRightOf="@+id/ivFees"
-                    android:gravity="left"
-                    android:paddingTop="5dp"
+                    android:gravity="start"
                     android:text="The Seminar costs Rs 10,000."
                     android:textColor="@color/text_color_black"
-                    android:textSize="15sp"
-                    android:layout_marginTop="10dp"/>
+                    android:textSize="@dimen/text_size_medium"/>
             </RelativeLayout>
-
         </RelativeLayout>
     </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

@@ -33,17 +33,20 @@ import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.actiknow.famdent.R;
+import com.actiknow.famdent.adapter.SpinnerAdapter;
 import com.actiknow.famdent.receiver.SmsListener;
 import com.actiknow.famdent.receiver.SmsReceiver;
 import com.actiknow.famdent.utils.AppConfigTags;
 import com.actiknow.famdent.utils.Constants;
 import com.actiknow.famdent.utils.SetTypeFace;
 import com.actiknow.famdent.utils.TypefaceSpan;
-import com.actiknow.famdent.utils.UserDetailsPref;
 import com.actiknow.famdent.utils.Utils;
+import com.actiknow.famdent.utils.VisitorDetailsPref;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
@@ -59,9 +62,11 @@ public class LoginActivity extends AppCompatActivity {
     TextView tvSubmit;
     CoordinatorLayout clMain;
     ProgressDialog progressDialog;
-    UserDetailsPref userDetailsPref;
-
-    String name, email, mobile, login_key, firebase_id;
+    VisitorDetailsPref visitorDetailsPref;
+    ImageView ivIndiaSupplyLogo;
+    Spinner spType;
+    String visitor_id, name, email, mobile, login_key, firebase_id;
+    private String[] user_type = new String[] {"I am a..", "Dentist", "Student", "Dealer"};
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -76,8 +81,18 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void initData () {
-        userDetailsPref = UserDetailsPref.getInstance ();
+        visitorDetailsPref = VisitorDetailsPref.getInstance ();
         progressDialog = new ProgressDialog (LoginActivity.this);
+
+
+        SpinnerAdapter spinnerAdapter = new SpinnerAdapter (this, android.R.layout.simple_list_item_1, user_type);
+        spType.setAdapter (spinnerAdapter);
+
+//        spType.setSelection (user_type.length);
+
+//        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String> (this, android.R.layout.simple_spinner_item, category); //selected item will look like a spinner set from XML
+//        spinnerArrayAdapter.setDropDownViewResource (android.R.layout.simple_spinner_dropdown_item);
+//        spType.setAdapter (spinnerArrayAdapter);
     }
 
     private void initView () {
@@ -85,7 +100,9 @@ public class LoginActivity extends AppCompatActivity {
         etName = (EditText) findViewById (R.id.etName);
         etEmail = (EditText) findViewById (R.id.etEmail);
         etMobile = (EditText) findViewById (R.id.etMobile);
+        spType = (Spinner) findViewById (R.id.spType);
         tvSubmit = (TextView) findViewById (R.id.tvSubmit);
+        ivIndiaSupplyLogo = (ImageView) findViewById (R.id.ivIndiaSupplyLogo);
         Utils.setTypefaceToAllViews (this, tvSubmit);
     }
 
@@ -117,6 +134,7 @@ public class LoginActivity extends AppCompatActivity {
                     name = etName.getText ().toString ();
                     email = etEmail.getText ().toString ();
                     mobile = etMobile.getText ().toString ();
+                    visitor_id = "FD123456";
                     login_key = "asdasdasd";
                     firebase_id = "zxczxczxczxc";
 //                    sendSignUpDetailsToServer (etName.getText ().toString ().trim (), etEmail.getText ().toString ().trim (), etMobile.getText ().toString ().trim ());
@@ -172,19 +190,29 @@ public class LoginActivity extends AppCompatActivity {
             public void afterTextChanged (Editable s) {
             }
         });
+
+        ivIndiaSupplyLogo.setOnClickListener (new View.OnClickListener () {
+            @Override
+            public void onClick (View v) {
+                Uri uri = Uri.parse ("http://indiasupply.com");
+                Intent intent = new Intent (Intent.ACTION_VIEW, uri);
+                startActivity (intent);
+
+            }
+        });
     }
 
     private void displayFirebaseRegId () {
-        String firebase_id = userDetailsPref.getStringPref (this, UserDetailsPref.USER_FIREBASE_ID);
+        String firebase_id = visitorDetailsPref.getStringPref (this, VisitorDetailsPref.VISITOR_FIREBASE_ID);
         Utils.showLog (Log.DEBUG, "Firebase Reg ID:", firebase_id, true);
     }
 
     private void showAutoFillDialog () {
         MaterialDialog dialog = new MaterialDialog.Builder (this)
                 .content (R.string.dialog_text_auto_fill)
-                .positiveColor (getResources ().getColor (R.color.app_text_color))
-                .contentColor (getResources ().getColor (R.color.app_text_color))
-                .negativeColor (getResources ().getColor (R.color.app_text_color))
+                .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
                 .typeface (SetTypeFace.getTypeface (this), SetTypeFace.getTypeface (this))
                 .canceledOnTouchOutside (false)
                 .cancelable (false)
@@ -225,9 +253,9 @@ public class LoginActivity extends AppCompatActivity {
     private void sendSignUpDetailsToServer (final String name, final String email, final String mobile) {
         final MaterialDialog.Builder mBuilder = new MaterialDialog.Builder (LoginActivity.this)
                 .content (R.string.dialog_text_enter_otp)
-                .contentColor (getResources ().getColor (R.color.app_text_color))
-                .positiveColor (getResources ().getColor (R.color.app_text_color))
-                .neutralColor (getResources ().getColor (R.color.app_text_color))
+                .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                .neutralColor (getResources ().getColor (R.color.app_text_color_dark))
                 .typeface (SetTypeFace.getTypeface (LoginActivity.this), SetTypeFace.getTypeface (LoginActivity.this))
                 .inputType (InputType.TYPE_CLASS_NUMBER)
                 .positiveText (R.string.dialog_action_submit)
@@ -245,12 +273,13 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                 if (dialog.getInputEditText ().getText ().length () > 0) {
                     if (Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == 123456) {
-                        UserDetailsPref userDetailsPref = UserDetailsPref.getInstance ();
-                        userDetailsPref.putStringPref (LoginActivity.this, UserDetailsPref.USER_NAME, name);
-                        userDetailsPref.putStringPref (LoginActivity.this, UserDetailsPref.USER_EMAIL, email);
-                        userDetailsPref.putStringPref (LoginActivity.this, UserDetailsPref.USER_MOBILE, mobile);
-                        userDetailsPref.putStringPref (LoginActivity.this, UserDetailsPref.USER_LOGIN_KEY, "lasdasdasdasd");
-                        userDetailsPref.putStringPref (LoginActivity.this, UserDetailsPref.USER_FIREBASE_ID, "asdasdasdasd");
+                        VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
+                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_ID, visitor_id);
+                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_NAME, name);
+                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_EMAIL, email);
+                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_MOBILE, mobile);
+                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY, login_key);
+                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_FIREBASE_ID, firebase_id);
 
                         Intent intent = new Intent (LoginActivity.this, MainActivity.class);
                         intent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -349,12 +378,12 @@ public class LoginActivity extends AppCompatActivity {
                                     boolean error = jsonObj.getBoolean (AppConfigTags.ERROR);
                                     String message = jsonObj.getString (AppConfigTags.MESSAGE);
                                     if(!error){
-                                        UserDetailsPref userDetailsPref = UserDetailsPref.getInstance ();
-                                        userDetailsPref.putStringPref (LoginActivity.this, UserDetailsPref.USER_NAME, jsonObj.getString (AppConfigTags.USER_NAME));
-                                        userDetailsPref.putStringPref (LoginActivity.this, UserDetailsPref.USER_EMAIL, jsonObj.getString (AppConfigTags.USER_EMAIL));
-                                        userDetailsPref.putStringPref (LoginActivity.this, UserDetailsPref.USER_MOBILE, jsonObj.getString (AppConfigTags.USER_MOBILE));
-                                        userDetailsPref.putStringPref (LoginActivity.this, UserDetailsPref.USER_LOGIN_KEY, jsonObj.getString (AppConfigTags.USER_LOGIN_KEY));
-                                        userDetailsPref.putStringPref (LoginActivity.this, UserDetailsPref.USER_FIREBASE_ID, jsonObj.getString (AppConfigTags.USER_FIREBASE_ID));
+                                        VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
+                                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_NAME, jsonObj.getString (AppConfigTags.VISITOR_NAME));
+                                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_EMAIL, jsonObj.getString (AppConfigTags.VISITOR_EMAIL));
+                                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_MOBILE, jsonObj.getString (AppConfigTags.VISITOR_MOBILE));
+                                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY, jsonObj.getString (AppConfigTags.VISITOR_LOGIN_KEY));
+                                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_FIREBASE_ID, jsonObj.getString (AppConfigTags.VISITOR_FIREBASE_ID));
 
                                         Intent intent = new Intent (LoginActivity.this, MainActivity.class);
                                         intent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -415,7 +444,6 @@ public class LoginActivity extends AppCompatActivity {
         }
         */
     }
-
 
     public void checkPermissions () {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -517,12 +545,13 @@ public class LoginActivity extends AppCompatActivity {
             } else if (dialogAction == DialogAction.POSITIVE) {
                 if (Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == 123456) {
                     dialog.dismiss ();
-                    UserDetailsPref userDetailsPref = UserDetailsPref.getInstance ();
-                    userDetailsPref.putStringPref (activity, UserDetailsPref.USER_NAME, name);
-                    userDetailsPref.putStringPref (activity, UserDetailsPref.USER_EMAIL, email);
-                    userDetailsPref.putStringPref (activity, UserDetailsPref.USER_MOBILE, mobile);
-                    userDetailsPref.putStringPref (activity, UserDetailsPref.USER_LOGIN_KEY, login_key);
-                    userDetailsPref.putStringPref (activity, UserDetailsPref.USER_FIREBASE_ID, firebase_id);
+                    VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
+                    visitorDetailsPref.putStringPref (activity, VisitorDetailsPref.VISITOR_ID, visitor_id);
+                    visitorDetailsPref.putStringPref (activity, VisitorDetailsPref.VISITOR_NAME, name);
+                    visitorDetailsPref.putStringPref (activity, VisitorDetailsPref.VISITOR_EMAIL, email);
+                    visitorDetailsPref.putStringPref (activity, VisitorDetailsPref.VISITOR_MOBILE, mobile);
+                    visitorDetailsPref.putStringPref (activity, VisitorDetailsPref.VISITOR_LOGIN_KEY, login_key);
+                    visitorDetailsPref.putStringPref (activity, VisitorDetailsPref.VISITOR_FIREBASE_ID, firebase_id);
                     Intent intent = new Intent (activity, MainActivity.class);
                     intent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     activity.startActivity (intent);

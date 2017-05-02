@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:background="@color/text_color_white">
+    android:background="@color/app_background"
+>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -28,22 +29,34 @@
                 android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"
                 android:visibility="gone"/>
         </android.support.design.widget.AppBarLayout>
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/appBar"
             android:layout_centerInParent="true"
-            android:animateLayoutChanges="true"
-            android:background="@color/app_background_grey">
-
+            android:animateLayoutChanges="true">
             <ImageView
                 android:id="@+id/ivLogo"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/logo_height"
                 android:layout_margin="@dimen/activity_margin"
                 android:src="@drawable/famdent_logo"/>
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_margin="@dimen/activity_margin"
+                android:background="@drawable/button_bg"
+                android:padding="@dimen/activity_margin_small"
+                android:visibility="gone">
+                <ImageView
+                    android:id="@+id/ivVisitorCard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_visitor_card"/>
 
+            </RelativeLayout>
             <View
                 android:id="@+id/view"
                 android:layout_width="match_parent"
@@ -51,7 +64,6 @@
                 android:layout_below="@+id/ivLogo"
                 android:background="@color/divider_color">
             </View>
-
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rvHomeServiceList"
                 android:layout_width="fill_parent"
@@ -63,5 +75,35 @@
                 android:scrollbarStyle="insideOverlay"/>
 
         </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rlFooter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true">
+
+            <ImageView
+                android:id="@+id/ivIndiaSupplyLogo"
+                android:layout_width="@dimen/indiasupply_logo_width"
+                android:layout_height="@dimen/indiasupply_logo_height"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/indiasupply_logo"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/ivIndiaSupplyLogo"
+                android:layout_marginBottom="@dimen/activity_margin_small"
+                android:layout_toLeftOf="@+id/ivIndiaSupplyLogo"
+                android:layout_toStartOf="@+id/ivIndiaSupplyLogo"
+                android:text="@string/activity_main_text_powered_by"
+                android:textColor="@color/app_text_color_dark"
+                android:textSize="@dimen/text_size_small"
+                android:textStyle="italic"
+            />
+        </RelativeLayout>
+
     </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

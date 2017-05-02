@@ -4,8 +4,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true">
-
+    android:animateLayoutChanges="true"
+    android:background="@color/app_background">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -24,50 +27,66 @@
             android:id="@+id/etName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_margin_small"
             android:layout_marginLeft="@dimen/activity_margin"
             android:layout_marginRight="@dimen/activity_margin"
             android:layout_marginTop="@dimen/activity_margin_small"
-            android:layout_marginBottom="@dimen/activity_margin_small"
             android:background="@drawable/edit_text_background"
             android:hint="@string/activity_login_hint_full_name"
-            android:padding="@dimen/edittext_padding"/>
+            android:padding="@dimen/edittext_padding"
+            android:textSize="@dimen/text_size_large"/>
 
         <EditText
             android:id="@+id/etEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_margin_small"
             android:layout_marginLeft="@dimen/activity_margin"
             android:layout_marginRight="@dimen/activity_margin"
             android:layout_marginTop="@dimen/activity_margin_small"
-            android:layout_marginBottom="@dimen/activity_margin_small"
             android:background="@drawable/edit_text_background"
             android:hint="@string/activity_login_hint_email"
             android:inputType="textEmailAddress"
-            android:padding="@dimen/edittext_padding"/>
+            android:padding="@dimen/edittext_padding"
+            android:textSize="@dimen/text_size_large"/>
 
         <EditText
             android:id="@+id/etMobile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_margin_small"
             android:layout_marginLeft="@dimen/activity_margin"
             android:layout_marginRight="@dimen/activity_margin"
             android:layout_marginTop="@dimen/activity_margin_small"
-            android:layout_marginBottom="@dimen/activity_margin_small"
-            android:maxLength="10"
             android:background="@drawable/edit_text_background"
             android:hint="@string/activity_login_hint_mobile"
             android:inputType="number"
-            android:padding="@dimen/edittext_padding"/>
+            android:maxLength="10"
+            android:padding="@dimen/edittext_padding"
+            android:textSize="@dimen/text_size_large"/>
+
+        <Spinner
+            android:id="@+id/spType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_margin_small"
+            android:layout_marginLeft="@dimen/activity_margin"
+            android:layout_marginRight="@dimen/activity_margin"
+            android:layout_marginTop="@dimen/activity_margin_small"
+            android:background="@drawable/edit_text_background"
+            android:hint="Type"
+            android:padding="@dimen/edittext_padding"
+            android:spinnerMode="dialog"/>
 
 
         <TextView
             android:id="@+id/tvSubmit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_margin_small"
             android:layout_marginLeft="@dimen/activity_margin"
             android:layout_marginRight="@dimen/activity_margin"
             android:layout_marginTop="@dimen/activity_margin_small"
-            android:layout_marginBottom="@dimen/activity_margin_small"
             android:background="@drawable/button_bg"
             android:elevation="@dimen/button_elevation"
             android:gravity="center"
@@ -76,5 +95,36 @@
             android:textColor="@color/text_color_white"
             android:textSize="@dimen/text_size_extra_large"/>
 
+
     </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/rlFooter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true">
+            <ImageView
+                android:id="@+id/ivIndiaSupplyLogo"
+                android:layout_width="@dimen/indiasupply_logo_width"
+                android:layout_height="@dimen/indiasupply_logo_height"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/indiasupply_logo"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/ivIndiaSupplyLogo"
+                android:layout_marginBottom="@dimen/activity_margin_small"
+                android:layout_toLeftOf="@+id/ivIndiaSupplyLogo"
+                android:layout_toStartOf="@+id/ivIndiaSupplyLogo"
+                android:text="@string/activity_main_text_powered_by"
+                android:textColor="@color/app_text_color_dark"
+                android:textSize="@dimen/text_size_small"
+                android:textStyle="italic"/>
+        </RelativeLayout>
+    </RelativeLayout>
+
+
 </android.support.design.widget.CoordinatorLayout>

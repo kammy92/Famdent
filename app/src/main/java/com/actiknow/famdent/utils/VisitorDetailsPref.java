@@ -4,20 +4,21 @@ package com.actiknow.famdent.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public class UserDetailsPref {
-    public static String USER_NAME = "user_name";
-    public static String USER_EMAIL = "user_email";
-    public static String USER_MOBILE = "user_mobile";
-    public static String USER_LOGIN_KEY = "user_login_key";
-    public static String USER_FIREBASE_ID = "user_firebase_id";
+public class VisitorDetailsPref {
+    public static String VISITOR_ID = "visitor_id";
+    public static String VISITOR_NAME = "visitor_name";
+    public static String VISITOR_EMAIL = "visitor_email";
+    public static String VISITOR_MOBILE = "visitor_mobile";
+    public static String VISITOR_LOGIN_KEY = "visitor_login_key";
+    public static String VISITOR_FIREBASE_ID = "visitor_firebase_id";
     public static String LOGGED_IN_SESSION = "logged_in_session";
-    private static UserDetailsPref userDetailsPref;
+    private static VisitorDetailsPref visitorDetailsPref;
     private String USER_DETAILS = "USER_DETAILS";
 
-    public static UserDetailsPref getInstance () {
-        if (userDetailsPref == null)
-            userDetailsPref = new UserDetailsPref ();
-        return userDetailsPref;
+    public static VisitorDetailsPref getInstance () {
+        if (visitorDetailsPref == null)
+            visitorDetailsPref = new VisitorDetailsPref ();
+        return visitorDetailsPref;
     }
 
     private SharedPreferences getPref (Context context) {

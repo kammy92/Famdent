@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/visitor_card_dialog_bg"
+                android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/ivCardLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/logo_height"
+        android:layout_margin="@dimen/activity_margin"
+        android:src="@drawable/famdent_logo"/>
+
+    <TextView
+        android:id="@+id/tvVisitorName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivCardLogo"
+        android:layout_marginTop="@dimen/activity_margin"
+        android:gravity="center_horizontal"
+        android:text="RAHUL JAIN"
+        android:textColor="@color/app_text_color_dark"
+        android:textSize="@dimen/text_size_large"
+        android:textStyle="bold"/>
+
+
+    <TextView
+        android:id="@+id/tvVisitorNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvVisitorName"
+        android:layout_marginTop="@dimen/activity_margin_small"
+        android:gravity="center_horizontal"
+        android:text="+91-8527875036"
+        android:textColor="@color/app_text_color_dark"
+        android:textSize="@dimen/text_size_medium"
+        android:textStyle="bold"/>
+
+
+    <TextView
+        android:id="@+id/tvVisitorEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvVisitorNumber"
+        android:layout_marginTop="@dimen/activity_margin_small"
+        android:gravity="center_horizontal"
+        android:text="Rahuljain_35@yahoo.com"
+        android:textColor="@color/app_text_color_dark"
+        android:textSize="@dimen/text_size_medium"
+        android:textStyle="bold"/>
+
+
+    <ImageView
+        android:id="@+id/ivQRCode"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/qr_code_height"
+        android:layout_below="@+id/tvVisitorEmail"
+        android:layout_marginTop="@dimen/activity_margin_small"
+        android:src="@mipmap/ic_launcher"/>
+
+    <TextView
+        android:id="@+id/tvVisitorID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivQRCode"
+        android:gravity="center_horizontal"
+        android:text="FD123456"
+        android:textColor="@color/app_text_color_dark"
+        android:textSize="@dimen/text_size_medium"
+        android:textStyle="bold"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvVisitorID"
+        android:layout_marginTop="@dimen/activity_margin_small"
+        android:background="@drawable/visitor_card_footer_bg"
+        android:gravity="center_horizontal"
+        android:padding="@dimen/activity_margin_small"
+        android:text="TRADE VISITOR"
+        android:textColor="@color/text_color_white"
+        android:textSize="@dimen/text_size_extra_large"
+        android:textStyle="bold"/>
+
+
+</RelativeLayout>

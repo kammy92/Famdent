@@ -5,7 +5,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.actiknow.famdent.utils.Constants;
-import com.actiknow.famdent.utils.UserDetailsPref;
+import com.actiknow.famdent.utils.VisitorDetailsPref;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 
@@ -32,8 +32,8 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
     }
 
     private void storeRegIdInPref (String token) {
-        UserDetailsPref userDetailsPref = UserDetailsPref.getInstance ();
-        userDetailsPref.putStringPref (getApplicationContext (), UserDetailsPref.USER_FIREBASE_ID, token);
+        VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
+        visitorDetailsPref.putStringPref (getApplicationContext (), VisitorDetailsPref.VISITOR_FIREBASE_ID, token);
     }
 }
 

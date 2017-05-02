@@ -17,6 +17,7 @@
 
 
     <string name="activity_main_text_no_service_found">No Services Found</string>
+    <string name="activity_main_text_powered_by">powered by</string>
 
 
 
@@ -30,6 +31,8 @@
     <string name="activity_hall_plan_title">HALL PLAN</string>
 
     <string name="activity_my_favourites_title">MY FAVOURITES</string>
+
+    <string name="activity_programme_detail_title">PROGRAMME DETAIL</string>
 
     <string name="activity_exhibitor_detail_title">EXHIBITOR DETAIL</string>
 
@@ -103,6 +106,7 @@
     <string name="snackbar_action_dismiss">DISMISS</string>
     <string name="snackbar_action_retry">RETRY</string>
 
+    <string name="snackbar_action_undo">UNDO</string>
 
 
     <string name="dialog_text_new_version_available">New version of the application is available.

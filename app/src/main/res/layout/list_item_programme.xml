@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/app_background"
+>
 
     <ImageView
         android:id="@+id/ivProgrammeLogo"
@@ -14,12 +17,14 @@
 
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="@dimen/activity_margin_small"
         android:layout_marginLeft="@dimen/activity_margin"
         android:layout_marginStart="@dimen/activity_margin"
+        android:layout_marginTop="@dimen/activity_margin_small"
         android:layout_toEndOf="@id/ivProgrammeLogo"
         android:layout_toLeftOf="@+id/ivRight"
-        android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/ivProgrammeLogo"
         android:layout_toStartOf="@+id/ivRight"
         android:gravity="center_vertical">
@@ -29,18 +34,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="PROGRAM NAME"
-            android:textColor="@color/app_text_color"
+            android:textColor="@color/app_text_color_dark"
             android:textSize="@dimen/text_size_large"
             android:textStyle="bold"
+
         />
         <TextView
             android:id="@+id/tvDoctorName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvProgrammeName"
+            android:layout_marginTop="@dimen/activity_margin_extra_small"
+            android:drawableLeft="@drawable/ic_doctor_name"
+            android:drawablePadding="@dimen/activity_margin_extra_small"
+            android:drawableStart="@drawable/ic_doctor_name"
+            android:gravity="center_vertical"
             android:text="Doctor Name"
-            android:textColor="@color/app_text_color"
-            android:textSize="@dimen/text_size_small"/>
+            android:textColor="@color/app_text_color_light"
+            android:textSize="@dimen/text_size_small"
+        />
 
 
         <TextView
@@ -48,33 +60,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvDoctorName"
+            android:layout_marginTop="@dimen/activity_margin_extra_small"
+            android:drawableLeft="@drawable/ic_date"
+            android:drawablePadding="@dimen/activity_margin_extra_small"
+            android:drawableStart="@drawable/ic_date"
+            android:gravity="center_vertical"
             android:text="27/04/2017"
-            android:textColor="@color/app_text_color"
-            android:textSize="@dimen/text_size_small"/>
+            android:textColor="@color/app_text_color_light"
+            android:textSize="@dimen/text_size_small"
+        />
 
-
-        <View
-            android:id="@+id/view1"
-            android:layout_width="1dp"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/tvDate"
-            android:layout_alignTop="@id/tvDate"
-            android:layout_marginLeft="@dimen/activity_margin_small"
-            android:layout_marginRight="@dimen/activity_margin_small"
-            android:layout_toEndOf="@id/tvDate"
-            android:layout_toRightOf="@+id/tvDate"
-            android:background="@color/app_text_color"/>
 
         <TextView
             android:id="@+id/tvTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvDoctorName"
-            android:layout_toRightOf="@+id/view1"
-            android:layout_toEndOf="@+id/view1"
+            android:layout_marginLeft="@dimen/activity_margin_small"
+            android:layout_marginTop="@dimen/activity_margin_extra_small"
+            android:layout_toRightOf="@+id/tvDate"
+            android:drawableLeft="@drawable/ic_time"
+            android:drawablePadding="@dimen/activity_margin_extra_small"
+            android:drawableStart="@drawable/ic_time"
+            android:gravity="center_vertical"
             android:text="15:02"
-            android:textColor="@color/app_text_color"
-            android:textSize="@dimen/text_size_small"/>
+            android:textColor="@color/app_text_color_light"
+            android:textSize="@dimen/text_size_small"
+        />
 
 
     </RelativeLayout>

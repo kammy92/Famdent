@@ -40,13 +40,9 @@ public class MyFavouriteExhibitorFragment extends Fragment {
     }
 
     private void initData() {
-        exhibitorList.add(new Exhibitor (1,"","3M ESPE","Hall 1","Stall 28"));
-        exhibitorList.add(new Exhibitor(2,"","DENTSPLY SIRONA","Hall 1","Stall 31"));
-        exhibitorList.add(new Exhibitor(3, "","DUERR DENTEL INDIA","Hall 1","Stall 45"));
-        exhibitorList.add(new Exhibitor(4, "","UNICORN DENMART","Hall 1","Stall 29"));
-        exhibitorList.add(new Exhibitor(5, "","CAPRI","Hall 1","Stall 38"));
-        exhibitorList.add(new Exhibitor(6, "","ACETON INDIA","Hall 1","Stall 17"));
-        exhibitorList.add(new Exhibitor(7, "","SKANRAY TECHNOLOGY","Hall 1","Stall 32"));
+        exhibitorList.add (new Exhibitor (1, "http://seeklogo.com/images/1/3M-logo-079FB52BC8-seeklogo.com.png", "3M ESPE", "Hall 1", "Stall 28"));
+        exhibitorList.add (new Exhibitor (2, "http://mudrsoc.com/wp-content/uploads/2017/01/Dentsply-Logo-Black.jpg", "DENTSPLY SIRONA", "Hall 1", "Stall 31"));
+        exhibitorList.add (new Exhibitor (3, "http://www.cldental.com.au/mobile/images/equipment/compressors/durrlogo.jpg", "DUERR DENTEL INDIA", "Hall 1", "Stall 45"));
 
         exhibitorServiceAdapter = new ExhibitorAdapter (getActivity(), exhibitorList);
         rvExhibitorServices.setAdapter (exhibitorServiceAdapter);

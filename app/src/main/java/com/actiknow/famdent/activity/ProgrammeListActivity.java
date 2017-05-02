@@ -43,16 +43,14 @@ public class ProgrammeListActivity extends AppCompatActivity {
     }
 
     private void initData() {
-
-        programmeList.add (new Programme (1, "ORTHODONTICS WORKSHOP", "DR NIKITA JAIN", "27/04/2017", "15:22"));
-        programmeList.add (new Programme (2, "ESTHETIC IMPLANTS", "DR RAHUL JAIN", "27/05/2017", "15:22"));
-        programmeList.add (new Programme (3, "BASIC ENDODONTICS", "DR SUMIT", "27/05/2017", "15:22"));
-        programmeList.add (new Programme (4, "SMILE DESIGNING", "DR KARMAN SINGH", "27/05/2017", "15:22"));
-        programmeList.add (new Programme (1, "ORTHODONTICS WORKSHOP", "DR NIKITA JAIN", "27/04/2017", "15:22"));
-        programmeList.add (new Programme (2, "ESTHETIC IMPLANTS", "DR RAHUL JAIN", "27/05/2017", "15:22"));
-        programmeList.add (new Programme (3, "BASIC ENDODONTICS", "DR RAHUL JAIN", "27/05/2017", "15:22"));
-        programmeList.add (new Programme (4, "SMILE DESIGNING", "DR KARMAN SINGH", "27/05/2017", "15:22"));
-
+        programmeList.add (new Programme (1, "Orthodontics Workshop", "Dr Nikita Jain", "27/04/2017", "15:22"));
+        programmeList.add (new Programme (2, "Esthetic Implants", "Dr Rahul Jain", "27/05/2017", "15:22"));
+        programmeList.add (new Programme (3, "Basic Endodontics", "Dr Sumit", "27/05/2017", "15:22"));
+        programmeList.add (new Programme (4, "Smile Designing", "Dr Karman Singh", "27/05/2017", "15:22"));
+        programmeList.add (new Programme (5, "Orthodontics Workshop", "Dr Nikita Jain", "27/04/2017", "15:22"));
+        programmeList.add (new Programme (6, "Aesthetic Implants", "Dr Rahul Jain", "27/05/2017", "15:22"));
+        programmeList.add (new Programme (7, "Basic Endodontics", "Dr Rahul Jain", "27/05/2017", "15:22"));
+        programmeList.add (new Programme (8, "Smile Designing", "Dr Karman Singh", "27/05/2017", "15:22"));
 
         programmeAdapter = new ProgrammeAdapter (this, programmeList);
         rvProgrammesList.setAdapter (programmeAdapter);

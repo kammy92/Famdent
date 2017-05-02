@@ -1,5 +1,7 @@
 package com.actiknow.famdent.model;
 
+import java.util.ArrayList;
+
 /**
  * Created by l on 27/04/2017.
  */
@@ -7,17 +9,18 @@ package com.actiknow.famdent.model;
 public class ExhibitorDetail {
     int id;
     boolean favourite;
-    String exhibitor_logo, exhibitor_name,hall_number,stall_number, address, number, email, website, notes;
+    ArrayList<String> contactList = new ArrayList<> ();
+    String exhibitor_logo, exhibitor_name, hall_number, stall_number, address, email, website, notes;
 
-    public ExhibitorDetail (int id, boolean favourite, String exhibitor_logo, String exhibitor_name, String hall_number, String stall_number, String address, String number, String email, String website, String notes) {
+    public ExhibitorDetail (int id, boolean favourite, ArrayList<String> contactList, String exhibitor_logo, String exhibitor_name, String hall_number, String stall_number, String address, String email, String website, String notes) {
         this.id = id;
         this.favourite = favourite;
+        this.contactList = contactList;
         this.exhibitor_logo = exhibitor_logo;
         this.exhibitor_name = exhibitor_name;
         this.hall_number = hall_number;
         this.stall_number = stall_number;
         this.address = address;
-        this.number = number;
         this.email = email;
         this.website = website;
         this.notes = notes;
@@ -37,6 +40,14 @@ public class ExhibitorDetail {
 
     public void setFavourite (boolean favourite) {
         this.favourite = favourite;
+    }
+
+    public ArrayList<String> getContactList () {
+        return contactList;
+    }
+
+    public void setContactList (ArrayList<String> contactList) {
+        this.contactList = contactList;
     }
 
     public String getExhibitor_logo () {
@@ -79,14 +90,6 @@ public class ExhibitorDetail {
         this.address = address;
     }
 
-    public String getNumber () {
-        return number;
-    }
-
-    public void setNumber (String number) {
-        this.number = number;
-    }
-
     public String getEmail () {
         return email;
     }
@@ -109,5 +112,9 @@ public class ExhibitorDetail {
 
     public void setNotes (String notes) {
         this.notes = notes;
+    }
+
+    public void setContactInList (String contact) {
+        this.contactList.add (contact);
     }
 }

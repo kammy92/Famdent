@@ -3,24 +3,26 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-android:gravity="center_vertical">
+    android:background="@color/app_background"
+    android:gravity="center_vertical"
+>
 
 
     <ImageView
         android:id="@+id/ivExhibitorLogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/activity_margin"
         android:layout_centerVertical="true"
+        android:padding="@dimen/activity_margin"
         android:src="@drawable/ic_list"
         android:visibility="gone"/>
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:layout_centerVertical="true"
         android:layout_marginLeft="@dimen/activity_margin"
         android:layout_marginStart="@dimen/activity_margin"
-        android:layout_centerVertical="true"
         android:layout_toEndOf="@id/ivExhibitorLogo"
         android:layout_toLeftOf="@+id/ivRight"
         android:layout_toRightOf="@+id/ivExhibitorLogo"
@@ -32,7 +34,7 @@ android:gravity="center_vertical">
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="EXHIBITOR L"
-            android:textColor="@color/app_text_color"
+            android:textColor="@color/app_text_color_dark"
             android:textSize="@dimen/text_size_large"
             android:textStyle="bold"/>
 
@@ -42,7 +44,7 @@ android:gravity="center_vertical">
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvExhibitorName"
             android:text="Hall 1"
-            android:textColor="@color/app_text_color"
+            android:textColor="@color/app_text_color_light"
             android:textSize="@dimen/text_size_small"/>
 
         <View
@@ -55,7 +57,7 @@ android:gravity="center_vertical">
             android:layout_marginRight="@dimen/activity_margin_small"
             android:layout_toEndOf="@id/tvHallNumber"
             android:layout_toRightOf="@+id/tvHallNumber"
-            android:background="@color/app_text_color"/>
+            android:background="@color/app_text_color_light"/>
 
         <TextView
             android:id="@+id/tvStallNumber"
@@ -65,7 +67,7 @@ android:gravity="center_vertical">
             android:layout_toEndOf="@id/view1"
             android:layout_toRightOf="@+id/view1"
             android:text="Stall 10"
-            android:textColor="@color/app_text_color"
+            android:textColor="@color/app_text_color_light"
             android:textSize="@dimen/text_size_small"/>
     </RelativeLayout>
 
@@ -76,8 +78,8 @@ android:gravity="center_vertical">
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:padding="@dimen/activity_margin"
         android:layout_centerVertical="true"
+        android:padding="@dimen/activity_margin"
         android:src="@drawable/ic_right"
         android:visibility="visible"/>
 

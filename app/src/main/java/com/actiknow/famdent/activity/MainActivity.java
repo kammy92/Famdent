@@ -2,11 +2,16 @@ package com.actiknow.famdent.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,8 +25,13 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.actiknow.famdent.R;
 import com.actiknow.famdent.adapter.HomeServiceAdapter;
@@ -32,8 +42,10 @@ import com.actiknow.famdent.utils.Constants;
 import com.actiknow.famdent.utils.NetworkConnection;
 import com.actiknow.famdent.utils.SetTypeFace;
 import com.actiknow.famdent.utils.SimpleDividerItemDecoration;
-import com.actiknow.famdent.utils.UserDetailsPref;
 import com.actiknow.famdent.utils.Utils;
+import com.actiknow.famdent.utils.VisitorDetailsPref;
+import com.actiknow.famdent.utils.qr_code.QRContents;
+import com.actiknow.famdent.utils.qr_code.QREncoder;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.AuthFailureError;
@@ -43,7 +55,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.bugsnag.android.Bugsnag;
+import com.google.zxing.WriterException;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -55,9 +69,11 @@ import java.util.Map;
 import static com.actiknow.famdent.activity.LoginActivity.PERMISSION_REQUEST_CODE;
 
 public class MainActivity extends AppCompatActivity {
-    UserDetailsPref userDetailPref;
+    VisitorDetailsPref visitorDetailsPref;
     int version_code;
     CoordinatorLayout clMain;
+    ImageView ivVisitorCard;
+    ImageView ivIndiaSupplyLogo;
 
     ProgressDialog progressDialog;
     ProgressBar progressBar;
@@ -73,12 +89,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView (R.layout.activity_main);
         initView ();
         initData ();
-        checkPermissions ();
+//        checkPermissions ();
         initListener ();
         isLogin ();
 //        initApplication ();
 
-        if (! userDetailPref.getBooleanPref (this, UserDetailsPref.LOGGED_IN_SESSION)) {
+        if (! visitorDetailsPref.getBooleanPref (this, VisitorDetailsPref.LOGGED_IN_SESSION)) {
 //            checkVersionUpdate ();
         }
     }
@@ -86,12 +102,14 @@ public class MainActivity extends AppCompatActivity {
     private void initView () {
         clMain = (CoordinatorLayout) findViewById (R.id.clMain);
         rvHomeServiceList = (RecyclerView) findViewById (R.id.rvHomeServiceList);
+        ivVisitorCard = (ImageView) findViewById (R.id.ivVisitorCard);
+        ivIndiaSupplyLogo = (ImageView) findViewById (R.id.ivIndiaSupplyLogo);
 
     }
 
     private void initData () {
         Bugsnag.init (this);
-        userDetailPref = UserDetailsPref.getInstance ();
+        visitorDetailsPref = VisitorDetailsPref.getInstance ();
         progressDialog = new ProgressDialog (this);
         PackageInfo pInfo = null;
         try {
@@ -105,8 +123,8 @@ public class MainActivity extends AppCompatActivity {
         homeServices.add (new HomeService (1, R.drawable.ic_list, "", "EXHIBITOR LIST"));
         homeServices.add (new HomeService (2, R.drawable.ic_list, "", "PROGRAMME"));
         homeServices.add (new HomeService (3, R.drawable.ic_list, "", "HALL PLAN"));
-        homeServices.add (new HomeService (4, R.drawable.ic_list, "", "MY FAVOURITE"));
-        homeServices.add (new HomeService (5, R.drawable.ic_list, "", "MATCH MAKING"));
+        homeServices.add (new HomeService (4, R.drawable.ic_list, "", "MY FAVOURITES"));
+        homeServices.add (new HomeService (5, R.drawable.ic_list, "", "MY ENTRY PASS"));
         homeServices.add (new HomeService (6, R.drawable.ic_list, "", "INFORMATION"));
 
 
@@ -122,6 +140,73 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initListener () {
+        ivIndiaSupplyLogo.setOnClickListener (new View.OnClickListener () {
+            @Override
+            public void onClick (View v) {
+                Uri uri = Uri.parse ("http://indiasupply.com");
+                Intent intent = new Intent (Intent.ACTION_VIEW, uri);
+                startActivity (intent);
+
+            }
+        });
+        ivVisitorCard.setOnClickListener (new View.OnClickListener () {
+            @Override
+            public void onClick (View v) {
+                final Dialog dialog = new Dialog (MainActivity.this);
+                dialog.requestWindowFeature (Window.FEATURE_NO_TITLE);
+                dialog.getWindow ().setBackgroundDrawable (new ColorDrawable (Color.TRANSPARENT));
+                dialog.setContentView (R.layout.dialog_visitor_card);
+                TextView tvID = (TextView) dialog.findViewById (R.id.tvVisitorID);
+                TextView tvName = (TextView) dialog.findViewById (R.id.tvVisitorName);
+                TextView tvEmail = (TextView) dialog.findViewById (R.id.tvVisitorEmail);
+                ImageView ivQRCode = (ImageView) dialog.findViewById (R.id.ivQRCode);
+                TextView tvMobile = (TextView) dialog.findViewById (R.id.tvVisitorNumber);
+
+                tvID.setText (visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_ID).toUpperCase ());
+                tvName.setText (visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_NAME).toUpperCase ());
+                tvEmail.setText (visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_EMAIL));
+                tvMobile.setText (visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_MOBILE));
+
+                WindowManager manager = (WindowManager) getSystemService (WINDOW_SERVICE);
+                Display display = manager.getDefaultDisplay ();
+                Point point = new Point ();
+                display.getSize (point);
+                int width = point.x;
+                int height = point.y;
+                int smallerDimension = width < height ? width : height;
+                smallerDimension = smallerDimension * 3 / 4;
+
+
+                JSONObject jsonObject = new JSONObject ();
+
+                try {
+                    jsonObject.put (VisitorDetailsPref.VISITOR_ID, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_ID));
+                    jsonObject.put (VisitorDetailsPref.VISITOR_NAME, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_NAME));
+                    jsonObject.put (VisitorDetailsPref.VISITOR_MOBILE, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_MOBILE));
+                    jsonObject.put (VisitorDetailsPref.VISITOR_EMAIL, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_EMAIL));
+                } catch (JSONException e) {
+                    e.printStackTrace ();
+                }
+
+                Log.e ("karman", jsonObject.toString ());
+
+                QREncoder qrgEncoder = new QREncoder (jsonObject.toString (), null, QRContents.Type.TEXT, smallerDimension);
+                try {
+                    // Getting QR-Code as Bitmap
+                    Bitmap bitmap = qrgEncoder.encodeAsBitmap ();
+                    // Setting Bitmap to ImageView
+                    ivQRCode.setImageBitmap (bitmap);
+                } catch (WriterException e) {
+                    Log.v ("karman", e.toString ());
+                }
+
+                Utils.setTypefaceToAllViews (MainActivity.this, tvName);
+//                tvName.setTypeface (SetTypeFace.getTypeface (activity, "OCRA.otf"));
+//                tvEmail.setTypeface (SetTypeFace.getTypeface (activity, "OCRA.otf"));
+//                tvMobile.setTypeface (SetTypeFace.getTypeface (activity, "OCRA.otf"));
+                dialog.show ();
+            }
+        });
     }
 
     private void checkVersionUpdate () {
@@ -147,12 +232,12 @@ public class MainActivity extends AppCompatActivity {
                                         if (db_version_code > version_code) {
                                             switch (version_update_critical) {
                                                 case 0:
-                                                    userDetailPref.putBooleanPref (MainActivity.this, userDetailPref.LOGGED_IN_SESSION, true);
+                                                    visitorDetailsPref.putBooleanPref (MainActivity.this, visitorDetailsPref.LOGGED_IN_SESSION, true);
                                                     new MaterialDialog.Builder (MainActivity.this)
                                                             .content (R.string.dialog_text_new_version_available)
-                                                            .positiveColor (getResources ().getColor (R.color.app_text_color))
-                                                            .contentColor (getResources ().getColor (R.color.app_text_color))
-                                                            .negativeColor (getResources ().getColor (R.color.app_text_color))
+                                                            .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                                                            .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                                                            .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
                                                             .typeface (SetTypeFace.getTypeface (MainActivity.this), SetTypeFace.getTypeface (MainActivity.this))
                                                             .canceledOnTouchOutside (false)
                                                             .cancelable (false)
@@ -179,9 +264,9 @@ public class MainActivity extends AppCompatActivity {
                                                 case 1:
                                                     new MaterialDialog.Builder (MainActivity.this)
                                                             .content (R.string.dialog_text_new_version_available)
-                                                            .positiveColor (getResources ().getColor (R.color.app_text_color))
-                                                            .contentColor (getResources ().getColor (R.color.app_text_color))
-                                                            .negativeColor (getResources ().getColor (R.color.app_text_color))
+                                                            .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                                                            .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                                                            .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
                                                             .typeface (SetTypeFace.getTypeface (MainActivity.this), SetTypeFace.getTypeface (MainActivity.this))
                                                             .canceledOnTouchOutside (false)
                                                             .cancelable (false)
@@ -250,7 +335,7 @@ public class MainActivity extends AppCompatActivity {
                 public Map<String, String> getHeaders () throws AuthFailureError {
                     Map<String, String> params = new HashMap<> ();
                     params.put (AppConfigTags.HEADER_API_KEY, Constants.api_key);
-                    params.put (AppConfigTags.HEADER_USER_LOGIN_KEY, userDetailPref.getStringPref (MainActivity.this, UserDetailsPref.USER_LOGIN_KEY));
+                    params.put (AppConfigTags.HEADER_USER_LOGIN_KEY, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
                     Utils.showLog (Log.INFO, AppConfigTags.HEADERS_SENT_TO_THE_SERVER, "" + params, false);
                     return params;
                 }
@@ -275,11 +360,12 @@ public class MainActivity extends AppCompatActivity {
                                     JSONObject jsonObj = new JSONObject (response);
                                     boolean error = jsonObj.getBoolean (AppConfigTags.ERROR);
                                     String message = jsonObj.getString (AppConfigTags.MESSAGE);
-                                    userDetailPref.putStringPref (MainActivity.this, UserDetailsPref.USER_NAME, "");
-                                    userDetailPref.putStringPref (MainActivity.this, UserDetailsPref.USER_EMAIL, "");
-                                    userDetailPref.putStringPref (MainActivity.this, UserDetailsPref.USER_MOBILE, "");
-                                    userDetailPref.putStringPref (MainActivity.this, UserDetailsPref.USER_LOGIN_KEY, "");
-                                    userDetailPref.putStringPref (MainActivity.this, UserDetailsPref.USER_FIREBASE_ID, "");
+                                    visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_ID, "");
+                                    visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_NAME, "");
+                                    visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_EMAIL, "");
+                                    visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_MOBILE, "");
+                                    visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY, "");
+                                    visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_FIREBASE_ID, "");
 
                                     Intent intent = new Intent (MainActivity.this, LoginActivity.class);
                                     intent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -316,7 +402,7 @@ public class MainActivity extends AppCompatActivity {
                 public Map<String, String> getHeaders () throws AuthFailureError {
                     Map<String, String> params = new HashMap<> ();
                     params.put (AppConfigTags.HEADER_API_KEY, Constants.api_key);
-                    params.put (AppConfigTags.HEADER_USER_LOGIN_KEY, userDetailPref.getStringPref (MainActivity.this, UserDetailsPref.USER_LOGIN_KEY));
+                    params.put (AppConfigTags.HEADER_USER_LOGIN_KEY, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
                     Utils.showLog (Log.INFO, AppConfigTags.HEADERS_SENT_TO_THE_SERVER, "" + params, false);
                     return params;
                 }
@@ -335,11 +421,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void isLogin () {
-        if (userDetailPref.getStringPref (MainActivity.this, UserDetailsPref.USER_LOGIN_KEY) == "") {
+        if (visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY) == "") {
             Intent myIntent = new Intent (this, LoginActivity.class);
             startActivity (myIntent);
         }
-        if (userDetailPref.getStringPref (MainActivity.this, UserDetailsPref.USER_LOGIN_KEY) == "")// || userDetailPref.getStringPref (MainActivity.this, UserDetailsPref.HOSPITAL_DEFAULT_PATIENT_ID) == "")
+        if (visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY) == "")// || userDetailPref.getStringPref (MainActivity.this, VisitorDetailsPref.HOSPITAL_DEFAULT_PATIENT_ID) == "")
             finish ();
     }
 
@@ -379,7 +465,7 @@ public class MainActivity extends AppCompatActivity {
                 public Map<String, String> getHeaders () throws AuthFailureError {
                     Map<String, String> params = new HashMap<> ();
                     params.put (AppConfigTags.HEADER_API_KEY, Constants.api_key);
-                    params.put (AppConfigTags.HEADER_USER_LOGIN_KEY, userDetailPref.getStringPref (MainActivity.this, UserDetailsPref.USER_LOGIN_KEY));
+                    params.put (AppConfigTags.HEADER_USER_LOGIN_KEY, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
                     Utils.showLog (Log.INFO, AppConfigTags.HEADERS_SENT_TO_THE_SERVER, "" + params, false);
                     return params;
                 }
@@ -396,10 +482,10 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed () {
         MaterialDialog dialog = new MaterialDialog.Builder (this)
                 .content (R.string.dialog_text_quit_application)
-                .positiveColor (getResources ().getColor (R.color.app_text_color))
-                .neutralColor (getResources ().getColor (R.color.app_text_color))
-                .contentColor (getResources ().getColor (R.color.app_text_color))
-                .negativeColor (getResources ().getColor (R.color.app_text_color))
+                .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                .neutralColor (getResources ().getColor (R.color.app_text_color_dark))
+                .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
                 .typeface (SetTypeFace.getTypeface (this), SetTypeFace.getTypeface (this))
                 .canceledOnTouchOutside (false)
                 .cancelable (false)
@@ -409,11 +495,12 @@ public class MainActivity extends AppCompatActivity {
                 .onNeutral (new MaterialDialog.SingleButtonCallback () {
                     @Override
                     public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        userDetailPref.putStringPref (MainActivity.this, UserDetailsPref.USER_NAME, "");
-                        userDetailPref.putStringPref (MainActivity.this, UserDetailsPref.USER_EMAIL, "");
-                        userDetailPref.putStringPref (MainActivity.this, UserDetailsPref.USER_MOBILE, "");
-                        userDetailPref.putStringPref (MainActivity.this, UserDetailsPref.USER_LOGIN_KEY, "");
-                        userDetailPref.putStringPref (MainActivity.this, UserDetailsPref.USER_FIREBASE_ID, "");
+                        visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_ID, "");
+                        visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_NAME, "");
+                        visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_EMAIL, "");
+                        visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_MOBILE, "");
+                        visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY, "");
+                        visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_FIREBASE_ID, "");
 
                         Intent intent = new Intent (MainActivity.this, LoginActivity.class);
                         intent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -424,7 +511,7 @@ public class MainActivity extends AppCompatActivity {
                 .onPositive (new MaterialDialog.SingleButtonCallback () {
                     @Override
                     public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        userDetailPref.putBooleanPref (MainActivity.this, UserDetailsPref.LOGGED_IN_SESSION, false);
+                        visitorDetailsPref.putBooleanPref (MainActivity.this, VisitorDetailsPref.LOGGED_IN_SESSION, false);
 
 
                         finish ();
@@ -433,7 +520,6 @@ public class MainActivity extends AppCompatActivity {
                 }).build ();
         dialog.show ();
     }
-
 
     public void checkPermissions () {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

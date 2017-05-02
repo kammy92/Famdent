@@ -4,7 +4,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true">
+    android:animateLayoutChanges="true"
+    android:background="@color/app_background">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -37,34 +38,46 @@
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
+                        android:paddingBottom="@dimen/activity_margin_small"
+                        android:paddingTop="@dimen/activity_margin_small"
                         android:src="@drawable/ic_back"
                         android:visibility="visible"/>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
-                        android:gravity="center"
+                        android:layout_marginLeft="@dimen/activity_margin"
+                        android:layout_marginRight="@dimen/activity_margin"
+                        android:layout_toEndOf="@+id/ivBack"
+                        android:layout_toLeftOf="@+id/ivFavourite"
+                        android:layout_toRightOf="@+id/ivBack"
+                        android:layout_toStartOf="@+id/ivFavourite"
+                        android:gravity="left"
                         android:text="@string/activity_exhibitor_detail_title"
                         android:textColor="@color/text_color_white"
-                        android:textSize="@dimen/text_size_extra_large"
+                        android:textSize="@dimen/text_size_large"
                         android:textStyle="bold"/>
+
                     <ImageView
                         android:id="@+id/ivFavourite"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
                         android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/ic_star_border"
                         android:visibility="visible"/>
 
                 </RelativeLayout>
+
+
             </android.support.v7.widget.Toolbar>
         </android.support.design.widget.AppBarLayout>
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/appBar">
+            android:layout_above="@+id/llButtons" android:layout_below="@+id/appBar">
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -95,7 +108,7 @@
                         android:layout_toRightOf="@+id/ivLocation"
                         android:gravity="center_vertical"
                         android:text="3M INDIA LIMITED"
-                        android:textColor="@color/app_text_color"
+                        android:textColor="@color/app_text_color_dark"
                         android:textSize="@dimen/text_size_large"
                         android:textStyle="bold"/>
 
@@ -107,15 +120,15 @@
                         android:layout_toEndOf="@+id/ivLocation"
                         android:layout_toRightOf="@+id/ivLocation"
                         android:text="3M Space Division, Concord block, UB city 24, Vittal Mallya Road, New Delhi 110075, India "
-                        android:textColor="@color/app_text_color"
+                        android:textColor="@color/app_text_color_dark"
                         android:textSize="@dimen/text_size_medium"/>
                 </RelativeLayout>
                 <RelativeLayout
                     android:id="@+id/rlPhone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/activity_margin"
-                    android:layout_below="@+id/rlAddress">
+                    android:layout_below="@+id/rlAddress"
+                    android:layout_marginTop="@dimen/activity_margin">
                     <ImageView
 
                         android:id="@+id/ivPhone"
@@ -124,25 +137,27 @@
                         android:padding="@dimen/activity_margin_small"
                         android:src="@drawable/ic_phone"/>
 
-                    <TextView
-                        android:id="@+id/tvContactNumber1"
-                        android:layout_width="match_parent"
+                    <LinearLayout
+                        android:id="@+id/llPhone"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvServiceName"
                         android:layout_centerVertical="true"
+                        android:layout_marginTop="@dimen/activity_margin_small"
                         android:layout_toEndOf="@+id/ivPhone"
                         android:layout_toRightOf="@+id/ivPhone"
-                        android:gravity="center_vertical"
-                        android:text="+91-8527875036"
-                        android:textColor="@color/app_text_color"
-                        android:textSize="@dimen/text_size_medium"/>
+                        android:orientation="vertical">
+                    </LinearLayout>
+
+
                 </RelativeLayout>
 
                 <RelativeLayout
                     android:id="@+id/rlEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/activity_margin"
                     android:layout_below="@id/rlPhone"
+                    android:layout_marginTop="@dimen/activity_margin"
                 >
                     <ImageView
                         android:id="@+id/ivEmail"
@@ -160,7 +175,7 @@
                         android:layout_toRightOf="@+id/ivEmail"
                         android:gravity="center_vertical"
                         android:text="Rahuljain_35@yahoo.com"
-                        android:textColor="@color/app_text_color"
+                        android:textColor="@color/app_text_color_dark"
                         android:textSize="@dimen/text_size_medium"/>
                 </RelativeLayout>
 
@@ -168,8 +183,8 @@
                     android:id="@+id/rlWebsite"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/activity_margin"
-                    android:layout_below="@id/rlEmail">
+                    android:layout_below="@id/rlEmail"
+                    android:layout_marginTop="@dimen/activity_margin">
 
 
                     <ImageView
@@ -188,12 +203,93 @@
                         android:layout_toRightOf="@+id/ivWebsite"
                         android:gravity="center_vertical"
                         android:text="www.actiknow.com"
-                        android:textColor="@color/app_text_color"
+                        android:textColor="@color/app_text_color_dark"
                         android:textSize="@dimen/text_size_medium"
-                        />
+                    />
                 </RelativeLayout>
+                <RelativeLayout
+                    android:id="@+id/rlNotes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/rlWebsite"
+                    android:layout_marginTop="@dimen/activity_margin"
+                    android:visibility="gone">
+                    <ImageView
+                        android:id="@+id/ivNotes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/activity_margin_small"
+                        android:src="@drawable/ic_comment"/>
+
+
+                    <TextView
+                        android:id="@+id/tv1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@+id/ivNotes"
+                        android:layout_alignTop="@+id/ivNotes"
+                        android:layout_toEndOf="@+id/ivNotes"
+                        android:layout_toRightOf="@+id/ivNotes"
+                        android:gravity="center_vertical"
+                        android:text="Notes"
+                        android:textColor="@color/app_text_color_dark"
+                        android:textSize="@dimen/text_size_large"
+                        android:textStyle="bold"
+                    />
+
+                    <TextView
+                        android:id="@+id/tvNotes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/ivNotes"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@+id/ivNotes"
+                        android:layout_toRightOf="@+id/ivNotes"
+                        android:gravity="center_vertical"
+                        android:text=""
+                        android:textColor="@color/app_text_color_dark"
+                        android:textSize="@dimen/text_size_medium"/>
+                </RelativeLayout>
+
             </RelativeLayout>
         </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/llButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:weightSum="2.0">
+            <TextView
+                android:id="@+id/tvAddFavourite"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_margin_small"
+                android:layout_weight="1.0"
+                android:background="@drawable/button_bg"
+                android:elevation="@dimen/button_elevation"
+                android:gravity="center"
+                android:padding="@dimen/activity_margin"
+                android:text="ADD FAVOURITE"
+                android:textColor="@color/text_color_white"
+                android:textSize="@dimen/text_size_medium"
+            />
+            <TextView
+                android:id="@+id/tvAddNotes"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_margin_small"
+                android:layout_weight="1.0"
+                android:background="@drawable/button_bg"
+                android:elevation="@dimen/button_elevation"
+                android:gravity="center"
+                android:padding="@dimen/activity_margin"
+                android:text="ADD NOTES"
+                android:textColor="@color/text_color_white"
+                android:textSize="@dimen/text_size_medium"
+            />
+
+        </LinearLayout>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabAddNote"
@@ -203,6 +299,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_margin="@dimen/activity_margin"
-            android:src="@drawable/ic_note"/>
+            android:src="@drawable/ic_note"
+            android:visibility="gone"/>
     </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

@@ -3,16 +3,21 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="activity_margin">16dp</dimen>
     <dimen name="activity_margin_small">8dp</dimen>
+    <dimen name="activity_margin_extra_small">4dp</dimen>
     <dimen name="edittext_padding">12dp</dimen>
     <dimen name="bt">56dp</dimen>
     <dimen name="blood_group_button">50dp</dimen>
 
 
-
-
     <dimen name="logo_height">150dp</dimen>
+    <dimen name="qr_code_height">150dp</dimen>
     <dimen name="button_radius">2dp</dimen>
     <dimen name="edittext_radius">2dp</dimen>
+    <dimen name="visitor_card_radius">10dp</dimen>
+
+
+    <dimen name="indiasupply_logo_width">85dp</dimen>
+    <dimen name="indiasupply_logo_height">35dp</dimen>
 
 
     <dimen name="top_bottom_margin">5dp</dimen>

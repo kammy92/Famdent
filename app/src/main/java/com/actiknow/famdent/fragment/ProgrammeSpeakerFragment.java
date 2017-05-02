@@ -2,6 +2,7 @@ package com.actiknow.famdent.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,8 @@ import com.actiknow.famdent.R;
 import com.actiknow.famdent.model.ProgrammeSpeaker;
 import com.actiknow.famdent.utils.Utils;
 
+import java.util.ArrayList;
+
 
 /**
  * Created by actiknow on 4/28/17.
@@ -19,31 +22,27 @@ import com.actiknow.famdent.utils.Utils;
 
 public class ProgrammeSpeakerFragment extends Fragment {
     public static ProgrammeSpeaker programmeSpeaker2;
-
+    public static ArrayList<ProgrammeSpeaker> programmeSpeakerList2;
     TextView tvSpeakerName;
     TextView tvSpeakerQualification;
     TextView tvExperience;
     ImageView ivSpeaker;
 
-//    private static final String ARG_TEXT = "text";
-
-
-    public static ProgrammeSpeakerFragment newInstance (ProgrammeSpeaker programmeSpeaker) {
+    public static ProgrammeSpeakerFragment newInstance (int position, ArrayList<ProgrammeSpeaker> programmeSpeakerList) {
         ProgrammeSpeakerFragment fragment = new ProgrammeSpeakerFragment ();
-//        Bundle args = new Bundle ();
-//        args.putString (ARG_TEXT, "");
-//        fragment.setArguments (args);
-        programmeSpeaker2 = programmeSpeaker;
+        Bundle args = new Bundle ();
+        args.putInt ("position", position);
+        fragment.setArguments (args);
+        programmeSpeakerList2 = programmeSpeakerList;
         return fragment;
     }
 
-
     @Override
-    public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+    public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate (R.layout.fragment_programme_speaker, container, false);
-        initView(rootView);
+        initView (rootView);
         initData ();
-        initListener();
+        initListener ();
         return rootView;
     }
 
@@ -54,13 +53,15 @@ public class ProgrammeSpeakerFragment extends Fragment {
         ivSpeaker = (ImageView) v.findViewById (R.id.ivSpeaker);
     }
 
-    private void initData() {
+    private void initData () {
+        ProgrammeSpeaker programmeSpeaker = programmeSpeakerList2.get (getArguments ().getInt ("position"));
         Utils.setTypefaceToAllViews (getActivity (), tvSpeakerName);
-        tvSpeakerName.setText (programmeSpeaker2.getName ());
-        tvSpeakerQualification.setText (programmeSpeaker2.getQualification ());
-        tvExperience.setText (programmeSpeaker2.getExperience ());
+        Log.e ("NAME", "" + programmeSpeaker.getName ());
+        tvSpeakerName.setText (programmeSpeaker.getName ());
+        tvSpeakerQualification.setText (programmeSpeaker.getQualification ());
+        tvExperience.setText (programmeSpeaker.getExperience ());
     }
 
-    private void initListener() {
+    private void initListener () {
     }
 }

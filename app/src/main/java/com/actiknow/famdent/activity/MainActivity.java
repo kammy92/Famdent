@@ -120,12 +120,12 @@ public class MainActivity extends AppCompatActivity {
         version_code = pInfo.versionCode;
 
 
-        homeServices.add (new HomeService (1, R.drawable.ic_list, "", "EXHIBITOR LIST"));
-        homeServices.add (new HomeService (2, R.drawable.ic_list, "", "PROGRAMME"));
-        homeServices.add (new HomeService (3, R.drawable.ic_list, "", "HALL PLAN"));
-        homeServices.add (new HomeService (4, R.drawable.ic_list, "", "MY FAVOURITES"));
-        homeServices.add (new HomeService (5, R.drawable.ic_list, "", "MY ENTRY PASS"));
-        homeServices.add (new HomeService (6, R.drawable.ic_list, "", "INFORMATION"));
+        homeServices.add (new HomeService (1, R.drawable.ic_list, "", "EXHIBITORS"));
+        homeServices.add (new HomeService (2, R.drawable.ic_program, "", "PROGRAMMES"));
+        homeServices.add (new HomeService (3, R.drawable.ic_hall_plan, "", "HALL PLAN"));
+        homeServices.add (new HomeService (4, R.drawable.ic_favourite, "", "MY FAVOURITES"));
+        homeServices.add (new HomeService (5, R.drawable.ic_card, "", "MY ENTRY PASS"));
+        homeServices.add (new HomeService (6, R.drawable.ic_information, "", "INFORMATION"));
 
 
         homeServiceAdapter = new HomeServiceAdapter (this, homeServices);

@@ -82,7 +82,7 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
         ArrayList<String> contactList = new ArrayList<> ();
         contactList.add ("+91 9873684678");
         contactList.add ("+91 9879879879");
-        contactList.add ("18004253030");
+        contactList.add ("1800 425 3030");
         exhibitorDetail = new ExhibitorDetail (1, false, contactList, "", "3M INDIA LIMITED", "Hall 1", "Stall 32", "3M Space Division, Concord Block, UB City 24, Vittal Mallya Road, New Delhi 110075, India", "karman.singh@actiknowbi.com", "www.indiasupply.com", "");
         tvExhibitorName.setText (exhibitorDetail.getExhibitor_name ());
         tvFullAddress.setText (exhibitorDetail.getAddress ());
@@ -92,7 +92,7 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
             final ArrayList<String> contactList2 = exhibitorDetail.getContactList ();
             TextView tv = new TextView (this);
             tv.setText (Html.fromHtml ("<u><font color='blue'>" + contactList2.get (i) + "</font></u>"), TextView.BufferType.SPANNABLE);
-            tv.setTextSize (15);
+            tv.setTextSize (14);
             tv.setPadding (0, 5, 0, 5);
             tv.setTypeface (SetTypeFace.getTypeface (this, Constants.font_name));
             tv.setTextColor (getResources ().getColor (R.color.app_text_color_dark));

@@ -15,7 +15,7 @@
             android:paddingLeft="@dimen/activity_margin_small"
             android:paddingRight="@dimen/activity_margin_small"
             android:paddingTop="@dimen/activity_margin_small"
-            android:text="Catogories"
+            android:text="Select Catogories"
             android:textColor="@color/app_text_color_dark"
             android:textSize="@dimen/text_size_large"
             android:textStyle="bold"
@@ -37,39 +37,9 @@
         android:id="@+id/llCategory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"></LinearLayout>
+        android:orientation="vertical"/>
 
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/activity_margin_small"
-        android:paddingRight="@dimen/activity_margin_small"
-        android:paddingTop="@dimen/activity_margin_small"
-        android:text="Halls"
-        android:textColor="@color/app_text_color_dark"
-        android:textSize="@dimen/text_size_large"
-        android:textStyle="bold"
-        android:visibility="visible"/>
-
-
-    <CheckBox
-        android:id="@+id/cb1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Hall - 1"/>
-
-    <CheckBox
-        android:id="@+id/cb2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Hall - 2"/>
-
-    <CheckBox
-        android:id="@+id/cb3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Hall - 3"/>
 
 
 </LinearLayout>

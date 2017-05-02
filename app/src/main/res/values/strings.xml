@@ -84,7 +84,9 @@
         favourites?
     </string>
     <string name="dialog_text_add_notes">Add Notes</string>
-    <string name="dialog_text_enter_otp">Enter the OTP sent to your mobile number</string>
+    <string name="dialog_text_enter_otp">Enter the OTP sent to your mobile number (TEST OTP:
+        123456)
+    </string>
 
 
     <string name="progress_dialog_text_loading">Loading&#8230;</string>

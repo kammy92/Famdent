@@ -89,6 +89,10 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
+                android:layout_marginEnd="@dimen/activity_margin_small"
+                android:layout_marginLeft="@dimen/activity_margin_small"
+                android:layout_marginRight="@dimen/activity_margin_small"
+                android:layout_marginStart="@dimen/activity_margin_small"
                 android:contentDescription="@string/app_name"
                 android:src="@drawable/indiasupply_logo"/>
             <TextView

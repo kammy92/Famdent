@@ -44,6 +44,10 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
     ImageView ivFavourite;
     ImageView ivBack;
     CoordinatorLayout clMain;
+
+    ArrayList<ProgrammeSpeaker> programmeSpeakerList = new ArrayList<> ();
+    TextView tvAddFavourite;
+
     //    private WrappingViewPager viewPager;
     private ViewPager viewPager2;
     private LinearLayout dotsLayout;
@@ -100,11 +104,69 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                                 public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                     programmeDetail.setFavourite (false);
                                     ivFavourite.setImageResource (R.drawable.ic_star_border);
+                                    tvAddFavourite.setVisibility (View.VISIBLE);
                                     Utils.showSnackBar (ProgrammeDetailActivity.this, clMain, "Programme removed from favourites", Snackbar.LENGTH_LONG, getResources ().getString (R.string.snackbar_action_undo), new View.OnClickListener () {
                                         @Override
                                         public void onClick (View v) {
                                             programmeDetail.setFavourite (true);
                                             ivFavourite.setImageResource (R.drawable.ic_star);
+                                            tvAddFavourite.setVisibility (View.GONE);
+                                        }
+                                    });
+                                }
+                            }).build ();
+                    dialog.show ();
+                } else {
+                    MaterialDialog dialog = new MaterialDialog.Builder (ProgrammeDetailActivity.this)
+                            .content (R.string.dialog_text_add_favourite)
+                            .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .typeface (SetTypeFace.getTypeface (ProgrammeDetailActivity.this), SetTypeFace.getTypeface (ProgrammeDetailActivity.this))
+                            .canceledOnTouchOutside (false)
+                            .cancelable (false)
+                            .positiveText (R.string.dialog_action_yes)
+                            .negativeText (R.string.dialog_action_no)
+                            .onPositive (new MaterialDialog.SingleButtonCallback () {
+                                @Override
+                                public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    programmeDetail.setFavourite (true);
+                                    ivFavourite.setImageResource (R.drawable.ic_star);
+                                    tvAddFavourite.setVisibility (View.GONE);
+                                    Utils.showSnackBar (ProgrammeDetailActivity.this, clMain, "Programme added to favourites", Snackbar.LENGTH_LONG, null, null);
+                                }
+                            }).build ();
+                    dialog.show ();
+                }
+            }
+        });
+
+        tvAddFavourite.setOnClickListener (new View.OnClickListener () {
+            @Override
+            public void onClick (View v) {
+                if (programmeDetail.isFavourite ()) {
+                    MaterialDialog dialog = new MaterialDialog.Builder (ProgrammeDetailActivity.this)
+                            .content (R.string.dialog_text_remove_favourite)
+                            .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .typeface (SetTypeFace.getTypeface (ProgrammeDetailActivity.this), SetTypeFace.getTypeface (ProgrammeDetailActivity.this))
+                            .canceledOnTouchOutside (false)
+                            .cancelable (false)
+                            .positiveText (R.string.dialog_action_yes)
+                            .negativeText (R.string.dialog_action_no)
+                            .onPositive (new MaterialDialog.SingleButtonCallback () {
+                                @Override
+                                public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    programmeDetail.setFavourite (false);
+                                    ivFavourite.setImageResource (R.drawable.ic_star_border);
+                                    tvAddFavourite.setVisibility (View.VISIBLE);
+                                    Utils.showSnackBar (ProgrammeDetailActivity.this, clMain, "Programme removed from favourites", Snackbar.LENGTH_LONG, getResources ().getString (R.string.snackbar_action_undo), new View.OnClickListener () {
+                                        @Override
+                                        public void onClick (View v) {
+                                            programmeDetail.setFavourite (true);
+                                            ivFavourite.setImageResource (R.drawable.ic_star);
+                                            tvAddFavourite.setVisibility (View.GONE);
                                         }
                                     });
                                 }
@@ -127,12 +189,14 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                                     programmeDetail.setFavourite (true);
                                     ivFavourite.setImageResource (R.drawable.ic_star);
                                     Utils.showSnackBar (ProgrammeDetailActivity.this, clMain, "Programme added to favourites", Snackbar.LENGTH_LONG, null, null);
+                                    tvAddFavourite.setVisibility (View.GONE);
                                 }
                             }).build ();
                     dialog.show ();
                 }
             }
         });
+
 
     }
 
@@ -148,15 +212,17 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
         tvTime = (TextView) findViewById (R.id.tvTime);
         tvDuration = (TextView) findViewById (R.id.tvDuration);
         tvCost = (TextView) findViewById (R.id.tvCost);
+        tvAddFavourite = (TextView) findViewById (R.id.tvAddFavourite);
     }
 
     private void initData () {
         Utils.setTypefaceToAllViews (this, tvCost);
 
-        ArrayList<ProgrammeSpeaker> programmeSpeakerList = new ArrayList<> ();
+
         programmeSpeakerList.add (new ProgrammeSpeaker (1, "Karman Singh", "MBBS, MD", "9 Years"));
         programmeSpeakerList.add (new ProgrammeSpeaker (2, "Rahul Jain", "MBBS, MD", "4 Years"));
         programmeSpeakerList.add (new ProgrammeSpeaker (3, "Sudhanshu Sharma", "MBBS, MD", "6 Years"));
+        programmeSpeakerList.add (new ProgrammeSpeaker (4, "Sameer", "MBBS, MD", "6 Years"));
 
         ArrayList<String> topicList = new ArrayList<> ();
         topicList.add ("Impaction");
@@ -232,10 +298,7 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem (int position) {
-            ArrayList<ProgrammeSpeaker> programmeSpeakerList = programmeDetail.getProgrammeSpeakerList ();
-            ProgrammeSpeaker programmeSpeaker = programmeSpeakerList.get (position);
-            Log.e ("karman", "speaker name " + programmeSpeaker.getName ());
-            return ProgrammeSpeakerFragment.newInstance (programmeSpeaker);
+            return ProgrammeSpeakerFragment.newInstance (position, programmeSpeakerList);
         }
 
         @Override

@@ -66,5 +66,7 @@
     <color name="app_text_color_light">#616161</color>
     <color name="divider_color">#4b4b4b</color>
 
+    <color name="progress_dialog_background_color">#ffffff</color>
+
 
 </resources>

@@ -15,7 +15,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -33,11 +32,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.actiknow.famdent.R;
 import com.actiknow.famdent.app.AppController;
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.toolbox.StringRequest;
 
@@ -52,14 +48,14 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static android.content.Context.ACTIVITY_SERVICE;
-import static android.support.v7.recyclerview.R.styleable.RecyclerView;
 
 /**
  * Created by Admin on 23-12-2015.
@@ -490,5 +486,32 @@ public class Utils {
             poke.setData (Uri.parse ("3"));
             activity.sendBroadcast (poke);
         }
+    }
+
+
+    public static int isValidMobile (String phone2) {
+        int number_status = 0;
+        String first_char = "";
+        first_char = phone2.substring (0, 1);
+        if (phone2.length () == 10 && Integer.parseInt (first_char) > 6) {
+            number_status = 3;
+        } else if (phone2.length () < 10 && Integer.parseInt (first_char) > 6) {
+            number_status = 1;
+        } else if (Integer.parseInt (first_char) <= 6 && Integer.parseInt (first_char) > 0 && phone2.length () <= 10 && phone2.length () > 1) {
+            number_status = 2;
+        } else if (phone2.equalsIgnoreCase ("")) {
+            number_status = 4;
+        }
+        return number_status;
+    }
+
+
+    public static boolean isValidEmail1 (String emailInput) {
+        String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
+        Pattern pattern = Pattern.compile (EMAIL_PATTERN);
+        Matcher matcher = pattern.matcher (emailInput);
+        return matcher.matches ();
     }
 }

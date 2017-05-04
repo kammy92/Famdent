@@ -132,6 +132,7 @@ public class HomeServiceAdapter extends RecyclerView.Adapter<HomeServiceAdapter.
                     tvEmail.setText (visitorDetailsPref.getStringPref (activity, VisitorDetailsPref.VISITOR_EMAIL));
                     tvMobile.setText (visitorDetailsPref.getStringPref (activity, VisitorDetailsPref.VISITOR_MOBILE));
 
+
                     WindowManager manager = (WindowManager) activity.getSystemService (WINDOW_SERVICE);
                     Display display = manager.getDefaultDisplay ();
                     Point point = new Point ();
@@ -147,6 +148,7 @@ public class HomeServiceAdapter extends RecyclerView.Adapter<HomeServiceAdapter.
                         jsonObject.put (VisitorDetailsPref.VISITOR_NAME, visitorDetailsPref.getStringPref (activity, VisitorDetailsPref.VISITOR_NAME));
                         jsonObject.put (VisitorDetailsPref.VISITOR_MOBILE, visitorDetailsPref.getStringPref (activity, VisitorDetailsPref.VISITOR_MOBILE));
                         jsonObject.put (VisitorDetailsPref.VISITOR_EMAIL, visitorDetailsPref.getStringPref (activity, VisitorDetailsPref.VISITOR_EMAIL));
+                        jsonObject.put (VisitorDetailsPref.VISITOR_TYPE, visitorDetailsPref.getStringPref (activity, VisitorDetailsPref.VISITOR_TYPE));
                     } catch (JSONException e) {
                         e.printStackTrace ();
                     }

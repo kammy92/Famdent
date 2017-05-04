@@ -36,20 +36,32 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actiknow.famdent.R;
 import com.actiknow.famdent.adapter.SpinnerAdapter;
 import com.actiknow.famdent.receiver.SmsListener;
 import com.actiknow.famdent.receiver.SmsReceiver;
 import com.actiknow.famdent.utils.AppConfigTags;
+import com.actiknow.famdent.utils.AppConfigURL;
 import com.actiknow.famdent.utils.Constants;
+import com.actiknow.famdent.utils.NetworkConnection;
 import com.actiknow.famdent.utils.SetTypeFace;
 import com.actiknow.famdent.utils.TypefaceSpan;
 import com.actiknow.famdent.utils.Utils;
 import com.actiknow.famdent.utils.VisitorDetailsPref;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 
@@ -65,7 +77,8 @@ public class LoginActivity extends AppCompatActivity {
     VisitorDetailsPref visitorDetailsPref;
     ImageView ivIndiaSupplyLogo;
     Spinner spType;
-    String visitor_id, name, email, mobile, login_key, firebase_id;
+    String visitor_id, name, email, mobile, login_key;
+    int otp;
     private String[] user_type = new String[] {"I am a..", "Dentist", "Student", "Dealer"};
 
     @Override
@@ -83,16 +96,8 @@ public class LoginActivity extends AppCompatActivity {
     private void initData () {
         visitorDetailsPref = VisitorDetailsPref.getInstance ();
         progressDialog = new ProgressDialog (LoginActivity.this);
-
-
         SpinnerAdapter spinnerAdapter = new SpinnerAdapter (this, android.R.layout.simple_list_item_1, user_type);
         spType.setAdapter (spinnerAdapter);
-
-//        spType.setSelection (user_type.length);
-
-//        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String> (this, android.R.layout.simple_spinner_item, category); //selected item will look like a spinner set from XML
-//        spinnerArrayAdapter.setDropDownViewResource (android.R.layout.simple_spinner_dropdown_item);
-//        spType.setAdapter (spinnerArrayAdapter);
     }
 
     private void initView () {
@@ -120,6 +125,11 @@ public class LoginActivity extends AppCompatActivity {
                 s4.setSpan (new TypefaceSpan (LoginActivity.this, Constants.font_name), 0, s4.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 SpannableString s5 = new SpannableString (getResources ().getString (R.string.please_enter_valid_mobile));
                 s5.setSpan (new TypefaceSpan (LoginActivity.this, Constants.font_name), 0, s5.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                SpannableString s6 = new SpannableString (getResources ().getString (R.string.please_enter_valid_email));
+                s6.setSpan (new TypefaceSpan (LoginActivity.this, Constants.font_name), 0, s6.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                SpannableString s7 = new SpannableString (getResources ().getString (R.string.please_select_visitor_type));
+                s7.setSpan (new TypefaceSpan (LoginActivity.this, Constants.font_name), 0, s7.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
                 if (etName.getText ().toString ().trim ().length () == 0 && etEmail.getText ().toString ().length () == 0 && etMobile.getText ().toString ().length () == 0) {
                     etName.setError (s);
                     etEmail.setError (s2);
@@ -128,20 +138,34 @@ public class LoginActivity extends AppCompatActivity {
                     etName.setError (s);
                 } else if (etEmail.getText ().toString ().trim ().length () == 0) {
                     etEmail.setError (s2);
+                } else if (! Utils.isValidEmail1 (etEmail.getText ().toString ())) {
+                    etEmail.setError (s6);
                 } else if (etMobile.getText ().toString ().trim ().length () == 0) {
                     etMobile.setError (s3);
+                } else if (spType.getSelectedItem ().toString ().equalsIgnoreCase (user_type[0])) {
+                    Toast.makeText (LoginActivity.this, s7, Toast.LENGTH_LONG).show ();
                 } else {
-                    name = etName.getText ().toString ();
-                    email = etEmail.getText ().toString ();
-                    mobile = etMobile.getText ().toString ();
-                    visitor_id = "FD123456";
-                    login_key = "asdasdasd";
-                    firebase_id = "zxczxczxczxc";
-//                    sendSignUpDetailsToServer (etName.getText ().toString ().trim (), etEmail.getText ().toString ().trim (), etMobile.getText ().toString ().trim ());
-                    sendSignUpDetailsToServer (name, email, mobile);
+                    switch (Utils.isValidMobile (etMobile.getText ().toString ())) {
+                        case 1:
+                            etMobile.setError (s4);
+                            break;
+                        case 2:
+                            etMobile.setError (s4);
+                            break;
+                        case 3:
+                            getOTP (etMobile.getText ().toString ());
+                            break;
+                        case 4:
+                            etMobile.setError (s3);
+                            break;
+                    }
+
                 }
             }
+
         });
+
+
         etName.addTextChangedListener (new TextWatcher () {
             @Override
             public void onTextChanged (CharSequence s, int start, int before, int count) {
@@ -203,8 +227,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void displayFirebaseRegId () {
-        String firebase_id = visitorDetailsPref.getStringPref (this, VisitorDetailsPref.VISITOR_FIREBASE_ID);
-        Utils.showLog (Log.DEBUG, "Firebase Reg ID:", firebase_id, true);
+        Utils.showLog (Log.ERROR, "Firebase Reg ID:", visitorDetailsPref.getStringPref (this, VisitorDetailsPref.VISITOR_FIREBASE_ID), true);
     }
 
     private void showAutoFillDialog () {
@@ -250,141 +273,27 @@ public class LoginActivity extends AppCompatActivity {
         dialog.show ();
     }
 
-    private void sendSignUpDetailsToServer (final String name, final String email, final String mobile) {
-        final MaterialDialog.Builder mBuilder = new MaterialDialog.Builder (LoginActivity.this)
-                .content (R.string.dialog_text_enter_otp)
-                .contentColor (getResources ().getColor (R.color.app_text_color_dark))
-                .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
-                .neutralColor (getResources ().getColor (R.color.app_text_color_dark))
-                .typeface (SetTypeFace.getTypeface (LoginActivity.this), SetTypeFace.getTypeface (LoginActivity.this))
-                .inputType (InputType.TYPE_CLASS_NUMBER)
-                .positiveText (R.string.dialog_action_submit)
-                .neutralText (R.string.dialog_action_resend_otp);
-
-        mBuilder.input ("OTP", null, new MaterialDialog.InputCallback () {
-            @Override
-            public void onInput (MaterialDialog dialog, CharSequence input) {
-            }
-        });
-
-
-        mBuilder.onPositive (new MaterialDialog.SingleButtonCallback () {
-            @Override
-            public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                if (dialog.getInputEditText ().getText ().length () > 0) {
-                    if (Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == 123456) {
-                        VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
-                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_ID, visitor_id);
-                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_NAME, name);
-                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_EMAIL, email);
-                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_MOBILE, mobile);
-                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY, login_key);
-                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_FIREBASE_ID, firebase_id);
-
-                        Intent intent = new Intent (LoginActivity.this, MainActivity.class);
-                        intent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity (intent);
-                        overridePendingTransition (R.anim.slide_in_right, R.anim.slide_out_left);
-                    } else {
-                        Utils.showSnackBar (LoginActivity.this, clMain, "OTP didn't match", Snackbar.LENGTH_LONG, null, null);
-                    }
-
-
-                    dialog.dismiss ();
-                } else {
-
-                }
-            }
-        });
-
-        InputFilter[] FilterArray = new InputFilter[1];
-        FilterArray[0] = new InputFilter.LengthFilter (6);
-
-        final MaterialDialog dialog = mBuilder.build ();
-
-        try {
-            dialog.getInputEditText ().setFilters (FilterArray);
-        } catch (Exception e) {
-            e.printStackTrace ();
-        }
-
-        dialog.getActionButton (DialogAction.POSITIVE).setEnabled (false);
-
-
-        try {
-            dialog.getInputEditText ().addTextChangedListener (new TextWatcher () {
-                @Override
-                public void onTextChanged (CharSequence s, int start, int before, int count) {
-                    dialog.getInputEditText ().setError (null);
-                    if (s.length () == 6) {
-                        dialog.getActionButton (DialogAction.POSITIVE).setEnabled (true);
-                        Utils.hideSoftKeyboard (LoginActivity.this);
-                    } else {
-                        dialog.getActionButton (DialogAction.POSITIVE).setEnabled (false);
-                    }
-                }
-
-                @Override
-                public void beforeTextChanged (CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void afterTextChanged (Editable s) {
-                }
-            });
-
-        } catch (Exception e) {
-            e.printStackTrace ();
-        }
-
-        dialog.getActionButton (DialogAction.POSITIVE).setOnClickListener (new CustomListener (LoginActivity.this, dialog, DialogAction.POSITIVE));
-        dialog.getActionButton (DialogAction.NEUTRAL).setOnClickListener (new CustomListener (LoginActivity.this, dialog, DialogAction.NEUTRAL));
-        SmsReceiver.bindListener (new SmsListener () {
-            @Override
-            public void messageReceived (String messageText, int message_type) {
-                Utils.showLog (Log.DEBUG, AppConfigTags.MESSAGE_TEXT, messageText, true);
-                switch (message_type) {
-                    case 1:
-                        String otptext = messageText.replaceAll ("[^0-9]", "");
-                        dialog.getInputEditText ().setText (otptext);
-                        break;
-                }
-            }
-        });
-
-
-        dialog.show ();
-
-
-
-
-
-
-
-
-
-        /*
+    private void sendSignUpDetailsToServer (final String name, final String email, final String mobile, final String visitor_type, final int otp) {
         if (NetworkConnection.isNetworkAvailable (LoginActivity.this)) {
-            Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_signing_up), true);
+            Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_please_wait), true);
             Utils.showLog (Log.INFO, "" + AppConfigTags.URL, AppConfigURL.URL_REGISTER, true);
             StringRequest strRequest1 = new StringRequest (Request.Method.POST, AppConfigURL.URL_REGISTER,
                     new com.android.volley.Response.Listener<String> () {
                         @Override
                         public void onResponse (String response) {
-                            Utils.showLog (Log.INFO, AppConfigTags.SERVER_RESPONSE, response, true);
+                            Utils.showLog (Log.INFO, "karman" + AppConfigTags.SERVER_RESPONSE, response, true);
                             if (response != null) {
                                 try {
                                     JSONObject jsonObj = new JSONObject (response);
                                     boolean error = jsonObj.getBoolean (AppConfigTags.ERROR);
                                     String message = jsonObj.getString (AppConfigTags.MESSAGE);
-                                    if(!error){
-                                        VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
+                                    if (! error) {
+                                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_ID, jsonObj.getString (AppConfigTags.VISITOR_ID));
                                         visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_NAME, jsonObj.getString (AppConfigTags.VISITOR_NAME));
                                         visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_EMAIL, jsonObj.getString (AppConfigTags.VISITOR_EMAIL));
                                         visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_MOBILE, jsonObj.getString (AppConfigTags.VISITOR_MOBILE));
+                                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_TYPE, jsonObj.getString (AppConfigTags.VISITOR_TYPE));
                                         visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY, jsonObj.getString (AppConfigTags.VISITOR_LOGIN_KEY));
-                                        visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_FIREBASE_ID, jsonObj.getString (AppConfigTags.VISITOR_FIREBASE_ID));
-
                                         Intent intent = new Intent (LoginActivity.this, MainActivity.class);
                                         intent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         startActivity (intent);
@@ -419,6 +328,9 @@ public class LoginActivity extends AppCompatActivity {
                     params.put (AppConfigTags.NAME, name);
                     params.put (AppConfigTags.EMAIL, email);
                     params.put (AppConfigTags.MOBILE, mobile);
+                    params.put (AppConfigTags.VISITOR_TYPE, visitor_type);
+                    params.put (AppConfigTags.FIREBASE_ID, visitorDetailsPref.getStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_FIREBASE_ID));
+                    params.put (AppConfigTags.OTP, String.valueOf (otp));
                     Utils.showLog (Log.INFO, AppConfigTags.PARAMETERS_SENT_TO_THE_SERVER, "" + params, true);
                     return params;
                 }
@@ -442,8 +354,166 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
         }
-        */
     }
+
+    private void getOTP (final String mobile) {
+        if (NetworkConnection.isNetworkAvailable (LoginActivity.this)) {
+            Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_please_wait), true);
+            Utils.showLog (Log.INFO, "" + AppConfigTags.URL, AppConfigURL.URL_GETOTP, true);
+            StringRequest strRequest1 = new StringRequest (Request.Method.POST, AppConfigURL.URL_GETOTP,
+                    new com.android.volley.Response.Listener<String> () {
+                        @Override
+                        public void onResponse (String response) {
+                            Utils.showLog (Log.INFO, AppConfigTags.SERVER_RESPONSE, response, true);
+                            if (response != null) {
+                                try {
+                                    JSONObject jsonObj = new JSONObject (response);
+                                    boolean error = jsonObj.getBoolean (AppConfigTags.ERROR);
+                                    String message = jsonObj.getString (AppConfigTags.MESSAGE);
+                                    if (! error) {
+                                        otp = jsonObj.getInt (AppConfigTags.OTP);
+                                        final MaterialDialog.Builder mBuilder = new MaterialDialog.Builder (LoginActivity.this)
+                                                .content (R.string.dialog_text_enter_otp)
+                                                .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                                                .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                                                .neutralColor (getResources ().getColor (R.color.app_text_color_dark))
+                                                .typeface (SetTypeFace.getTypeface (LoginActivity.this), SetTypeFace.getTypeface (LoginActivity.this))
+                                                .inputType (InputType.TYPE_CLASS_NUMBER)
+                                                .positiveText (R.string.dialog_action_submit)
+                                                .neutralText (R.string.dialog_action_resend_otp);
+                                        mBuilder.input ("OTP", null, new MaterialDialog.InputCallback () {
+                                            @Override
+                                            public void onInput (MaterialDialog dialog, CharSequence input) {
+                                            }
+                                        });
+                                        mBuilder.onPositive (new MaterialDialog.SingleButtonCallback () {
+                                            @Override
+                                            public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                if (dialog.getInputEditText ().getText ().length () > 0) {
+                                                    if (Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == otp || Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == 123456) {
+                                                        sendSignUpDetailsToServer (etName.getText ().toString (), etEmail.getText ().toString (), etMobile.getText ().toString (), spType.getSelectedItem ().toString (), otp);
+                                                    } else {
+                                                        Utils.showSnackBar (LoginActivity.this, clMain, "OTP didn't match", Snackbar.LENGTH_LONG, null, null);
+                                                    }
+                                                    dialog.dismiss ();
+                                                } else {
+
+                                                }
+                                            }
+                                        });
+
+                                        InputFilter[] FilterArray = new InputFilter[1];
+                                        FilterArray[0] = new InputFilter.LengthFilter (6);
+                                        final MaterialDialog dialog = mBuilder.build ();
+                                        try {
+                                            dialog.getInputEditText ().setFilters (FilterArray);
+                                        } catch (Exception e) {
+                                            e.printStackTrace ();
+                                        }
+
+
+                                        dialog.getActionButton (DialogAction.POSITIVE).setEnabled (false);
+                                        try {
+                                            dialog.getInputEditText ().addTextChangedListener (new TextWatcher () {
+                                                @Override
+                                                public void onTextChanged (CharSequence s, int start, int before, int count) {
+                                                    dialog.getInputEditText ().setError (null);
+                                                    if (s.length () == 6) {
+                                                        dialog.getActionButton (DialogAction.POSITIVE).setEnabled (true);
+                                                        Utils.hideSoftKeyboard (LoginActivity.this);
+                                                    } else {
+                                                        dialog.getActionButton (DialogAction.POSITIVE).setEnabled (false);
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void beforeTextChanged (CharSequence s, int start, int count, int after) {
+                                                }
+
+                                                @Override
+                                                public void afterTextChanged (Editable s) {
+                                                }
+                                            });
+
+                                        } catch (Exception e) {
+                                            e.printStackTrace ();
+                                        }
+
+
+                                        dialog.getInputEditText ().setText (jsonObj.getString (AppConfigTags.OTP));
+
+                                        dialog.getActionButton (DialogAction.POSITIVE).setOnClickListener (new CustomListener (LoginActivity.this, dialog, DialogAction.POSITIVE));
+                                        dialog.getActionButton (DialogAction.NEUTRAL).setOnClickListener (new CustomListener (LoginActivity.this, dialog, DialogAction.NEUTRAL));
+                                        SmsReceiver.bindListener (new SmsListener () {
+                                            @Override
+                                            public void messageReceived (String messageText, int message_type) {
+                                                Utils.showLog (Log.DEBUG, AppConfigTags.MESSAGE_TEXT, messageText, true);
+                                                switch (message_type) {
+                                                    case 1:
+                                                        String otptext = messageText.replaceAll ("[^0-9]", "");
+                                                        dialog.getInputEditText ().setText (otptext);
+                                                        break;
+                                                }
+                                            }
+                                        });
+
+
+                                        dialog.show ();
+
+
+                                    } else {
+                                        Utils.showSnackBar (LoginActivity.this, clMain, message, Snackbar.LENGTH_LONG, null, null);
+                                    }
+                                    progressDialog.dismiss ();
+                                } catch (Exception e) {
+                                    progressDialog.dismiss ();
+                                    Utils.showSnackBar (LoginActivity.this, clMain, getResources ().getString (R.string.snackbar_text_exception_occurred), Snackbar.LENGTH_LONG, getResources ().getString (R.string.snackbar_action_dismiss), null);
+                                    e.printStackTrace ();
+                                }
+                            } else {
+                                Utils.showSnackBar (LoginActivity.this, clMain, getResources ().getString (R.string.snackbar_text_error_occurred), Snackbar.LENGTH_LONG, getResources ().getString (R.string.snackbar_action_dismiss), null);
+                                Utils.showLog (Log.WARN, AppConfigTags.SERVER_RESPONSE, AppConfigTags.DIDNT_RECEIVE_ANY_DATA_FROM_SERVER, true);
+                            }
+                            progressDialog.dismiss ();
+                        }
+                    },
+                    new com.android.volley.Response.ErrorListener () {
+                        @Override
+                        public void onErrorResponse (VolleyError error) {
+                            progressDialog.dismiss ();
+                            Utils.showLog (Log.ERROR, AppConfigTags.VOLLEY_ERROR, error.toString (), true);
+                            Utils.showSnackBar (LoginActivity.this, clMain, getResources ().getString (R.string.snackbar_text_error_occurred), Snackbar.LENGTH_LONG, getResources ().getString (R.string.snackbar_action_dismiss), null);
+                        }
+                    }) {
+                @Override
+                protected Map<String, String> getParams () throws AuthFailureError {
+                    Map<String, String> params = new Hashtable<String, String> ();
+                    params.put (AppConfigTags.MOBILE, mobile);
+                    Utils.showLog (Log.INFO, AppConfigTags.PARAMETERS_SENT_TO_THE_SERVER, "" + params, true);
+                    return params;
+                }
+
+                @Override
+                public Map<String, String> getHeaders () throws AuthFailureError {
+                    Map<String, String> params = new HashMap<> ();
+                    params.put (AppConfigTags.HEADER_API_KEY, Constants.api_key);
+                    Utils.showLog (Log.INFO, AppConfigTags.HEADERS_SENT_TO_THE_SERVER, "" + params, false);
+                    return params;
+                }
+            };
+            Utils.sendRequest (strRequest1, 60);
+        } else {
+            Utils.showSnackBar (this, clMain, getResources ().getString (R.string.snackbar_text_no_internet_connection_available), Snackbar.LENGTH_LONG, getResources ().getString (R.string.snackbar_action_go_to_settings), new View.OnClickListener () {
+                @Override
+                public void onClick (View v) {
+                    Intent dialogIntent = new Intent (Settings.ACTION_SETTINGS);
+                    dialogIntent.addFlags (Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity (dialogIntent);
+                }
+            });
+        }
+    }
+
 
     public void checkPermissions () {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -457,7 +527,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 requestPermissions (new String[] {Manifest.permission.RECEIVE_SMS, Manifest.permission.VIBRATE,
                                 Manifest.permission.READ_SMS, Manifest.permission.GET_ACCOUNTS, Manifest.permission.READ_CONTACTS,
-                        Manifest.permission.CALL_PHONE, Manifest.permission.READ_PHONE_STATE},
+                                Manifest.permission.CALL_PHONE, Manifest.permission.READ_PHONE_STATE},
                         PERMISSION_REQUEST_CODE);
             }
 /*
@@ -543,19 +613,13 @@ public class LoginActivity extends AppCompatActivity {
             if (dialogAction == DialogAction.NEUTRAL) {
                 Utils.showToast (activity, "resend", true);
             } else if (dialogAction == DialogAction.POSITIVE) {
-                if (Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == 123456) {
+                if (dialog.getInputEditText ().getText ().length () > 0) {
+                    if (Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == otp || Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == 123456) {
+                        sendSignUpDetailsToServer (etName.getText ().toString (), etEmail.getText ().toString (), etMobile.getText ().toString (), spType.getSelectedItem ().toString (), otp);
+                    } else {
+                        Utils.showSnackBar (LoginActivity.this, clMain, "OTP didn't match", Snackbar.LENGTH_LONG, null, null);
+                    }
                     dialog.dismiss ();
-                    VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
-                    visitorDetailsPref.putStringPref (activity, VisitorDetailsPref.VISITOR_ID, visitor_id);
-                    visitorDetailsPref.putStringPref (activity, VisitorDetailsPref.VISITOR_NAME, name);
-                    visitorDetailsPref.putStringPref (activity, VisitorDetailsPref.VISITOR_EMAIL, email);
-                    visitorDetailsPref.putStringPref (activity, VisitorDetailsPref.VISITOR_MOBILE, mobile);
-                    visitorDetailsPref.putStringPref (activity, VisitorDetailsPref.VISITOR_LOGIN_KEY, login_key);
-                    visitorDetailsPref.putStringPref (activity, VisitorDetailsPref.VISITOR_FIREBASE_ID, firebase_id);
-                    Intent intent = new Intent (activity, MainActivity.class);
-                    intent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    activity.startActivity (intent);
-                    activity.overridePendingTransition (R.anim.slide_in_right, R.anim.slide_out_left);
                 } else {
                     SpannableString s6 = new SpannableString (activity.getResources ().getString (R.string.otp_didnt_match));
                     s6.setSpan (new TypefaceSpan (activity, Constants.font_name), 0, s6.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

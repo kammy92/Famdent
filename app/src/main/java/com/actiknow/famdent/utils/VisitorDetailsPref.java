@@ -9,6 +9,7 @@ public class VisitorDetailsPref {
     public static String VISITOR_NAME = "visitor_name";
     public static String VISITOR_EMAIL = "visitor_email";
     public static String VISITOR_MOBILE = "visitor_mobile";
+    public static String VISITOR_TYPE = "visitor_type";
     public static String VISITOR_LOGIN_KEY = "visitor_login_key";
     public static String VISITOR_FIREBASE_ID = "visitor_firebase_id";
     public static String LOGGED_IN_SESSION = "logged_in_session";

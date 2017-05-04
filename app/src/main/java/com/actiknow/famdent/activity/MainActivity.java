@@ -110,6 +110,15 @@ public class MainActivity extends AppCompatActivity {
     private void initData () {
         Bugsnag.init (this);
         visitorDetailsPref = VisitorDetailsPref.getInstance ();
+
+        Log.e ("karman", visitorDetailsPref.getStringPref (this, VisitorDetailsPref.VISITOR_ID));
+        Log.e ("karman", visitorDetailsPref.getStringPref (this, VisitorDetailsPref.VISITOR_NAME));
+        Log.e ("karman", visitorDetailsPref.getStringPref (this, VisitorDetailsPref.VISITOR_EMAIL));
+        Log.e ("karman", visitorDetailsPref.getStringPref (this, VisitorDetailsPref.VISITOR_MOBILE));
+        Log.e ("karman", visitorDetailsPref.getStringPref (this, VisitorDetailsPref.VISITOR_FIREBASE_ID));
+        Log.e ("karman", visitorDetailsPref.getStringPref (this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
+
+
         progressDialog = new ProgressDialog (this);
         PackageInfo pInfo = null;
         try {
@@ -365,7 +374,6 @@ public class MainActivity extends AppCompatActivity {
                                     visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_EMAIL, "");
                                     visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_MOBILE, "");
                                     visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY, "");
-                                    visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_FIREBASE_ID, "");
 
                                     Intent intent = new Intent (MainActivity.this, LoginActivity.class);
                                     intent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -500,7 +508,6 @@ public class MainActivity extends AppCompatActivity {
                         visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_EMAIL, "");
                         visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_MOBILE, "");
                         visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY, "");
-                        visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_FIREBASE_ID, "");
 
                         Intent intent = new Intent (MainActivity.this, LoginActivity.class);
                         intent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

@@ -6,8 +6,9 @@
     <string name="please_enter_name">Please enter Username</string>
     <string name="please_enter_email">Please enter Email</string>
     <string name="please_enter_mobile">Please enter Mobile</string>
-    <string name="please_enter_valid_email">Please enter valid Mobile</string>
+    <string name="please_enter_valid_email">Please enter valid Email</string>
     <string name="please_enter_valid_mobile">Please enter valid Mobile</string>
+    <string name="please_select_visitor_type">Please select visitor type</string>
     <string name="otp_didnt_match">OTP didn\'t match</string>
 
     <string name="activity_login_hint_full_name">Full Name</string>

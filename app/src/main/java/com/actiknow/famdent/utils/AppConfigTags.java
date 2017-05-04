@@ -39,6 +39,7 @@ public class AppConfigTags {
     public static final String NAME= "name";
     public static final String EMAIL = "email";
     public static final String MOBILE = "mobile";
+    public static final String FIREBASE_ID = "firebase_id";
 
     public static final String VERSION_CODE = "version_code";
     public static final String VERSION_NAME = "version_name";
@@ -46,14 +47,16 @@ public class AppConfigTags {
     public static final String VERSION_UPDATE_CRITICAL = "version_update_critical";
 
 
-    public static final String USER_NAME = "user_name";
-    public static final String USER_EMAIL = "user_email";
-    public static final String USER_MOBILE = "user_mobile";
-    public static final String USER_FIREBASE_ID = "user_firebase_id";
-    public static final String USER_LOGIN_KEY = "user_login_key";
+    public static final String VISITOR_ID = "visitor_id";
+    public static final String VISITOR_NAME = "visitor_name";
+    public static final String VISITOR_EMAIL = "visitor_email";
+    public static final String VISITOR_MOBILE = "visitor_mobile";
+    public static final String VISITOR_TYPE = "visitor_type";
+    public static final String VISITOR_LOGIN_KEY = "visitor_login_key";
 
 
     public static final String EXHIBITOR_ID = "exhibitor_id";
     public static final String PROGRAMME_ID = "programme_id";
+
 
 }

@@ -21,7 +21,6 @@ import java.util.ArrayList;
  */
 
 public class ProgrammeSpeakerFragment extends Fragment {
-    public static ProgrammeSpeaker programmeSpeaker2;
     public static ArrayList<ProgrammeSpeaker> programmeSpeakerList2;
     TextView tvSpeakerName;
     TextView tvSpeakerQualification;

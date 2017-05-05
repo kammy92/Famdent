@@ -50,4 +50,8 @@ public class Exhibitor {
     public void setStallDetailInList (StallDetail stallDetail) {
         this.stallDetailList.add (stallDetail);
     }
+
+    public void clearStallDetailList () {
+        this.stallDetailList.clear ();
+    }
 }

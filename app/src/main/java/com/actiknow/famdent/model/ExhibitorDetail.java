@@ -1,6 +1,7 @@
 package com.actiknow.famdent.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by l on 27/04/2017.
@@ -10,16 +11,14 @@ public class ExhibitorDetail {
     int id;
     boolean favourite;
     ArrayList<String> contactList = new ArrayList<> ();
-    String exhibitor_logo, exhibitor_name, hall_number, stall_number, address, email, website, notes;
+    ArrayList<StallDetail> stallDetailList = new ArrayList<> ();
+    String exhibitor_logo, exhibitor_name, address, email, website, notes;
 
-    public ExhibitorDetail (int id, boolean favourite, ArrayList<String> contactList, String exhibitor_logo, String exhibitor_name, String hall_number, String stall_number, String address, String email, String website, String notes) {
+    public ExhibitorDetail (int id, boolean favourite, String exhibitor_logo, String exhibitor_name, String address, String email, String website, String notes) {
         this.id = id;
         this.favourite = favourite;
-        this.contactList = contactList;
         this.exhibitor_logo = exhibitor_logo;
         this.exhibitor_name = exhibitor_name;
-        this.hall_number = hall_number;
-        this.stall_number = stall_number;
         this.address = address;
         this.email = email;
         this.website = website;
@@ -66,22 +65,6 @@ public class ExhibitorDetail {
         this.exhibitor_name = exhibitor_name;
     }
 
-    public String getHall_number () {
-        return hall_number;
-    }
-
-    public void setHall_number (String hall_number) {
-        this.hall_number = hall_number;
-    }
-
-    public String getStall_number () {
-        return stall_number;
-    }
-
-    public void setStall_number (String stall_number) {
-        this.stall_number = stall_number;
-    }
-
     public String getAddress () {
         return address;
     }
@@ -116,5 +99,21 @@ public class ExhibitorDetail {
 
     public void setContactInList (String contact) {
         this.contactList.add (contact);
+    }
+
+    public List<StallDetail> getStallDetailList () {
+        return stallDetailList;
+    }
+
+    public void setStallDetailList (ArrayList<StallDetail> stallDetailList) {
+        this.stallDetailList = stallDetailList;
+    }
+
+    public void setStallDetailInList (StallDetail stallDetail) {
+        this.stallDetailList.add (stallDetail);
+    }
+
+    public void clearStallDetailList () {
+        this.stallDetailList.clear ();
     }
 }

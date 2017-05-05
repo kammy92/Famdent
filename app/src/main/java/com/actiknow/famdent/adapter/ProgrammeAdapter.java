@@ -87,11 +87,9 @@ public class ProgrammeAdapter extends RecyclerView.Adapter<ProgrammeAdapter.View
         public void onClick(View v) {
             Programme programme = programmeList.get(getLayoutPosition());
             Intent intent = new Intent (activity, ProgrammeDetailActivity.class);
-            intent.putExtra (AppConfigTags.PROGRAMME_ID, programme.getId ());
+            intent.putExtra (AppConfigTags.EVENT_ID, programme.getId ());
             activity.startActivity (intent);
             activity.overridePendingTransition (R.anim.slide_in_right, R.anim.slide_out_left);
-
-
         }
     }
 }

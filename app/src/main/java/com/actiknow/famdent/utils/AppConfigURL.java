@@ -19,7 +19,14 @@ public class AppConfigURL {
     public static String URL_CHECK_VERSION = "check/status/version";
 
     public static String URL_EXHIBITOR_LIST = BASE_URL + "exhibitor";
+    public static String URL_EXHIBITOR_DETAIL = BASE_URL + "exhibitor";
 
-    public static String URL_EVENT = BASE_URL + "event";
+    public static String URL_EVENT_LIST = BASE_URL + "event";
+    public static String URL_EVENT_DETAIL = BASE_URL + "event";
+
+    public static String URL_EXHIBITOR_FAVOURITE = BASE_URL + "favourite/exhibitor";
+    public static String URL_EVENT_FAVOURITE = BASE_URL + "favourite/event";
+
+    public static String URL_EXHIBITOR_NOTE = BASE_URL + "notes/exhibitor";
 
 }

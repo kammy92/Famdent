@@ -21,7 +21,7 @@ public class AppConfigTags {
     public static final String MESSAGE = "message";
     public static final String DATABASE_LOG = "DATABASE LOG";
     public static final String HEADER_API_KEY = "api-key";
-    public static final String HEADER_USER_LOGIN_KEY = "user-login-key";
+    public static final String HEADER_VISITOR_LOGIN_KEY = "visitor-login-key";
 
     public static final String MESSAGE_TEXT = "Message Text";
 
@@ -77,6 +77,7 @@ public class AppConfigTags {
 
 
     public static final String EVENT_DETAIL_ID = "event_id";
+    public static final String EVENT_DETAIL_FAVOURITE = "event_favourite";
     public static final String EVENT_DETAIL_NAME = "event_name";
     public static final String EVENT_DETAIL_DATE = "event_date";
     public static final String EVENT_DETAIL_TIME = "event_time";
@@ -84,7 +85,6 @@ public class AppConfigTags {
     public static final String EVENT_DETAIL_FEES = "event_fees";
     public static final String EVENT_DETAIL_SPEAKERS = "event_speakers";
     public static final String EVENT_DETAIL_TOPICS = "event_topics";
-
 
     public static final String EVENT_DETAIL_SPEAKER_ID = "speaker_id";
     public static final String EVENT_DETAIL_SPEAKER_NAME = "speaker_name";
@@ -94,4 +94,12 @@ public class AppConfigTags {
     public static final String EVENT_DETAIL_TOPIC_TEXT = "topic_text";
 
 
+    public static final String EXHIBITOR_ADDRESS = "exhibitor_address";
+    public static final String EXHIBITOR_EMAIL = "exhibitor_email";
+    public static final String EXHIBITOR_NOTES = "exhibitor_notes";
+    public static final String EXHIBITOR_DESCRIPTION = "exhibitor_description";
+    public static final String EXHIBITOR_WEBSITE = "exhibitor_website";
+    public static final String EXHIBITOR_FAVOURITE = "exhibitor_favourite";
+    public static final String EXHIBITOR_CONTACTS = "exhibitor_contacts";
+    public static final String CONTACT = "contact";
 }

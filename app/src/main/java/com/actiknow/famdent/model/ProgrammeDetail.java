@@ -13,7 +13,7 @@ public class ProgrammeDetail {
     ArrayList<ProgrammeSpeaker> programmeSpeakerList = new ArrayList<> ();
     ArrayList<String> topicList = new ArrayList<> ();
 
-    public ProgrammeDetail (int id, boolean favourite, String name, String date, String time, String duration, String fees, ArrayList<ProgrammeSpeaker> programmeSpeakerList, ArrayList<String> topicList) {
+    public ProgrammeDetail (int id, boolean favourite, String name, String date, String time, String duration, String fees) {
         this.id = id;
         this.favourite = favourite;
         this.name = name;
@@ -21,8 +21,6 @@ public class ProgrammeDetail {
         this.time = time;
         this.duration = duration;
         this.fees = fees;
-        this.programmeSpeakerList = programmeSpeakerList;
-        this.topicList = topicList;
     }
 
     public int getId () {

@@ -1,5 +1,7 @@
 package com.actiknow.famdent.activity;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
@@ -20,14 +22,30 @@ import com.actiknow.famdent.R;
 import com.actiknow.famdent.fragment.ProgrammeSpeakerFragment;
 import com.actiknow.famdent.model.ProgrammeDetail;
 import com.actiknow.famdent.model.ProgrammeSpeaker;
+import com.actiknow.famdent.utils.AppConfigTags;
+import com.actiknow.famdent.utils.AppConfigURL;
 import com.actiknow.famdent.utils.Constants;
+import com.actiknow.famdent.utils.NetworkConnection;
 import com.actiknow.famdent.utils.SetTypeFace;
 import com.actiknow.famdent.utils.Utils;
+import com.actiknow.famdent.utils.VisitorDetailsPref;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by actiknow on 4/28/17.
@@ -45,8 +63,12 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
     ImageView ivBack;
     CoordinatorLayout clMain;
 
-    ArrayList<ProgrammeSpeaker> programmeSpeakerList = new ArrayList<> ();
+    int event_id;
+
+
+    //    ArrayList<ProgrammeSpeaker> programmeSpeakerList = new ArrayList<> ();
     TextView tvAddFavourite;
+    ProgressDialog progressDialog;
 
     //    private WrappingViewPager viewPager;
     private ViewPager viewPager2;
@@ -71,9 +93,12 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_programme_detail);
+        getExtras ();
         initView ();
         initData ();
         initListener ();
+
+        getEventDetailFromServer (event_id);
     }
 
     private void initListener () {
@@ -102,17 +127,7 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                             .onPositive (new MaterialDialog.SingleButtonCallback () {
                                 @Override
                                 public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    programmeDetail.setFavourite (false);
-                                    ivFavourite.setImageResource (R.drawable.ic_star_border);
-                                    tvAddFavourite.setVisibility (View.VISIBLE);
-                                    Utils.showSnackBar (ProgrammeDetailActivity.this, clMain, "Programme removed from favourites", Snackbar.LENGTH_LONG, getResources ().getString (R.string.snackbar_action_undo), new View.OnClickListener () {
-                                        @Override
-                                        public void onClick (View v) {
-                                            programmeDetail.setFavourite (true);
-                                            ivFavourite.setImageResource (R.drawable.ic_star);
-                                            tvAddFavourite.setVisibility (View.GONE);
-                                        }
-                                    });
+                                    updateFavouriteStatus (false, event_id);
                                 }
                             }).build ();
                     dialog.show ();
@@ -130,10 +145,7 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                             .onPositive (new MaterialDialog.SingleButtonCallback () {
                                 @Override
                                 public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    programmeDetail.setFavourite (true);
-                                    ivFavourite.setImageResource (R.drawable.ic_star);
-                                    tvAddFavourite.setVisibility (View.GONE);
-                                    Utils.showSnackBar (ProgrammeDetailActivity.this, clMain, "Programme added to favourites", Snackbar.LENGTH_LONG, null, null);
+                                    updateFavouriteStatus (true, event_id);
                                 }
                             }).build ();
                     dialog.show ();
@@ -158,17 +170,7 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                             .onPositive (new MaterialDialog.SingleButtonCallback () {
                                 @Override
                                 public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    programmeDetail.setFavourite (false);
-                                    ivFavourite.setImageResource (R.drawable.ic_star_border);
-                                    tvAddFavourite.setVisibility (View.VISIBLE);
-                                    Utils.showSnackBar (ProgrammeDetailActivity.this, clMain, "Programme removed from favourites", Snackbar.LENGTH_LONG, getResources ().getString (R.string.snackbar_action_undo), new View.OnClickListener () {
-                                        @Override
-                                        public void onClick (View v) {
-                                            programmeDetail.setFavourite (true);
-                                            ivFavourite.setImageResource (R.drawable.ic_star);
-                                            tvAddFavourite.setVisibility (View.GONE);
-                                        }
-                                    });
+                                    updateFavouriteStatus (false, event_id);
                                 }
                             }).build ();
                     dialog.show ();
@@ -186,18 +188,13 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                             .onPositive (new MaterialDialog.SingleButtonCallback () {
                                 @Override
                                 public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    programmeDetail.setFavourite (true);
-                                    ivFavourite.setImageResource (R.drawable.ic_star);
-                                    Utils.showSnackBar (ProgrammeDetailActivity.this, clMain, "Programme added to favourites", Snackbar.LENGTH_LONG, null, null);
-                                    tvAddFavourite.setVisibility (View.GONE);
+                                    updateFavouriteStatus (true, event_id);
                                 }
                             }).build ();
                     dialog.show ();
                 }
             }
         });
-
-
     }
 
     private void initView () {
@@ -216,45 +213,243 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
     }
 
     private void initData () {
+        progressDialog = new ProgressDialog (this);
         Utils.setTypefaceToAllViews (this, tvCost);
 
 
-        programmeSpeakerList.add (new ProgrammeSpeaker (1, "Karman Singh", "MBBS, MD", "9 Years"));
-        programmeSpeakerList.add (new ProgrammeSpeaker (2, "Rahul Jain", "MBBS, MD", "4 Years"));
-        programmeSpeakerList.add (new ProgrammeSpeaker (3, "Sudhanshu Sharma", "MBBS, MD", "6 Years"));
-        programmeSpeakerList.add (new ProgrammeSpeaker (4, "Sameer", "MBBS, MD", "6 Years"));
+//        programmeSpeakerList.add (new ProgrammeSpeaker (1, "Karman Singh", "MBBS, MD", "9 Years"));
+//        programmeSpeakerList.add (new ProgrammeSpeaker (2, "Rahul Jain", "MBBS, MD", "4 Years"));
+//        programmeSpeakerList.add (new ProgrammeSpeaker (3, "Sudhanshu Sharma", "MBBS, MD", "6 Years"));
+//        programmeSpeakerList.add (new ProgrammeSpeaker (4, "Sameer", "MBBS, MD", "6 Years"));
 
-        ArrayList<String> topicList = new ArrayList<> ();
-        topicList.add ("Impaction");
-        topicList.add ("Implantology");
-        topicList.add ("TMU Surgery");
+//        ArrayList<String> topicList = new ArrayList<> ();
+//        topicList.add ("Impaction");
+//        topicList.add ("Implantology");
+//        topicList.add ("TMU Surgery");
 
-        programmeDetail = new ProgrammeDetail (1, true, "asd", "24/05/2017", "13:00", "3 Hours", "10,000", programmeSpeakerList, topicList);
+//        programmeDetail = new ProgrammeDetail (1, true, "asd", "24/05/2017", "13:00", "3 Hours", "10,000", programmeSpeakerList, topicList);
 
-        if (programmeDetail.isFavourite ()) {
-            ivFavourite.setImageResource (R.drawable.ic_star);
-        } else {
-            ivFavourite.setImageResource (R.drawable.ic_star_border);
-        }
+//        if (programmeDetail.isFavourite ()) {
+//            ivFavourite.setImageResource (R.drawable.ic_star);
+//        } else {
+//            ivFavourite.setImageResource (R.drawable.ic_star_border);
+//        }
 
-        for (int i = 0; i < programmeDetail.getTopicList ().size (); i++) {
-            ArrayList<String> topicListTemp = programmeDetail.getTopicList ();
-            TextView tv = new TextView (this);
-            tv.setText ("\u25B8 " + topicListTemp.get (i));
-            tv.setTextSize (18);
-            tv.setTypeface (SetTypeFace.getTypeface (this, Constants.font_name));
-            tv.setTextColor (getResources ().getColor (R.color.app_text_color_dark));
-            llTopics.addView (tv);
-        }
+//        for (int i = 0; i < programmeDetail.getTopicList ().size (); i++) {
+//            ArrayList<String> topicListTemp = programmeDetail.getTopicList ();
+//            TextView tv = new TextView (this);
+//            tv.setText ("\u25B8 " + topicListTemp.get (i));
+//            tv.setTextSize (18);
+//            tv.setTypeface (SetTypeFace.getTypeface (this, Constants.font_name));
+//            tv.setTextColor (getResources ().getColor (R.color.app_text_color_dark));
+//            llTopics.addView (tv);
+//        }
 
-        tvDate.setText ("Date: " + programmeDetail.getDate ());
-        tvTime.setText ("Time: " + programmeDetail.getTime ());
-        tvDuration.setText ("Duration: " + programmeDetail.getDuration ());
-        tvCost.setText ("The Seminar costs Rs " + programmeDetail.getFees ());
+//        tvDate.setText ("Date: " + programmeDetail.getDate ());
+//        tvTime.setText ("Time: " + programmeDetail.getTime ());
+//        tvDuration.setText ("Duration: " + programmeDetail.getDuration ());
+//        tvCost.setText ("The Seminar costs Rs " + programmeDetail.getFees ());
 
-        setUpViewPager (viewPager2);
+//        setUpViewPager (viewPager2);
 
     }
+
+    private void getExtras () {
+        Intent intent = getIntent ();
+        event_id = intent.getIntExtra (AppConfigTags.EVENT_ID, 0);
+    }
+
+
+    private void getEventDetailFromServer (int event_id) {
+        if (NetworkConnection.isNetworkAvailable (this)) {
+            Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_please_wait), false);
+            Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_EVENT_DETAIL + "/" + event_id, true);
+            StringRequest strRequest = new StringRequest (Request.Method.GET, AppConfigURL.URL_EVENT_DETAIL + "/" + event_id,
+                    new Response.Listener<String> () {
+                        @Override
+                        public void onResponse (String response) {
+                            Utils.showLog (Log.INFO, AppConfigTags.SERVER_RESPONSE, response, true);
+                            if (response != null) {
+                                try {
+                                    JSONObject jsonObj = new JSONObject (response);
+                                    boolean error = jsonObj.getBoolean (AppConfigTags.ERROR);
+                                    String message = jsonObj.getString (AppConfigTags.MESSAGE);
+                                    if (! error) {
+                                        programmeDetail = new ProgrammeDetail (
+                                                jsonObj.getInt (AppConfigTags.EVENT_DETAIL_ID),
+                                                jsonObj.getBoolean (AppConfigTags.EVENT_DETAIL_FAVOURITE),
+                                                jsonObj.getString (AppConfigTags.EVENT_DETAIL_NAME),
+                                                jsonObj.getString (AppConfigTags.EVENT_DETAIL_DATE),
+                                                jsonObj.getString (AppConfigTags.EVENT_DETAIL_TIME),
+                                                jsonObj.getString (AppConfigTags.EVENT_DETAIL_DURATION),
+                                                jsonObj.getString (AppConfigTags.EVENT_DETAIL_FEES));
+
+                                        JSONArray jsonArraySpeakers = jsonObj.getJSONArray (AppConfigTags.EVENT_DETAIL_SPEAKERS);
+                                        ArrayList<ProgrammeSpeaker> programmeSpeakerList = new ArrayList<> ();
+                                        for (int i = 0; i < jsonArraySpeakers.length (); i++) {
+                                            JSONObject jsonObjectSpeakers = jsonArraySpeakers.getJSONObject (i);
+                                            ProgrammeSpeaker programmeSpeaker = new ProgrammeSpeaker (
+                                                    jsonObjectSpeakers.getInt (AppConfigTags.EVENT_DETAIL_SPEAKER_ID),
+                                                    jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_NAME),
+                                                    jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_QUALIFICATION),
+                                                    jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_EXPERIENCE)
+                                            );
+                                            programmeSpeakerList.add (programmeSpeaker);
+                                        }
+                                        programmeDetail.setProgrammeSpeakerList (programmeSpeakerList);
+
+                                        ArrayList<String> topicList = new ArrayList<> ();
+                                        JSONArray jsonArrayTopic = jsonObj.getJSONArray (AppConfigTags.EVENT_DETAIL_TOPICS);
+                                        for (int j = 0; j < jsonArrayTopic.length (); j++) {
+                                            JSONObject jsonObjectTopic = jsonArrayTopic.getJSONObject (j);
+                                            topicList.add (jsonObjectTopic.getString (AppConfigTags.EVENT_DETAIL_TOPIC_TEXT));
+                                        }
+                                        programmeDetail.setTopicList (topicList);
+                                    }
+
+
+                                    for (int i = 0; i < programmeDetail.getTopicList ().size (); i++) {
+                                        ArrayList<String> topicListTemp = programmeDetail.getTopicList ();
+                                        TextView tv = new TextView (ProgrammeDetailActivity.this);
+                                        tv.setText ("\u25B8 " + topicListTemp.get (i));
+                                        tv.setTextSize (16);
+                                        tv.setTypeface (SetTypeFace.getTypeface (ProgrammeDetailActivity.this, Constants.font_name));
+                                        tv.setTextColor (getResources ().getColor (R.color.app_text_color_dark));
+                                        llTopics.addView (tv);
+                                    }
+
+                                    tvDate.setText ("Date: " + programmeDetail.getDate ());
+                                    tvTime.setText ("Time: " + programmeDetail.getTime ());
+                                    tvDuration.setText ("Duration: " + programmeDetail.getDuration ());
+                                    tvCost.setText ("The Seminar costs Rs " + programmeDetail.getFees ());
+
+                                    if (programmeDetail.isFavourite ()) {
+                                        ivFavourite.setImageResource (R.drawable.ic_star);
+                                        tvAddFavourite.setVisibility (View.GONE);
+                                    } else {
+                                        ivFavourite.setImageResource (R.drawable.ic_star_border);
+                                        tvAddFavourite.setVisibility (View.VISIBLE);
+                                    }
+
+                                    setUpViewPager (viewPager2);
+
+                                    progressDialog.dismiss ();
+                                } catch (Exception e) {
+                                    progressDialog.dismiss ();
+                                    e.printStackTrace ();
+                                }
+                            } else {
+                                progressDialog.dismiss ();
+                                Utils.showLog (Log.WARN, AppConfigTags.SERVER_RESPONSE, AppConfigTags.DIDNT_RECEIVE_ANY_DATA_FROM_SERVER, true);
+                            }
+                        }
+                    },
+                    new Response.ErrorListener () {
+                        @Override
+                        public void onErrorResponse (VolleyError error) {
+                            progressDialog.dismiss ();
+                            Utils.showLog (Log.ERROR, AppConfigTags.VOLLEY_ERROR, error.toString (), true);
+                        }
+                    }) {
+                @Override
+                public Map<String, String> getHeaders () throws AuthFailureError {
+                    VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
+                    Map<String, String> params = new HashMap<> ();
+                    params.put (AppConfigTags.HEADER_API_KEY, Constants.api_key);
+                    params.put (AppConfigTags.HEADER_VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (ProgrammeDetailActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
+                    Utils.showLog (Log.INFO, AppConfigTags.HEADERS_SENT_TO_THE_SERVER, "" + params, false);
+                    return params;
+                }
+            };
+            strRequest.setRetryPolicy (new DefaultRetryPolicy (DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            Utils.sendRequest (strRequest, 30);
+        } else {
+            progressDialog.dismiss ();
+        }
+    }
+
+    private void updateFavouriteStatus (final boolean add_favourite, final int event_id) {
+        if (NetworkConnection.isNetworkAvailable (this)) {
+            Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_please_wait), false);
+            String URL;
+            if (add_favourite) {
+                URL = AppConfigURL.URL_EVENT_FAVOURITE + "/add";
+            } else {
+                URL = AppConfigURL.URL_EVENT_FAVOURITE + "/remove";
+            }
+            Utils.showLog (Log.INFO, AppConfigTags.URL, URL, true);
+            StringRequest strRequest = new StringRequest (Request.Method.POST, URL,
+                    new Response.Listener<String> () {
+                        @Override
+                        public void onResponse (String response) {
+                            Utils.showLog (Log.INFO, AppConfigTags.SERVER_RESPONSE, response, true);
+                            if (response != null) {
+                                try {
+                                    JSONObject jsonObj = new JSONObject (response);
+                                    boolean error = jsonObj.getBoolean (AppConfigTags.ERROR);
+                                    String message = jsonObj.getString (AppConfigTags.MESSAGE);
+                                    if (! error) {
+                                        if (add_favourite) {
+                                            programmeDetail.setFavourite (true);
+                                            ivFavourite.setImageResource (R.drawable.ic_star);
+                                            tvAddFavourite.setVisibility (View.GONE);
+                                            Utils.showSnackBar (ProgrammeDetailActivity.this, clMain, "Exhibitor added to favourites", Snackbar.LENGTH_LONG, null, null);
+                                        } else {
+                                            programmeDetail.setFavourite (false);
+                                            ivFavourite.setImageResource (R.drawable.ic_star_border);
+                                            tvAddFavourite.setVisibility (View.VISIBLE);
+                                            Utils.showSnackBar (ProgrammeDetailActivity.this, clMain, "Exhibitor removed from favourites", Snackbar.LENGTH_LONG, getResources ().getString (R.string.snackbar_action_undo), new View.OnClickListener () {
+                                                @Override
+                                                public void onClick (View v) {
+                                                    updateFavouriteStatus (true, event_id);
+                                                }
+                                            });
+                                        }
+                                    }
+                                    progressDialog.dismiss ();
+                                } catch (Exception e) {
+                                    progressDialog.dismiss ();
+                                    e.printStackTrace ();
+                                }
+                            } else {
+                                progressDialog.dismiss ();
+                                Utils.showLog (Log.WARN, AppConfigTags.SERVER_RESPONSE, AppConfigTags.DIDNT_RECEIVE_ANY_DATA_FROM_SERVER, true);
+                            }
+                        }
+                    },
+                    new Response.ErrorListener () {
+                        @Override
+                        public void onErrorResponse (VolleyError error) {
+                            progressDialog.dismiss ();
+                            Utils.showLog (Log.ERROR, AppConfigTags.VOLLEY_ERROR, error.toString (), true);
+                        }
+                    }) {
+
+                @Override
+                protected Map<String, String> getParams () throws AuthFailureError {
+                    Map<String, String> params = new Hashtable<String, String> ();
+                    params.put (AppConfigTags.EVENT_ID, String.valueOf (event_id));
+                    Utils.showLog (Log.INFO, AppConfigTags.PARAMETERS_SENT_TO_THE_SERVER, "" + params, true);
+                    return params;
+                }
+
+                @Override
+                public Map<String, String> getHeaders () throws AuthFailureError {
+                    VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
+                    Map<String, String> params = new HashMap<> ();
+                    params.put (AppConfigTags.HEADER_API_KEY, Constants.api_key);
+                    params.put (AppConfigTags.HEADER_VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (ProgrammeDetailActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
+                    Utils.showLog (Log.INFO, AppConfigTags.HEADERS_SENT_TO_THE_SERVER, "" + params, false);
+                    return params;
+                }
+            };
+            strRequest.setRetryPolicy (new DefaultRetryPolicy (DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            Utils.sendRequest (strRequest, 30);
+        } else {
+            progressDialog.dismiss ();
+        }
+    }
+
 
     private void setUpViewPager (ViewPager viewPager) {
         ArrayList<ProgrammeSpeaker> programmeSpeakerList = programmeDetail.getProgrammeSpeakerList ();
@@ -298,7 +493,7 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem (int position) {
-            return ProgrammeSpeakerFragment.newInstance (position, programmeSpeakerList);
+            return ProgrammeSpeakerFragment.newInstance (position, programmeDetail.getProgrammeSpeakerList ());
         }
 
         @Override

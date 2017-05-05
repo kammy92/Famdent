@@ -85,6 +85,7 @@ public class ExhibitorListActivity extends AppCompatActivity {
     private void initData () {
         category = new String[] {"Air Abrasion", "Curing Lights", "Disposable Needles"};
 
+        swipeRefreshLayout.setRefreshing (true);
 
 //        exhibitorList.add (new Exhibitor (1, "http://seeklogo.com/images/1/3M-logo-079FB52BC8-seeklogo.com.png", "3M ESPE", "Hall 1", "Stall 28"));
 //        exhibitorList.add (new Exhibitor (2, "http://mudrsoc.com/wp-content/uploads/2017/01/Dentsply-Logo-Black.jpg", "DENTSPLY SIRONA", "Hall 1", "Stall 31"));
@@ -106,7 +107,8 @@ public class ExhibitorListActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener (new SwipeRefreshLayout.OnRefreshListener () {
             @Override
             public void onRefresh () {
-                swipeRefreshLayout.setRefreshing (false);
+                swipeRefreshLayout.setRefreshing (true);
+                getExhibitorList ();
             }
         });
         ivBack.setOnClickListener (new View.OnClickListener () {
@@ -162,7 +164,6 @@ public class ExhibitorListActivity extends AppCompatActivity {
         });
     }
 
-
     private void getExhibitorList () {
         if (NetworkConnection.isNetworkAvailable (this)) {
             tvNoResult.setVisibility (View.GONE);
@@ -188,6 +189,7 @@ public class ExhibitorListActivity extends AppCompatActivity {
                                                     jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_NAME));
 
                                             JSONArray jsonArrayStallDetails = jsonObjectExhibitor.getJSONArray (AppConfigTags.STALL_DETAILS);
+                                            exhibitor.clearStallDetailList ();
                                             for (int j = 0; j < jsonArrayStallDetails.length (); j++) {
                                                 JSONObject jsonObjectStallDetail = jsonArrayStallDetails.getJSONObject (j);
                                                 StallDetail stallDetail = new StallDetail (
@@ -248,24 +250,21 @@ public class ExhibitorListActivity extends AppCompatActivity {
                     Map<String, String> params = new HashMap<> ();
                     VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
                     params.put (AppConfigTags.HEADER_API_KEY, Constants.api_key);
-                    params.put (AppConfigTags.VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (ExhibitorListActivity.this, visitorDetailsPref.VISITOR_LOGIN_KEY));
+                    params.put (AppConfigTags.HEADER_VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (ExhibitorListActivity.this, visitorDetailsPref.VISITOR_LOGIN_KEY));
                     Utils.showLog (Log.INFO, AppConfigTags.HEADERS_SENT_TO_THE_SERVER, "" + params, false);
                     return params;
                 }
             };
             Utils.sendRequest (strRequest, 5);
         } else {
-            // getOfflineData();
             swipeRefreshLayout.setRefreshing (false);
             tvNoResult.setVisibility (View.VISIBLE);
         }
     }
-
 
     @Override
     public void onBackPressed () {
         finish ();
         overridePendingTransition (R.anim.slide_in_left, R.anim.slide_out_right);
     }
-
 }

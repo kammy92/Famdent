@@ -344,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
                 public Map<String, String> getHeaders () throws AuthFailureError {
                     Map<String, String> params = new HashMap<> ();
                     params.put (AppConfigTags.HEADER_API_KEY, Constants.api_key);
-                    params.put (AppConfigTags.HEADER_USER_LOGIN_KEY, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
+                    params.put (AppConfigTags.HEADER_VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
                     Utils.showLog (Log.INFO, AppConfigTags.HEADERS_SENT_TO_THE_SERVER, "" + params, false);
                     return params;
                 }
@@ -410,7 +410,7 @@ public class MainActivity extends AppCompatActivity {
                 public Map<String, String> getHeaders () throws AuthFailureError {
                     Map<String, String> params = new HashMap<> ();
                     params.put (AppConfigTags.HEADER_API_KEY, Constants.api_key);
-                    params.put (AppConfigTags.HEADER_USER_LOGIN_KEY, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
+                    params.put (AppConfigTags.HEADER_VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
                     Utils.showLog (Log.INFO, AppConfigTags.HEADERS_SENT_TO_THE_SERVER, "" + params, false);
                     return params;
                 }
@@ -473,7 +473,7 @@ public class MainActivity extends AppCompatActivity {
                 public Map<String, String> getHeaders () throws AuthFailureError {
                     Map<String, String> params = new HashMap<> ();
                     params.put (AppConfigTags.HEADER_API_KEY, Constants.api_key);
-                    params.put (AppConfigTags.HEADER_USER_LOGIN_KEY, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
+                    params.put (AppConfigTags.HEADER_VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
                     Utils.showLog (Log.INFO, AppConfigTags.HEADERS_SENT_TO_THE_SERVER, "" + params, false);
                     return params;
                 }

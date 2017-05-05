@@ -11,10 +11,16 @@
     <string name="please_select_visitor_type">Please select visitor type</string>
     <string name="otp_didnt_match">OTP didn\'t match</string>
 
+
     <string name="activity_login_hint_full_name">Full Name</string>
     <string name="activity_login_hint_email">Email Address</string>
     <string name="activity_login_hint_mobile">Mobile</string>
     <string name="activity_login_button_submit">SUBMIT</string>
+    <string name="activity_login_text_i_agree">You agree to our Term and Condition and Privacy
+        Policy
+    </string>
+    <string name="activity_login_text_check_term_condition">Please check our Term And Condition
+    </string>
 
 
     <string name="activity_main_text_no_service_found">No Services Found</string>

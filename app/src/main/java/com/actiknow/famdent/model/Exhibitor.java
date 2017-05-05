@@ -1,19 +1,20 @@
 package com.actiknow.famdent.model;
 
-/**
- * Created by l on 27/04/2017.
- */
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Exhibitor {
     int id;
-    String exhibitor_logo, exhibitor_name,hall_number,stall_number;
+    String exhibitor_logo, exhibitor_name;
+    List<StallDetail> stallDetailList = new ArrayList<> ();
 
-    public Exhibitor (int id, String exhibitor_logo, String exhibitor_name, String hall_number, String stall_number) {
+    public Exhibitor (int id, String exhibitor_logo, String exhibitor_name, List<StallDetail> stallDetailList) {
         this.id = id;
         this.exhibitor_logo = exhibitor_logo;
         this.exhibitor_name = exhibitor_name;
-        this.hall_number = hall_number;
-        this.stall_number = stall_number;
+        this.stallDetailList = stallDetailList;
+
     }
 
     public int getId () {
@@ -40,19 +41,15 @@ public class Exhibitor {
         this.exhibitor_name = exhibitor_name;
     }
 
-    public String getHall_number () {
-        return hall_number;
+    public List<StallDetail> getStallDetailList () {
+        return stallDetailList;
     }
 
-    public void setHall_number (String hall_number) {
-        this.hall_number = hall_number;
+    public void setStallDetailList (List<StallDetail> stallDetailList) {
+        this.stallDetailList = stallDetailList;
     }
 
-    public String getStall_number () {
-        return stall_number;
-    }
-
-    public void setStall_number (String stall_number) {
-        this.stall_number = stall_number;
+    public void setStallDetailInList (StallDetail stallDetail) {
+        this.stallDetailList.add (stallDetail);
     }
 }

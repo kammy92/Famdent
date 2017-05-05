@@ -28,10 +28,14 @@ import android.text.InputFilter;
 import android.text.InputType;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -76,6 +80,10 @@ public class LoginActivity extends AppCompatActivity {
     ProgressDialog progressDialog;
     VisitorDetailsPref visitorDetailsPref;
     ImageView ivIndiaSupplyLogo;
+
+    TextView tvTerm;
+    CheckBox cbTermAndCondition;
+
     Spinner spType;
     String visitor_id, name, email, mobile, login_key;
     int otp;
@@ -98,6 +106,14 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog (LoginActivity.this);
         SpinnerAdapter spinnerAdapter = new SpinnerAdapter (this, android.R.layout.simple_list_item_1, user_type);
         spType.setAdapter (spinnerAdapter);
+
+        SpannableString ss = new SpannableString (getResources ().getString (R.string.activity_login_text_i_agree));
+        ss.setSpan (new myClickableSpan (1), 17, 35, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan (new myClickableSpan (2), 40, 54, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        tvTerm.setText (ss);
+        tvTerm.setMovementMethod (LinkMovementMethod.getInstance ());
+
+
     }
 
     private void initView () {
@@ -106,6 +122,8 @@ public class LoginActivity extends AppCompatActivity {
         etEmail = (EditText) findViewById (R.id.etEmail);
         etMobile = (EditText) findViewById (R.id.etMobile);
         spType = (Spinner) findViewById (R.id.spType);
+        tvTerm = (TextView) findViewById (R.id.tvTermConditions);
+        cbTermAndCondition = (CheckBox) findViewById (R.id.cbTerm);
         tvSubmit = (TextView) findViewById (R.id.tvSubmit);
         ivIndiaSupplyLogo = (ImageView) findViewById (R.id.ivIndiaSupplyLogo);
         Utils.setTypefaceToAllViews (this, tvSubmit);
@@ -129,6 +147,9 @@ public class LoginActivity extends AppCompatActivity {
                 s6.setSpan (new TypefaceSpan (LoginActivity.this, Constants.font_name), 0, s6.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 SpannableString s7 = new SpannableString (getResources ().getString (R.string.please_select_visitor_type));
                 s7.setSpan (new TypefaceSpan (LoginActivity.this, Constants.font_name), 0, s7.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                SpannableString s8 = new SpannableString (getResources ().getString (R.string.activity_login_text_check_term_condition));
+                s8.setSpan (new TypefaceSpan (LoginActivity.this, Constants.font_name), 0, s8.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
 
                 if (etName.getText ().toString ().trim ().length () == 0 && etEmail.getText ().toString ().length () == 0 && etMobile.getText ().toString ().length () == 0) {
                     etName.setError (s);
@@ -144,6 +165,8 @@ public class LoginActivity extends AppCompatActivity {
                     etMobile.setError (s3);
                 } else if (spType.getSelectedItem ().toString ().equalsIgnoreCase (user_type[0])) {
                     Toast.makeText (LoginActivity.this, s7, Toast.LENGTH_LONG).show ();
+                } else if (! cbTermAndCondition.isChecked ()) {
+                    Toast.makeText (LoginActivity.this, s8, Toast.LENGTH_LONG).show ();
                 } else {
                     switch (Utils.isValidMobile (etMobile.getText ().toString ())) {
                         case 1:
@@ -628,6 +651,22 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
     }
+
+    public class myClickableSpan extends ClickableSpan {
+
+        int pos;
+
+        public myClickableSpan (int position) {
+            this.pos = position;
+        }
+
+        @Override
+        public void onClick (View widget) {
+            Toast.makeText (getApplicationContext (), "Position " + pos + " clicked!", Toast.LENGTH_LONG).show ();
+        }
+
+    }
+
 
 }
 

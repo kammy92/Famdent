@@ -17,4 +17,6 @@ public class AppConfigURL {
     public static String URL_INIT = BASE_URL + "/init";
     public static String URL_LOGOUT = BASE_URL + "/logout";
     public static String URL_CHECK_VERSION = "check/status/version";
+
+    public static String URL_EXHIBITOR_LIST = BASE_URL + "exhibitor";
 }

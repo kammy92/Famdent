@@ -59,4 +59,12 @@ public class AppConfigTags {
     public static final String PROGRAMME_ID = "programme_id";
 
 
+    public static final String EXHIBITOR = "exhibitors";
+    public static final String EXHIBITOR_NAME = "exhibitor_name";
+    public static final String STALL_DETAILS = "stall_details";
+    public static final String STALL_NAME = "stall_name";
+    public static final String HALL_NUMBER = "hall_number";
+    public static final String STALL_NUMBER = "stall_number";
+
+
 }

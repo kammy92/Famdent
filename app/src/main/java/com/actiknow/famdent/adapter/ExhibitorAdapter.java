@@ -45,8 +45,8 @@ public class ExhibitorAdapter extends RecyclerView.Adapter<ExhibitorAdapter.View
         holder.tvHallNumber.setTypeface (SetTypeFace.getTypeface (activity));
 
         holder.tvExhibitorName.setText(exhibitor.getExhibitor_name ());
-        holder.tvStallNumber.setText(exhibitor.getStall_number());
-        holder.tvHallNumber.setText(exhibitor.getHall_number());
+//        holder.tvStallNumber.setText(exhibitor.getStall_number());
+//        holder.tvHallNumber.setText(exhibitor.getHall_number());
         //Glide.with(activity).load("").placeholder(homeService.getIcon()).into(holder.ivIcon);
     }
 

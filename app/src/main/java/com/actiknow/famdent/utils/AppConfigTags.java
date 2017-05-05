@@ -60,11 +60,38 @@ public class AppConfigTags {
 
 
     public static final String EXHIBITOR = "exhibitors";
+    public static final String EXHIBITOR_LOGO = "exhibitor_logo";
     public static final String EXHIBITOR_NAME = "exhibitor_name";
     public static final String STALL_DETAILS = "stall_details";
     public static final String STALL_NAME = "stall_name";
     public static final String HALL_NUMBER = "hall_number";
     public static final String STALL_NUMBER = "stall_number";
+
+
+    public static final String EVENTS = "events";
+    public static final String EVENT_ID = "event_id";
+    public static final String EVENT_NAME = "event_name";
+    public static final String EVENT_SPEAKERS = "event_speakers";
+    public static final String EVENT_DATE = "event_date";
+    public static final String EVENT_TIME = "event_time";
+
+
+    public static final String EVENT_DETAIL_ID = "event_id";
+    public static final String EVENT_DETAIL_NAME = "event_name";
+    public static final String EVENT_DETAIL_DATE = "event_date";
+    public static final String EVENT_DETAIL_TIME = "event_time";
+    public static final String EVENT_DETAIL_DURATION = "event_duration";
+    public static final String EVENT_DETAIL_FEES = "event_fees";
+    public static final String EVENT_DETAIL_SPEAKERS = "event_speakers";
+    public static final String EVENT_DETAIL_TOPICS = "event_topics";
+
+
+    public static final String EVENT_DETAIL_SPEAKER_ID = "speaker_id";
+    public static final String EVENT_DETAIL_SPEAKER_NAME = "speaker_name";
+    public static final String EVENT_DETAIL_SPEAKER_QUALIFICATION = "speaker_qualification";
+    public static final String EVENT_DETAIL_SPEAKER_EXPERIENCE = "speaker_experience";
+    public static final String EVENT_DETAIL_TOPIC_ID = "topic_id";
+    public static final String EVENT_DETAIL_TOPIC_TEXT = "topic_text";
 
 
 }

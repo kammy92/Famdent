@@ -184,10 +184,10 @@ public class ExhibitorListActivity extends AppCompatActivity {
                                             JSONObject jsonObjectExhibitor = jsonArrayExhibitor.getJSONObject (i);
                                             Exhibitor exhibitor = new Exhibitor (
                                                     jsonObjectExhibitor.getInt (AppConfigTags.EXHIBITOR_ID),
-                                                    jsonObjectExhibitor.getString (""),
-                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_NAME), null);
+                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_LOGO),
+                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_NAME));
 
-                                            JSONArray jsonArrayStallDetails = jsonObj.getJSONArray (AppConfigTags.STALL_DETAILS);
+                                            JSONArray jsonArrayStallDetails = jsonObjectExhibitor.getJSONArray (AppConfigTags.STALL_DETAILS);
                                             for (int j = 0; j < jsonArrayStallDetails.length (); j++) {
                                                 JSONObject jsonObjectStallDetail = jsonArrayStallDetails.getJSONObject (j);
                                                 StallDetail stallDetail = new StallDetail (

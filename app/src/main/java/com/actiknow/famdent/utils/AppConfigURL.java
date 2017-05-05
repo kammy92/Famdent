@@ -19,4 +19,7 @@ public class AppConfigURL {
     public static String URL_CHECK_VERSION = "check/status/version";
 
     public static String URL_EXHIBITOR_LIST = BASE_URL + "exhibitor";
+
+    public static String URL_EVENT = BASE_URL + "event";
+
 }

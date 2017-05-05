@@ -9,12 +9,10 @@ public class Exhibitor {
     String exhibitor_logo, exhibitor_name;
     List<StallDetail> stallDetailList = new ArrayList<> ();
 
-    public Exhibitor (int id, String exhibitor_logo, String exhibitor_name, List<StallDetail> stallDetailList) {
+    public Exhibitor (int id, String exhibitor_logo, String exhibitor_name) {
         this.id = id;
         this.exhibitor_logo = exhibitor_logo;
         this.exhibitor_name = exhibitor_name;
-        this.stallDetailList = stallDetailList;
-
     }
 
     public int getId () {

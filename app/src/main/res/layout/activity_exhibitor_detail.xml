@@ -119,7 +119,7 @@
                         android:layout_below="@+id/tvExhibitorName"
                         android:layout_toEndOf="@+id/ivLocation"
                         android:layout_toRightOf="@+id/ivLocation"
-                        android:text="3M Space Division, Concord block, UB city 24, Vittal Mallya Road, New Delhi 110075, India "
+                        android:text="Coming soon..."
                         android:textColor="@color/app_text_color_dark"
                         android:textSize="@dimen/text_size_medium"/>
                 </RelativeLayout>
@@ -147,6 +147,13 @@
                         android:layout_toEndOf="@+id/ivPhone"
                         android:layout_toRightOf="@+id/ivPhone"
                         android:orientation="vertical">
+
+                        <TextView android:layout_width="match_parent"
+                                  android:layout_height="match_parent"
+                                  android:text="Coming soon..."
+                                  android:textColor="@color/app_text_color_dark"
+                                  android:textSize="@dimen/text_size_medium"/>
+
                     </LinearLayout>
 
 
@@ -174,7 +181,7 @@
                         android:layout_toEndOf="@+id/ivEmail"
                         android:layout_toRightOf="@+id/ivEmail"
                         android:gravity="center_vertical"
-                        android:text="Rahuljain_35@yahoo.com"
+                        android:text="Coming soon..."
                         android:textColor="@color/app_text_color_dark"
                         android:textSize="@dimen/text_size_medium"/>
                 </RelativeLayout>
@@ -202,7 +209,7 @@
                         android:layout_toEndOf="@+id/ivWebsite"
                         android:layout_toRightOf="@+id/ivWebsite"
                         android:gravity="center_vertical"
-                        android:text="www.actiknow.com"
+                        android:text="Coming soon..."
                         android:textColor="@color/app_text_color_dark"
                         android:textSize="@dimen/text_size_medium"
                     />

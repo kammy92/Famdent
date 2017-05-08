@@ -9,7 +9,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -412,10 +411,12 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
 
 
                                         tvExhibitorName.setText (exhibitorDetail.getExhibitor_name ());
+/*
+
                                         tvFullAddress.setText (exhibitorDetail.getAddress ());
                                         tvEmail.setText (Html.fromHtml ("<u><font color='blue'>" + exhibitorDetail.getEmail () + "</font></u>"), TextView.BufferType.SPANNABLE);
                                         tvWebsite.setText (Html.fromHtml ("<u><font color='blue'>" + exhibitorDetail.getWebsite () + "</font></u>"), TextView.BufferType.SPANNABLE);
-
+                                        tvNotes.setText (exhibitorDetail.getNotes ());
 
                                         for (int i = 0; i < exhibitorDetail.getContactList ().size (); i++) {
                                             final ArrayList<String> contactList2 = exhibitorDetail.getContactList ();
@@ -436,7 +437,7 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
                                             });
                                             llPhone.addView (tv);
                                         }
-
+*/
                                         if (exhibitorDetail.isFavourite ()) {
                                             ivFavourite.setImageResource (R.drawable.ic_star);
                                             tvAddFavourite.setVisibility (View.GONE);
@@ -448,9 +449,12 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
                                         }
 
                                         if (exhibitorDetail.getNotes ().length () > 0) {
+                                            tvNotes.setText (exhibitorDetail.getNotes ());
                                             rlNotes.setVisibility (View.VISIBLE);
+                                            tvAddNotes.setText ("EDIT NOTES");
                                         } else {
                                             rlNotes.setVisibility (View.GONE);
+                                            tvAddNotes.setText ("ADD NOTES");
                                         }
                                     }
                                     progressDialog.dismiss ();
@@ -603,8 +607,10 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
                                         tvNotes.setText (exhibitorDetail.getNotes ());
                                         if (exhibitorDetail.getNotes ().length () > 0) {
                                             rlNotes.setVisibility (View.VISIBLE);
+                                            tvAddNotes.setText ("EDIT NOTES");
                                         } else {
                                             rlNotes.setVisibility (View.GONE);
+                                            tvAddNotes.setText ("ADD NOTES");
                                         }
                                         Utils.showSnackBar (ExhibitorDetailActivity.this, clMain, message, Snackbar.LENGTH_LONG, null, null);
                                     }

@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.actiknow.famdent.R;
@@ -37,6 +38,10 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -63,6 +68,12 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
     ImageView ivBack;
     CoordinatorLayout clMain;
 
+    ImageView ivSpeakerImage;
+    ProgressBar progressBar;
+    TextView tvSpeakerName;
+    //    ExpandableTextView tvSpeakerQualification;
+    TextView tvSpeakerQualification;
+
     int event_id;
 
 
@@ -71,6 +82,7 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
     ProgressDialog progressDialog;
 
     //    private WrappingViewPager viewPager;
+
     private ViewPager viewPager2;
     private LinearLayout dotsLayout;
     private TextView[] dots;
@@ -195,6 +207,25 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                 }
             }
         });
+
+        tvSpeakerQualification.setOnClickListener (new View.OnClickListener () {
+            @Override
+            public void onClick (View v) {
+                ArrayList<ProgrammeSpeaker> programmeSpeakerList = programmeDetail.getProgrammeSpeakerList ();
+                ProgrammeSpeaker programmeSpeaker = programmeSpeakerList.get (0);
+                MaterialDialog dialog = new MaterialDialog.Builder (ProgrammeDetailActivity.this)
+                        .title (programmeSpeaker.getName ())
+                        .content (programmeSpeaker.getQualification ())
+                        .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                        .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                        .typeface (SetTypeFace.getTypeface (ProgrammeDetailActivity.this), SetTypeFace.getTypeface (ProgrammeDetailActivity.this))
+                        .canceledOnTouchOutside (false)
+                        .cancelable (false)
+                        .positiveText (R.string.dialog_action_ok)
+                        .build ();
+                dialog.show ();
+            }
+        });
     }
 
     private void initView () {
@@ -210,48 +241,16 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
         tvDuration = (TextView) findViewById (R.id.tvDuration);
         tvCost = (TextView) findViewById (R.id.tvCost);
         tvAddFavourite = (TextView) findViewById (R.id.tvAddFavourite);
+        ivSpeakerImage = (ImageView) findViewById (R.id.ivSpeakerImage);
+        progressBar = (ProgressBar) findViewById (R.id.progressBar);
+        tvSpeakerName = (TextView) findViewById (R.id.tvSpeakerName);
+        //tvSpeakerQualification = (ExpandableTextView) findViewById (R.id.tvSpeakerQualification);
+        tvSpeakerQualification = (TextView) findViewById (R.id.tvSpeakerQualification);
     }
 
     private void initData () {
         progressDialog = new ProgressDialog (this);
         Utils.setTypefaceToAllViews (this, tvCost);
-
-
-//        programmeSpeakerList.add (new ProgrammeSpeaker (1, "Karman Singh", "MBBS, MD", "9 Years"));
-//        programmeSpeakerList.add (new ProgrammeSpeaker (2, "Rahul Jain", "MBBS, MD", "4 Years"));
-//        programmeSpeakerList.add (new ProgrammeSpeaker (3, "Sudhanshu Sharma", "MBBS, MD", "6 Years"));
-//        programmeSpeakerList.add (new ProgrammeSpeaker (4, "Sameer", "MBBS, MD", "6 Years"));
-
-//        ArrayList<String> topicList = new ArrayList<> ();
-//        topicList.add ("Impaction");
-//        topicList.add ("Implantology");
-//        topicList.add ("TMU Surgery");
-
-//        programmeDetail = new ProgrammeDetail (1, true, "asd", "24/05/2017", "13:00", "3 Hours", "10,000", programmeSpeakerList, topicList);
-
-//        if (programmeDetail.isFavourite ()) {
-//            ivFavourite.setImageResource (R.drawable.ic_star);
-//        } else {
-//            ivFavourite.setImageResource (R.drawable.ic_star_border);
-//        }
-
-//        for (int i = 0; i < programmeDetail.getTopicList ().size (); i++) {
-//            ArrayList<String> topicListTemp = programmeDetail.getTopicList ();
-//            TextView tv = new TextView (this);
-//            tv.setText ("\u25B8 " + topicListTemp.get (i));
-//            tv.setTextSize (18);
-//            tv.setTypeface (SetTypeFace.getTypeface (this, Constants.font_name));
-//            tv.setTextColor (getResources ().getColor (R.color.app_text_color_dark));
-//            llTopics.addView (tv);
-//        }
-
-//        tvDate.setText ("Date: " + programmeDetail.getDate ());
-//        tvTime.setText ("Time: " + programmeDetail.getTime ());
-//        tvDuration.setText ("Duration: " + programmeDetail.getDuration ());
-//        tvCost.setText ("The Seminar costs Rs " + programmeDetail.getFees ());
-
-//        setUpViewPager (viewPager2);
-
     }
 
     private void getExtras () {
@@ -290,6 +289,7 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                                             JSONObject jsonObjectSpeakers = jsonArraySpeakers.getJSONObject (i);
                                             ProgrammeSpeaker programmeSpeaker = new ProgrammeSpeaker (
                                                     jsonObjectSpeakers.getInt (AppConfigTags.EVENT_DETAIL_SPEAKER_ID),
+                                                    jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_IMAGE),
                                                     jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_NAME),
                                                     jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_QUALIFICATION),
                                                     jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_EXPERIENCE)
@@ -318,10 +318,36 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                                         llTopics.addView (tv);
                                     }
 
+                                    for (int i = 0; i < programmeDetail.getProgrammeSpeakerList ().size (); i++) {
+                                        ArrayList<ProgrammeSpeaker> programmeSpeakerList = programmeDetail.getProgrammeSpeakerList ();
+                                        ProgrammeSpeaker programmeSpeaker = programmeSpeakerList.get (i);
+                                        tvSpeakerName.setText (programmeSpeaker.getName ());
+                                        tvSpeakerQualification.setText (programmeSpeaker.getQualification ());
+
+
+                                        Glide.with (ProgrammeDetailActivity.this)
+                                                .load (programmeSpeaker.getImage ())
+                                                .listener (new RequestListener<String, GlideDrawable> () {
+                                                    @Override
+                                                    public boolean onException (Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                                        progressBar.setVisibility (View.GONE);
+                                                        return false;
+                                                    }
+
+                                                    @Override
+                                                    public boolean onResourceReady (GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                                        progressBar.setVisibility (View.GONE);
+                                                        return false;
+                                                    }
+                                                })
+                                                .into (ivSpeakerImage);
+                                    }
+
+
                                     tvDate.setText ("Date: " + programmeDetail.getDate ());
                                     tvTime.setText ("Time: " + programmeDetail.getTime ());
                                     tvDuration.setText ("Duration: " + programmeDetail.getDuration ());
-                                    tvCost.setText ("The Seminar costs Rs " + programmeDetail.getFees ());
+                                    tvCost.setText (programmeDetail.getFees ());
 
                                     if (programmeDetail.isFavourite ()) {
                                         ivFavourite.setImageResource (R.drawable.ic_star);
@@ -331,7 +357,7 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                                         tvAddFavourite.setVisibility (View.VISIBLE);
                                     }
 
-                                    setUpViewPager (viewPager2);
+//                                    setUpViewPager (viewPager2);
 
                                     progressDialog.dismiss ();
                                 } catch (Exception e) {
@@ -449,7 +475,6 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
             progressDialog.dismiss ();
         }
     }
-
 
     private void setUpViewPager (ViewPager viewPager) {
         ArrayList<ProgrammeSpeaker> programmeSpeakerList = programmeDetail.getProgrammeSpeakerList ();

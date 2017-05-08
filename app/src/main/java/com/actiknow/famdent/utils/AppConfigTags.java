@@ -87,6 +87,7 @@ public class AppConfigTags {
     public static final String EVENT_DETAIL_TOPICS = "event_topics";
 
     public static final String EVENT_DETAIL_SPEAKER_ID = "speaker_id";
+    public static final String EVENT_DETAIL_SPEAKER_IMAGE = "speaker_image";
     public static final String EVENT_DETAIL_SPEAKER_NAME = "speaker_name";
     public static final String EVENT_DETAIL_SPEAKER_QUALIFICATION = "speaker_qualification";
     public static final String EVENT_DETAIL_SPEAKER_EXPERIENCE = "speaker_experience";

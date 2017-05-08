@@ -6,10 +6,11 @@ package com.actiknow.famdent.model;
 
 public class ProgrammeSpeaker {
     int id;
-    String name, qualification, experience;
+    String image, name, qualification, experience;
 
-    public ProgrammeSpeaker (int id, String name, String qualification, String experience) {
+    public ProgrammeSpeaker (int id, String image, String name, String qualification, String experience) {
         this.id = id;
+        this.image = image;
         this.name = name;
         this.qualification = qualification;
         this.experience = experience;
@@ -21,6 +22,14 @@ public class ProgrammeSpeaker {
 
     public void setId (int id) {
         this.id = id;
+    }
+
+    public String getImage () {
+        return image;
+    }
+
+    public void setImage (String image) {
+        this.image = image;
     }
 
     public String getName () {

@@ -10,11 +10,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.actiknow.famdent.R;
-import com.actiknow.famdent.adapter.ProgrammeAdapter;
-import com.actiknow.famdent.model.Programme;
+import com.actiknow.famdent.adapter.SessionAdapter;
+import com.actiknow.famdent.model.Session;
 import com.actiknow.famdent.utils.AppConfigTags;
 import com.actiknow.famdent.utils.AppConfigURL;
 import com.actiknow.famdent.utils.Constants;
@@ -23,7 +24,7 @@ import com.actiknow.famdent.utils.SimpleDividerItemDecoration;
 import com.actiknow.famdent.utils.Utils;
 import com.actiknow.famdent.utils.VisitorDetailsPref;
 import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkResponse;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -37,49 +38,51 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by l on 28/04/2017.
- */
-
-public class MyFavouriteProgrammesFragment extends Fragment {
-    RecyclerView rvProgrammesList;
+public class MyFavouriteSessionFragment extends Fragment {
+    ImageView ivBack;
+    RecyclerView rvSession;
     SwipeRefreshLayout swipeRefreshLayout;
-    List<Programme> programmeList = new ArrayList<> ();
-    ProgrammeAdapter programmeAdapter;
+    List<Session> sessionList = new ArrayList<> ();
+    List<String> list = new ArrayList<> ();
+    SessionAdapter sessionAdapter;
+    ImageView ivFilter;
+
     TextView tvNoResult;
+
+    //karman
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate (R.layout.fragment_my_favourite_programmes, container, false);
+        View rootView = inflater.inflate (R.layout.fragment_my_favourite_session, container, false);
         initView (rootView);
         initData ();
         initListener ();
-        getProgramListFromServer ();
+        getSessionListFromServer ();
         return rootView;
     }
 
-    private void initView(View rootView) {
-        rvProgrammesList = (RecyclerView) rootView.findViewById (R.id.rvProgrammerList);
-        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById (R.id.swipeRefreshLayout);
+    private void initView (View rootView) {
+        ivBack = (ImageView) rootView.findViewById (R.id.ivBack);
         tvNoResult = (TextView) rootView.findViewById (R.id.tvNoResult);
+        rvSession = (RecyclerView) rootView.findViewById (R.id.rvScientificSession);
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById (R.id.swipeRefreshLayout);
+        ivFilter = (ImageView) rootView.findViewById (R.id.ivFilter);
     }
 
-    private void initData() {
-        swipeRefreshLayout.setRefreshing (true);
+    private void initData () {
         swipeRefreshLayout.setColorSchemeColors (getResources ().getColor (R.color.colorPrimaryDark));
-
-        programmeAdapter = new ProgrammeAdapter (getActivity (), programmeList);
-        rvProgrammesList.setAdapter (programmeAdapter);
-        rvProgrammesList.setHasFixedSize (true);
-        rvProgrammesList.setLayoutManager (new LinearLayoutManager (getActivity (), LinearLayoutManager.VERTICAL, false));
-        rvProgrammesList.addItemDecoration (new SimpleDividerItemDecoration (getActivity ()));
-        rvProgrammesList.setItemAnimator (new DefaultItemAnimator ());
+        swipeRefreshLayout.setRefreshing (true);
+        sessionAdapter = new SessionAdapter (getActivity (), sessionList);
+        rvSession.setAdapter (sessionAdapter);
+        rvSession.setHasFixedSize (true);
+        rvSession.setLayoutManager (new LinearLayoutManager (getActivity (), LinearLayoutManager.VERTICAL, false));
+        rvSession.addItemDecoration (new SimpleDividerItemDecoration (getActivity ()));
+        rvSession.setItemAnimator (new DefaultItemAnimator ());
 
         Utils.setTypefaceToAllViews (getActivity (), tvNoResult);
-
     }
 
-    private void initListener() {
+    private void initListener () {
         swipeRefreshLayout.setOnRefreshListener (new SwipeRefreshLayout.OnRefreshListener () {
             @Override
             public void onRefresh () {
@@ -88,14 +91,14 @@ public class MyFavouriteProgrammesFragment extends Fragment {
         });
     }
 
-    private void getProgramListFromServer () {
+    private void getSessionListFromServer () {
         if (NetworkConnection.isNetworkAvailable (getActivity ())) {
-            Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_EVENT_LIST, true);
-            StringRequest strRequest = new StringRequest (Request.Method.GET, AppConfigURL.URL_EVENT_LIST,
+            Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_SESSION_LIST, true);
+            StringRequest strRequest = new StringRequest (Request.Method.GET, AppConfigURL.URL_SESSION_LIST,
                     new Response.Listener<String> () {
                         @Override
                         public void onResponse (String response) {
-                            programmeList.clear ();
+                            sessionList.clear ();
                             Utils.showLog (Log.INFO, AppConfigTags.SERVER_RESPONSE, response, true);
                             if (response != null) {
                                 try {
@@ -103,19 +106,21 @@ public class MyFavouriteProgrammesFragment extends Fragment {
                                     boolean error = jsonObj.getBoolean (AppConfigTags.ERROR);
                                     String message = jsonObj.getString (AppConfigTags.MESSAGE);
                                     if (! error) {
-                                        JSONArray jsonArrayEvent = jsonObj.getJSONArray (AppConfigTags.EVENTS);
-                                        for (int i = 0; i < jsonArrayEvent.length (); i++) {
-                                            JSONObject jsonObject = jsonArrayEvent.getJSONObject (i);
-                                            Programme programme = new Programme (
-                                                    jsonObject.getInt (AppConfigTags.EVENT_ID),
-                                                    jsonObject.getString (AppConfigTags.EVENT_NAME),
-                                                    jsonObject.getString (AppConfigTags.EVENT_SPEAKERS),
-                                                    jsonObject.getString (AppConfigTags.EVENT_DATE),
-                                                    jsonObject.getString (AppConfigTags.EVENT_TIME));
-                                            programmeList.add (programme);
+                                        JSONArray jsonArray = jsonObj.getJSONArray (AppConfigTags.SESSIONS);
+                                        for (int i = 0; i < jsonArray.length (); i++) {
+                                            JSONObject jsonObject = jsonArray.getJSONObject (i);
+                                            Session session = new Session ();
+                                            session.setId (jsonObject.getInt (AppConfigTags.SESSION_ID));
+                                            session.setProgram_name (jsonObject.getString (AppConfigTags.SESSION_NAME));
+                                            session.setDoctor_name (jsonObject.getString (AppConfigTags.SESSION_SPEAKERS));
+                                            session.setDate (jsonObject.getString (AppConfigTags.SESSION_DATE));
+                                            session.setTime (jsonObject.getString (AppConfigTags.SESSION_TIME));
+                                            session.setLocation (jsonObject.getString (AppConfigTags.SESSION_LOCATION));
+                                            session.setCategory (jsonObject.getString (AppConfigTags.SESSION_CATEGORY));
+                                            sessionList.add (session);
                                         }
-                                        programmeAdapter.notifyDataSetChanged ();
-                                        if (jsonArrayEvent.length () > 0) {
+                                        sessionAdapter.notifyDataSetChanged ();
+                                        if (jsonArray.length () > 0) {
                                             swipeRefreshLayout.setRefreshing (false);
                                         } else {
                                             swipeRefreshLayout.setRefreshing (false);
@@ -125,6 +130,7 @@ public class MyFavouriteProgrammesFragment extends Fragment {
                                         swipeRefreshLayout.setRefreshing (false);
                                         tvNoResult.setVisibility (View.VISIBLE);
                                     }
+                                    Utils.setTypefaceToAllViews (getActivity (), ivBack);
                                 } catch (Exception e) {
                                     swipeRefreshLayout.setRefreshing (false);
                                     tvNoResult.setVisibility (View.VISIBLE);
@@ -140,31 +146,27 @@ public class MyFavouriteProgrammesFragment extends Fragment {
                     new Response.ErrorListener () {
                         @Override
                         public void onErrorResponse (VolleyError error) {
-                            Utils.showLog (Log.ERROR, AppConfigTags.VOLLEY_ERROR, error.toString (), true);
-                            NetworkResponse response = error.networkResponse;
-                            if (response != null && response.data != null) {
-                                Utils.showLog (Log.ERROR, AppConfigTags.ERROR, new String (response.data), true);
-
-                            }
                             swipeRefreshLayout.setRefreshing (false);
                             tvNoResult.setVisibility (View.VISIBLE);
+                            Utils.showLog (Log.ERROR, AppConfigTags.VOLLEY_ERROR, error.toString (), true);
                         }
                     }) {
                 @Override
                 public Map<String, String> getHeaders () throws AuthFailureError {
-                    Map<String, String> params = new HashMap<> ();
                     VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
+                    Map<String, String> params = new HashMap<> ();
                     params.put (AppConfigTags.HEADER_API_KEY, Constants.api_key);
-                    params.put (AppConfigTags.HEADER_VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (getActivity (), visitorDetailsPref.VISITOR_LOGIN_KEY));
+                    params.put (AppConfigTags.HEADER_VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (getActivity (), VisitorDetailsPref.VISITOR_LOGIN_KEY));
                     Utils.showLog (Log.INFO, AppConfigTags.HEADERS_SENT_TO_THE_SERVER, "" + params, false);
                     return params;
                 }
             };
+            strRequest.setRetryPolicy (new DefaultRetryPolicy (DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             Utils.sendRequest (strRequest, 30);
         } else {
-            // getOfflineData();
             swipeRefreshLayout.setRefreshing (false);
             tvNoResult.setVisibility (View.VISIBLE);
         }
     }
 }
+

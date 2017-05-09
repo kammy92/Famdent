@@ -24,6 +24,7 @@ import com.actiknow.famdent.activity.HallPlanActivity;
 import com.actiknow.famdent.activity.InformationActivity;
 import com.actiknow.famdent.activity.MyFavouriteActivity;
 import com.actiknow.famdent.activity.ProgrammeListActivity;
+import com.actiknow.famdent.activity.SessionListActivity;
 import com.actiknow.famdent.model.HomeService;
 import com.actiknow.famdent.utils.SetTypeFace;
 import com.actiknow.famdent.utils.Utils;
@@ -106,16 +107,21 @@ public class HomeServiceAdapter extends RecyclerView.Adapter<HomeServiceAdapter.
                     activity.overridePendingTransition (R.anim.slide_in_right, R.anim.slide_out_left);
                     break;
                 case 3:
+                    Intent intent7 = new Intent (activity, SessionListActivity.class);
+                    activity.startActivity (intent7);
+                    activity.overridePendingTransition (R.anim.slide_in_right, R.anim.slide_out_left);
+                    break;
+                case 4:
                     Intent intent3 = new Intent (activity, HallPlanActivity.class);
                     activity.startActivity (intent3);
                     activity.overridePendingTransition (R.anim.slide_in_right, R.anim.slide_out_left);
                     break;
-                case 4:
+                case 5:
                     Intent intent4 = new Intent (activity, MyFavouriteActivity.class);
                     activity.startActivity (intent4);
                     activity.overridePendingTransition (R.anim.slide_in_right, R.anim.slide_out_left);
                     break;
-                case 5:
+                case 6:
                     VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
                     final Dialog dialog = new Dialog (activity);
                     dialog.requestWindowFeature (Window.FEATURE_NO_TITLE);
@@ -153,8 +159,6 @@ public class HomeServiceAdapter extends RecyclerView.Adapter<HomeServiceAdapter.
                         e.printStackTrace ();
                     }
 
-                    Log.e ("karman", jsonObject.toString ());
-
                     QREncoder qrgEncoder = new QREncoder (jsonObject.toString (), null, QRContents.Type.TEXT, smallerDimension);
                     try {
                         // Getting QR-Code as Bitmap
@@ -168,7 +172,7 @@ public class HomeServiceAdapter extends RecyclerView.Adapter<HomeServiceAdapter.
                     Utils.setTypefaceToAllViews (activity, tvName);
                     dialog.show ();
                     break;
-                case 6:
+                case 7:
                     Intent intent6 = new Intent (activity, InformationActivity.class);
                     activity.startActivity (intent6);
                     activity.overridePendingTransition (R.anim.slide_in_right, R.anim.slide_out_left);

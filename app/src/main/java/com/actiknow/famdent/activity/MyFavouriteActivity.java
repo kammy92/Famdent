@@ -13,19 +13,17 @@ import android.widget.ImageView;
 import com.actiknow.famdent.R;
 import com.actiknow.famdent.fragment.MyFavouriteExhibitorFragment;
 import com.actiknow.famdent.fragment.MyFavouriteProgrammesFragment;
+import com.actiknow.famdent.fragment.MyFavouriteSessionFragment;
 import com.actiknow.famdent.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by l on 28/04/2017.
- */
-
 public class MyFavouriteActivity extends AppCompatActivity {
+    ImageView ivBack;
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    ImageView ivBack;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +60,8 @@ public class MyFavouriteActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new MyFavouriteExhibitorFragment (), "EXHIBITOR");
-        adapter.addFragment(new MyFavouriteProgrammesFragment (), "PROGRAMMES");
+        adapter.addFragment (new MyFavouriteProgrammesFragment (), "PROGRAMMES");
+        adapter.addFragment (new MyFavouriteSessionFragment (), "SESSIONS");
         viewPager.setAdapter(adapter);
     }
 

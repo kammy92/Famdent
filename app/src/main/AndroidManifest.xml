@@ -47,6 +47,13 @@
         <activity android:name=".activity.ProgrammeDetailActivity"
                   android:screenOrientation="portrait">
         </activity>
+        <activity android:name=".activity.SessionListActivity"
+                  android:screenOrientation="portrait">
+        </activity>
+
+        <activity android:name=".activity.SessionDetailActivity"
+                  android:screenOrientation="portrait">
+        </activity>
         <activity android:name=".activity.HallPlanActivity"
                   android:screenOrientation="portrait">
         </activity>

@@ -68,46 +68,45 @@
                 android:id="@+id/rvHomeServiceList"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_alignParentBottom="true"
+                android:layout_above="@+id/rlFooter"
                 android:layout_below="@+id/view"
                 android:fillViewport="true"
-                android:overScrollMode="never"
-                android:scrollbarStyle="insideOverlay"/>
+                android:overScrollMode="never" android:scrollbarStyle="insideOverlay"/>
 
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/rlFooter"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true">
-
-            <ImageView
-                android:id="@+id/ivIndiaSupplyLogo"
-                android:layout_width="@dimen/indiasupply_logo_width"
+            <RelativeLayout
+                android:id="@+id/rlFooter"
+                android:layout_width="match_parent"
                 android:layout_height="@dimen/indiasupply_logo_height"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginEnd="@dimen/activity_margin_small"
-                android:layout_marginLeft="@dimen/activity_margin_small"
-                android:layout_marginRight="@dimen/activity_margin_small"
-                android:layout_marginStart="@dimen/activity_margin_small"
-                android:contentDescription="@string/app_name"
-                android:src="@drawable/indiasupply_logo"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/ivIndiaSupplyLogo"
-                android:layout_marginBottom="@dimen/activity_margin_small"
-                android:layout_toLeftOf="@+id/ivIndiaSupplyLogo"
-                android:layout_toStartOf="@+id/ivIndiaSupplyLogo"
-                android:text="@string/activity_main_text_powered_by"
-                android:textColor="@color/app_text_color_dark"
-                android:textSize="@dimen/text_size_small"
-                android:textStyle="italic"
-            />
+                android:layout_alignParentBottom="true">
+
+                <ImageView
+                    android:id="@+id/ivIndiaSupplyLogo"
+                    android:layout_width="@dimen/indiasupply_logo_width"
+                    android:layout_height="@dimen/indiasupply_logo_height"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginEnd="@dimen/activity_margin_small"
+                    android:layout_marginLeft="@dimen/activity_margin_small"
+                    android:layout_marginRight="@dimen/activity_margin_small"
+                    android:layout_marginStart="@dimen/activity_margin_small"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/indiasupply_logo"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/ivIndiaSupplyLogo"
+                    android:layout_marginBottom="@dimen/activity_margin_small"
+                    android:layout_toLeftOf="@+id/ivIndiaSupplyLogo"
+                    android:layout_toStartOf="@+id/ivIndiaSupplyLogo"
+                    android:text="@string/activity_main_text_powered_by"
+                    android:textColor="@color/app_text_color_dark"
+                    android:textSize="@dimen/text_size_small"
+                    android:textStyle="italic"/>
+            </RelativeLayout>
+
         </RelativeLayout>
+
 
     </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

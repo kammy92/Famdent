@@ -43,6 +43,8 @@
 
     <string name="activity_exhibitor_detail_title">EXHIBITOR DETAIL</string>
 
+    <string name="activity_session_detail_title">SESSION DETAIL</string>
+
 
     <string name="activity_information_title">INFORMATION</string>
     <string name="activity_information_text_1">The House of FAMDENT swears by its mission of
@@ -84,12 +86,29 @@
 
     <string name="dialog_text_quit_application">Do you want to quit the application?</string>
     <string name="dialog_text_auto_fill">Do you want to auto fill the details?</string>
-    <string name="dialog_text_remove_favourite">Do you want to remove this exhibitor from your
+    <string name="dialog_text_remove_favourite_exhibitor">Do you want to remove this exhibitor from
+        your
         favourites?
     </string>
-    <string name="dialog_text_add_favourite">Do you want to add this exhibitor to your
+    <string name="dialog_text_add_favourite_exhibitor">Do you want to add this exhibitor to your
         favourites?
     </string>
+
+    <string name="dialog_text_remove_favourite_programme">Do you want to remove this programme from
+        your
+        favourites?
+    </string>
+    <string name="dialog_text_add_favourite_programme">Do you want to add this programme to your
+        favourites?
+    </string>
+    <string name="dialog_text_remove_favourite_session">Do you want to remove this session from your
+        favourites?
+    </string>
+    <string name="dialog_text_add_favourite_session">Do you want to add this session to your
+        favourites?
+    </string>
+
+
     <string name="dialog_text_add_notes">Add Notes</string>
     <string name="dialog_text_enter_otp">Enter the OTP sent to your mobile number (TEST OTP:
         123456)

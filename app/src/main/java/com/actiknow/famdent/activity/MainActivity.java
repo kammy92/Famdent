@@ -111,13 +111,6 @@ public class MainActivity extends AppCompatActivity {
         Bugsnag.init (this);
         visitorDetailsPref = VisitorDetailsPref.getInstance ();
 
-        Log.e ("karman", visitorDetailsPref.getStringPref (this, VisitorDetailsPref.VISITOR_ID));
-        Log.e ("karman", visitorDetailsPref.getStringPref (this, VisitorDetailsPref.VISITOR_NAME));
-        Log.e ("karman", visitorDetailsPref.getStringPref (this, VisitorDetailsPref.VISITOR_EMAIL));
-        Log.e ("karman", visitorDetailsPref.getStringPref (this, VisitorDetailsPref.VISITOR_MOBILE));
-        Log.e ("karman", visitorDetailsPref.getStringPref (this, VisitorDetailsPref.VISITOR_FIREBASE_ID));
-        Log.e ("karman", visitorDetailsPref.getStringPref (this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
-
 
         progressDialog = new ProgressDialog (this);
         PackageInfo pInfo = null;
@@ -131,10 +124,11 @@ public class MainActivity extends AppCompatActivity {
 
         homeServices.add (new HomeService (1, R.drawable.ic_list, "", "EXHIBITORS"));
         homeServices.add (new HomeService (2, R.drawable.ic_program, "", "PROGRAMMES"));
-        homeServices.add (new HomeService (3, R.drawable.ic_hall_plan, "", "HALL PLAN"));
-        homeServices.add (new HomeService (4, R.drawable.ic_favourite, "", "MY FAVOURITES"));
-        homeServices.add (new HomeService (5, R.drawable.ic_card, "", "MY ENTRY PASS"));
-        homeServices.add (new HomeService (6, R.drawable.ic_information, "", "INFORMATION"));
+        homeServices.add (new HomeService (3, R.drawable.ic_program, "", "SCIENTIFIC SESSIONS"));
+        homeServices.add (new HomeService (4, R.drawable.ic_hall_plan, "", "HALL PLAN"));
+        homeServices.add (new HomeService (5, R.drawable.ic_favourite, "", "MY FAVOURITES"));
+        homeServices.add (new HomeService (6, R.drawable.ic_card, "", "MY ENTRY PASS"));
+        homeServices.add (new HomeService (7, R.drawable.ic_information, "", "INFORMATION"));
 
 
         homeServiceAdapter = new HomeServiceAdapter (this, homeServices);

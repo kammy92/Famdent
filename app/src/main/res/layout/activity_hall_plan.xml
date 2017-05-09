@@ -59,12 +59,23 @@
                 </RelativeLayout>
             </android.support.v7.widget.Toolbar>
         </android.support.design.widget.AppBarLayout>
+
+        <WebView
+            android:id="@+id/webView"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/appBar"/>
+
+        <!--
         <com.actiknow.famdent.utils.TouchImageView
             android:id="@+id/ivHallPlan"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/appBar"
-            android:src="@drawable/floor_plan">
+            android:src="@drawable/hall_plan">
         </com.actiknow.famdent.utils.TouchImageView>
+
+        -->
     </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

@@ -7,8 +7,10 @@ public class AppConfigURL {
 //    public static String BASE_URL = "http://ec2-52-42-89-17.us-west-2.compute.amazonaws.com/bloodkonnect/api/v1/user";
 //    public static String BASE_URL = "http://52.39.244.218/bloodkonnect/api/v1/user";
 
-    public static String version = "v1";
+    public static String version = "v1.0.1";
     public static String BASE_URL = "https://project-famdent-cammy92.c9users.io/api/" + version + "/";
+//    public static String BASE_URL = "http://35.165.111.86/api/api/" + version + "/";
+
 
     public static String URL_GETOTP = BASE_URL + "visitor/otp";
 
@@ -26,7 +28,9 @@ public class AppConfigURL {
 
     public static String URL_EXHIBITOR_FAVOURITE = BASE_URL + "favourite/exhibitor";
     public static String URL_EVENT_FAVOURITE = BASE_URL + "favourite/event";
+    public static String URL_SESSION_FAVOURITE = BASE_URL + "favourite/session";
 
     public static String URL_EXHIBITOR_NOTE = BASE_URL + "notes/exhibitor";
 
+    public static String URL_SESSION_LIST = BASE_URL + "session";
 }

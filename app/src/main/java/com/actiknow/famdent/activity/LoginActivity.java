@@ -9,6 +9,7 @@ import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -296,7 +297,7 @@ public class LoginActivity extends AppCompatActivity {
         dialog.show ();
     }
 
-    private void sendSignUpDetailsToServer (final String name, final String email, final String mobile, final String visitor_type, final int otp) {
+    private void sendSignUpDetailsToServer (final String name, final String email, final String mobile, final String visitor_type, final int otp, final String device_details) {
         if (NetworkConnection.isNetworkAvailable (LoginActivity.this)) {
             Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_please_wait), true);
             Utils.showLog (Log.INFO, "" + AppConfigTags.URL, AppConfigURL.URL_REGISTER, true);
@@ -354,6 +355,7 @@ public class LoginActivity extends AppCompatActivity {
                     params.put (AppConfigTags.VISITOR_TYPE, visitor_type);
                     params.put (AppConfigTags.FIREBASE_ID, visitorDetailsPref.getStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_FIREBASE_ID));
                     params.put (AppConfigTags.OTP, String.valueOf (otp));
+                    params.put (AppConfigTags.DEVICE_DETAILS, device_details);
                     Utils.showLog (Log.INFO, AppConfigTags.PARAMETERS_SENT_TO_THE_SERVER, "" + params, true);
                     return params;
                 }
@@ -414,7 +416,26 @@ public class LoginActivity extends AppCompatActivity {
                                             public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                                 if (dialog.getInputEditText ().getText ().length () > 0) {
                                                     if (Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == otp || Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == 123456) {
-                                                        sendSignUpDetailsToServer (etName.getText ().toString (), etEmail.getText ().toString (), etMobile.getText ().toString (), spType.getSelectedItem ().toString (), otp);
+                                                        PackageInfo pInfo = null;
+                                                        try {
+                                                            pInfo = getPackageManager ().getPackageInfo (getPackageName (), 0);
+                                                        } catch (PackageManager.NameNotFoundException e) {
+                                                            e.printStackTrace ();
+                                                        }
+
+                                                        JSONObject jsonDeviceDetails = new JSONObject ();
+                                                        try {
+                                                            jsonDeviceDetails.put ("device_id", Settings.Secure.getString (LoginActivity.this.getContentResolver (), Settings.Secure.ANDROID_ID));
+                                                            jsonDeviceDetails.put ("device_api_level", android.os.Build.VERSION.SDK_INT);
+                                                            jsonDeviceDetails.put ("device_os_version", android.os.Build.VERSION.RELEASE);
+                                                            jsonDeviceDetails.put ("device_manufacturer", android.os.Build.MANUFACTURER);
+                                                            jsonDeviceDetails.put ("device_model", android.os.Build.MODEL);
+                                                            jsonDeviceDetails.put ("app_version", pInfo.versionCode);
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace ();
+                                                        }
+
+                                                        sendSignUpDetailsToServer (etName.getText ().toString (), etEmail.getText ().toString (), etMobile.getText ().toString (), spType.getSelectedItem ().toString (), otp, jsonDeviceDetails.toString ());
                                                     } else {
                                                         Utils.showSnackBar (LoginActivity.this, clMain, "OTP didn't match", Snackbar.LENGTH_LONG, null, null);
                                                     }
@@ -638,7 +659,27 @@ public class LoginActivity extends AppCompatActivity {
             } else if (dialogAction == DialogAction.POSITIVE) {
                 if (dialog.getInputEditText ().getText ().length () > 0) {
                     if (Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == otp || Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == 123456) {
-                        sendSignUpDetailsToServer (etName.getText ().toString (), etEmail.getText ().toString (), etMobile.getText ().toString (), spType.getSelectedItem ().toString (), otp);
+
+                        PackageInfo pInfo = null;
+                        try {
+                            pInfo = getPackageManager ().getPackageInfo (getPackageName (), 0);
+                        } catch (PackageManager.NameNotFoundException e) {
+                            e.printStackTrace ();
+                        }
+
+                        JSONObject jsonDeviceDetails = new JSONObject ();
+                        try {
+                            jsonDeviceDetails.put ("device_id", Settings.Secure.getString (LoginActivity.this.getContentResolver (), Settings.Secure.ANDROID_ID));
+                            jsonDeviceDetails.put ("device_api_level", android.os.Build.VERSION.SDK_INT);
+                            jsonDeviceDetails.put ("device_os_version", android.os.Build.VERSION.RELEASE);
+                            jsonDeviceDetails.put ("device_manufacturer", android.os.Build.MANUFACTURER);
+                            jsonDeviceDetails.put ("device_model", android.os.Build.MODEL);
+                            jsonDeviceDetails.put ("app_version", pInfo.versionCode);
+                        } catch (Exception e) {
+                            e.printStackTrace ();
+                        }
+
+                        sendSignUpDetailsToServer (etName.getText ().toString (), etEmail.getText ().toString (), etMobile.getText ().toString (), spType.getSelectedItem ().toString (), otp, jsonDeviceDetails.toString ());
                     } else {
                         Utils.showSnackBar (LoginActivity.this, clMain, "OTP didn't match", Snackbar.LENGTH_LONG, null, null);
                     }

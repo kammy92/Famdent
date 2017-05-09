@@ -57,6 +57,7 @@ public class AppConfigTags {
 
     public static final String EXHIBITOR_ID = "exhibitor_id";
     public static final String PROGRAMME_ID = "programme_id";
+    public static final String SESSION_ID = "session_id";
 
 
     public static final String EXHIBITOR = "exhibitors";
@@ -103,4 +104,38 @@ public class AppConfigTags {
     public static final String EXHIBITOR_FAVOURITE = "exhibitor_favourite";
     public static final String EXHIBITOR_CONTACTS = "exhibitor_contacts";
     public static final String CONTACT = "contact";
+
+
+    public static final String SESSIONS = "sessions";
+    public static final String SESSION_NAME = "session_title";
+    public static final String SESSION_SPEAKERS = "session_speakers";
+    public static final String SESSION_DATE = "session_date";
+    public static final String SESSION_TIME = "session_time";
+    public static final String SESSION_CATEGORY = "session_category";
+    public static final String SESSION_LOCATION = "session_location";
+
+
+    public static final String SESSIONS_DETAILS = "sessions";
+    public static final String SESSION_DETAILS_ID = "session_id";
+    public static final String SESSION_DETAILS_TITLE = "session_title";
+    public static final String SESSION_DETAILS_DATE = "session_date";
+    public static final String SESSION_DETAILS_TIME = "session_time";
+    public static final String SESSION_DETAILS_CATEGORY = "session_category";
+    public static final String SESSION_DETAILS_LOCATION = "session_location";
+    public static final String SESSION_DETAILS_FAVOURITE = "session_favourite";
+
+    public static final String SESSION_DETAILS_TOPICS = "session_topics";
+    public static final String SESSION_DETAILS_TOPIC_ID = "topic_id";
+    public static final String SESSION_DETAILS_TOPIC_TEXT = "topic_text";
+
+
+    public static final String SESSION_DETAILS_SPEAKERS = "session_speakers";
+    public static final String SESSION_DETAILS_SPEAKER_ID = "speaker_id";
+    public static final String SESSION_DETAILS_SPEAKER_IMAGE = "speaker_image";
+    public static final String SESSION_DETAILS_SPEAKER_NAME = "speaker_name";
+
+
+    public static final String DEVICE_DETAILS = "device_details";
+
+
 }

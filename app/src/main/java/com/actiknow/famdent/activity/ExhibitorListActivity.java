@@ -95,6 +95,7 @@ public class ExhibitorListActivity extends AppCompatActivity {
 //        exhibitorList.add (new Exhibitor (6, "", "ACETON INDIA", "Hall 1", "Stall 17"));
 //        exhibitorList.add (new Exhibitor (7, "", "SKANRAY TECHNOLOGY", "Hall 1", "Stall 32"));
 
+        swipeRefreshLayout.setColorSchemeColors (getResources ().getColor (R.color.colorPrimaryDark));
         exhibitorAdapter = new ExhibitorAdapter (this, exhibitorList);
         rvExhibitor.setAdapter (exhibitorAdapter);
         rvExhibitor.setHasFixedSize (true);
@@ -194,8 +195,8 @@ public class ExhibitorListActivity extends AppCompatActivity {
                                                 JSONObject jsonObjectStallDetail = jsonArrayStallDetails.getJSONObject (j);
                                                 StallDetail stallDetail = new StallDetail (
                                                         jsonObjectStallDetail.getString (AppConfigTags.STALL_NAME),
-                                                        jsonObjectStallDetail.getString (AppConfigTags.STALL_NUMBER),
-                                                        jsonObjectStallDetail.getString (AppConfigTags.HALL_NUMBER)
+                                                        jsonObjectStallDetail.getString (AppConfigTags.HALL_NUMBER),
+                                                        jsonObjectStallDetail.getString (AppConfigTags.STALL_NUMBER)
                                                 );
                                                 exhibitor.setStallDetailInList (stallDetail);
                                             }

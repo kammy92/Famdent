@@ -13,6 +13,7 @@ import com.actiknow.famdent.activity.ProgrammeDetailActivity;
 import com.actiknow.famdent.model.Programme;
 import com.actiknow.famdent.utils.AppConfigTags;
 import com.actiknow.famdent.utils.SetTypeFace;
+import com.actiknow.famdent.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +51,8 @@ public class ProgrammeAdapter extends RecyclerView.Adapter<ProgrammeAdapter.View
 
         holder.tvProgrammeName.setText(programme.getProgram_name());
         holder.tvDoctorName.setText(programme.getDoctor_name());
-        holder.tvDate.setText(programme.getDate());
-        holder.tvTime.setText(programme.getTime());
+        holder.tvDate.setText (Utils.convertTimeFormat (programme.getDate (), "yyyy-MM-dd", "dd/MM/yyyy"));
+        holder.tvTime.setText (Utils.convertTimeFormat (programme.getTime (), "HH:mm", "hh:mm a"));
         //Glide.with(activity).load("").placeholder(homeService.getIcon()).into(holder.ivIcon);
     }
 

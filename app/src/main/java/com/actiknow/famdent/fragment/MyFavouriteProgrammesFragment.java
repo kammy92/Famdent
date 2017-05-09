@@ -90,8 +90,8 @@ public class MyFavouriteProgrammesFragment extends Fragment {
 
     private void getProgramListFromServer () {
         if (NetworkConnection.isNetworkAvailable (getActivity ())) {
-            Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_EVENT_LIST, true);
-            StringRequest strRequest = new StringRequest (Request.Method.GET, AppConfigURL.URL_EVENT_LIST,
+            Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_EVENT_FAVOURITE_LIST, true);
+            StringRequest strRequest = new StringRequest (Request.Method.GET, AppConfigURL.URL_EVENT_FAVOURITE_LIST,
                     new Response.Listener<String> () {
                         @Override
                         public void onResponse (String response) {

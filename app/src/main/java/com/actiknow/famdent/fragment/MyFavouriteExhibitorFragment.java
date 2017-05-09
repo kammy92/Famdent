@@ -100,8 +100,8 @@ public class MyFavouriteExhibitorFragment extends Fragment {
     private void getExhibitorList () {
         if (NetworkConnection.isNetworkAvailable (getActivity ())) {
             tvNoResult.setVisibility (View.GONE);
-            Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_EXHIBITOR_LIST, true);
-            StringRequest strRequest = new StringRequest (Request.Method.GET, AppConfigURL.URL_EXHIBITOR_LIST,
+            Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_EXHIBITOR_FAVOURITE_LIST, true);
+            StringRequest strRequest = new StringRequest (Request.Method.GET, AppConfigURL.URL_EXHIBITOR_FAVOURITE_LIST,
                     new Response.Listener<String> () {
                         @Override
                         public void onResponse (String response) {

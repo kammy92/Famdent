@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -50,10 +51,14 @@ public class ExhibitorListActivity extends AppCompatActivity {
     ImageView ivBack;
     SwipeRefreshLayout swipeRefreshLayout;
     List<Exhibitor> exhibitorList = new ArrayList<> ();
+    List<Exhibitor> tempExhibitorList = new ArrayList<> ();
     ExhibitorAdapter exhibitorAdapter;
     String[] category;
 
     ImageView ivFilter;
+    ImageView ivSort;
+    TextView tvTitle;
+    SearchView searchView;
 
     TextView tvNoResult;
 
@@ -78,6 +83,9 @@ public class ExhibitorListActivity extends AppCompatActivity {
         ivFilter = (ImageView) findViewById (R.id.ivFilter);
         tvNoResult = (TextView) findViewById (R.id.tvNoResult);
 
+        ivSort = (ImageView) findViewById (R.id.ivSort);
+        tvTitle = (TextView) findViewById (R.id.tvTitle);
+        searchView = (SearchView) findViewById (R.id.searchView);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById (R.id.swipeRefreshLayout);
         Utils.setTypefaceToAllViews (this, rvExhibitor);
     }
@@ -161,6 +169,59 @@ public class ExhibitorListActivity extends AppCompatActivity {
                     llCategory.addView (checkBox);
 
                 }
+            }
+        });
+
+        searchView.setOnSearchClickListener (new View.OnClickListener () {
+            @Override
+            public void onClick (View v) {
+//                Toast.makeText (ExhibitorListActivity.this, "karman open", Toast.LENGTH_SHORT).show ();
+                ivFilter.setVisibility (View.GONE);
+                ivBack.setVisibility (View.GONE);
+                ivSort.setVisibility (View.GONE);
+                tvTitle.setVisibility (View.GONE);
+            }
+        });
+
+        searchView.setOnQueryTextListener (new SearchView.OnQueryTextListener () {
+            @Override
+            public boolean onQueryTextSubmit (String query) {
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange (String newText) {
+                int textlength = newText.length ();
+                tempExhibitorList.clear ();
+
+                for (Exhibitor exhibitor : exhibitorList) {
+                    if (textlength <= exhibitor.getExhibitor_name ().length ()) {
+                        if (exhibitor.getExhibitor_name ().contains (newText.toString ().toLowerCase ())) {
+                            tempExhibitorList.add (exhibitor);
+                        }
+                    }
+                }
+                exhibitorAdapter = new ExhibitorAdapter (ExhibitorListActivity.this, tempExhibitorList);
+                rvExhibitor.setAdapter (exhibitorAdapter);
+                rvExhibitor.setHasFixedSize (true);
+                rvExhibitor.setLayoutManager (new LinearLayoutManager (ExhibitorListActivity.this, LinearLayoutManager.VERTICAL, false));
+                rvExhibitor.addItemDecoration (new SimpleDividerItemDecoration (ExhibitorListActivity.this));
+                rvExhibitor.setItemAnimator (new DefaultItemAnimator ());
+
+
+                return true;
+            }
+        });
+
+        searchView.setOnCloseListener (new SearchView.OnCloseListener () {
+            @Override
+            public boolean onClose () {
+//                Toast.makeText (ExhibitorListActivity.this, "karman close", Toast.LENGTH_SHORT).show ();
+                ivFilter.setVisibility (View.VISIBLE);
+                ivBack.setVisibility (View.VISIBLE);
+                ivSort.setVisibility (View.VISIBLE);
+                tvTitle.setVisibility (View.VISIBLE);
+                return false;
             }
         });
     }
@@ -262,6 +323,81 @@ public class ExhibitorListActivity extends AppCompatActivity {
             tvNoResult.setVisibility (View.VISIBLE);
         }
     }
+/*
+    @Override
+    public boolean onCreateOptionsMenu (Menu menu) {
+        getMenuInflater ().inflate (R.menu.menu_main, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService (Context.SEARCH_SERVICE);
+        searchView = (SearchView) menu.findItem (R.id.action_search).getActionView ();
+        if (null != searchView) {
+            searchView.setSearchableInfo (searchManager.getSearchableInfo (getComponentName ()));
+//            searchView.setIconifiedByDefault (false);
+        }
+
+
+//        final int searchBarId = searchView.getContext ().getResources ().getIdentifier ("android:id/search_bar", null, null);
+//        LinearLayout searchBar = (LinearLayout) searchView.findViewById (searchBarId);
+
+        EditText et = (EditText) searchView.findViewById (R.id.search_src_text);
+//        et.getBackground ().setColorFilter (R.color.text_color_grey_dark,null);
+//        et.setBackgroundColor (getResources ().getColor (R.color.text_color_grey_light)); // ← If you just want a color
+//        et.setBackground (getResources ().getDrawable (R.drawable.layout_search_edittext));
+
+//        et.setFocusableInTouchMode (true);
+//        et.setFocusable (true);
+
+        LinearLayout searchBar = (LinearLayout) searchView.findViewById (R.id.search_bar);
+        searchBar.setLayoutTransition (new LayoutTransition ());
+
+        searchView.setQueryHint ("Search ATM ID");
+        SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener () {
+            public boolean onQueryTextChange (String newText) {
+//                etSearch.setText (newText);
+                return true;
+            }
+
+            public boolean onQueryTextSubmit (String query) {
+                //Here u can get the value "query" which is entered in the search box.
+                return true;
+            }
+        };
+        searchView.setOnQueryTextListener (queryTextListener);
+
+        return super.onCreateOptionsMenu (menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected (MenuItem item) {
+        switch (item.getItemId ()) {
+            case R.id.action_search:
+//                if (etSearch.isShown ()) {
+//                    etSearch.setVisibility (View.GONE);
+//                    final Handler handler = new Handler ();
+//                    handler.postDelayed (new Runnable () {
+//                        @Override
+//                        public void run () {
+//                            etSearch.setText ("");
+//                        }
+//                    }, 1000);
+//                } else {
+//                    etSearch.setVisibility (View.VISIBLE);
+//                }
+                break;
+        }
+        Utils.hideSoftKeyboard (ExhibitorListActivity.this);
+/**
+ if (item != null && item.getItemId () == android.R.id.home) {
+ if (mDrawerLayout.isDrawerOpen (mDrawerPanel)) {
+ } else {
+ mDrawerLayout.openDrawer (mDrawerPanel);
+ }
+ return true;
+ }
+ */
+//        return super.onOptionsItemSelected (item);
+//    }
+//*/
 
     @Override
     public void onBackPressed () {

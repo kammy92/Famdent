@@ -93,8 +93,8 @@ public class MyFavouriteSessionFragment extends Fragment {
 
     private void getSessionListFromServer () {
         if (NetworkConnection.isNetworkAvailable (getActivity ())) {
-            Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_SESSION_LIST, true);
-            StringRequest strRequest = new StringRequest (Request.Method.GET, AppConfigURL.URL_SESSION_LIST,
+            Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_SESSION_FAVOURITE_LIST, true);
+            StringRequest strRequest = new StringRequest (Request.Method.GET, AppConfigURL.URL_SESSION_FAVOURITE_LIST,
                     new Response.Listener<String> () {
                         @Override
                         public void onResponse (String response) {

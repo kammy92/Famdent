@@ -37,6 +37,7 @@ public class HallPlanActivity extends AppCompatActivity {
 
     private void initData () {
         // ivHallPlan.setZoom (1);
+        webView.setScrollbarFadingEnabled (true);
         webView.getSettings ().setJavaScriptEnabled (true);
         webView.getSettings ().setPluginState (WebSettings.PluginState.ON);
         webView.getSettings ().setDisplayZoomControls (false);
@@ -49,7 +50,7 @@ public class HallPlanActivity extends AppCompatActivity {
         webView.setInitialScale (250);
         webView.setWebViewClient (new Callback ());
 
-        String pdfURL = "https://project-famdent-cammy92.c9users.io/api/hallplan.pdf";
+        String pdfURL = "http://35.165.111.86/api/extras/hallplan.pdf";
         webView.loadUrl (
                 "http://docs.google.com/gview?embedded=true&url=" + pdfURL);
     }

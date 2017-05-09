@@ -9,6 +9,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -413,6 +414,35 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
 
 
                                         tvExhibitorName.setText (exhibitorDetail.getExhibitor_name ());
+
+
+                                        tvFullAddress.setText (exhibitorDetail.getAddress ());
+                                        tvEmail.setText (Html.fromHtml ("<u><font color='blue'>" + exhibitorDetail.getEmail () + "</font></u>"), TextView.BufferType.SPANNABLE);
+                                        tvWebsite.setText (Html.fromHtml ("<u><font color='blue'>" + exhibitorDetail.getWebsite () + "</font></u>"), TextView.BufferType.SPANNABLE);
+                                        tvNotes.setText (exhibitorDetail.getNotes ());
+
+                                        for (int i = 0; i < exhibitorDetail.getContactList ().size (); i++) {
+                                            final ArrayList<String> contactList2 = exhibitorDetail.getContactList ();
+                                            TextView tv = new TextView (ExhibitorDetailActivity.this);
+                                            tv.setText (Html.fromHtml ("<u><font color='blue'>" + contactList2.get (i) + "</font></u>"), TextView.BufferType.SPANNABLE);
+                                            tv.setTextSize (14);
+                                            tv.setPadding (0, 5, 0, 5);
+                                            tv.setTypeface (SetTypeFace.getTypeface (ExhibitorDetailActivity.this, Constants.font_name));
+                                            tv.setTextColor (getResources ().getColor (R.color.app_text_color_dark));
+                                            final int finalI = i;
+                                            tv.setOnClickListener (new View.OnClickListener () {
+                                                @Override
+                                                public void onClick (View v) {
+                                                    Intent sIntent = new Intent (Intent.ACTION_DIAL, Uri.parse ("tel:" + contactList2.get (finalI)));
+                                                    sIntent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                    startActivity (sIntent);
+                                                }
+                                            });
+                                            llPhone.addView (tv);
+                                        }
+
+
+
 
                                         if (exhibitorDetail.isFavourite ()) {
                                             ivFavourite.setImageResource (R.drawable.ic_star);

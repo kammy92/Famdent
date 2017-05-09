@@ -512,6 +512,12 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
             dots[currentPage].setTextColor (getResources ().getColor (R.color.colorPrimary));
     }
 
+    @Override
+    public void onBackPressed () {
+        finish ();
+        overridePendingTransition (R.anim.slide_in_left, R.anim.slide_out_right);
+    }
+
     class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<> ();
 
@@ -533,4 +539,5 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
             mFragmentList.add (fragment);
         }
     }
+
 }

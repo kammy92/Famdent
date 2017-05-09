@@ -130,11 +130,41 @@
                             android:textColor="@color/app_text_color_dark"
                             android:textSize="@dimen/text_size_medium"/>
                     </RelativeLayout>
+
+
+                    <RelativeLayout
+                        android:id="@+id/rlContactPerson"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/rlAddress"
+                        android:layout_marginTop="@dimen/activity_margin"
+                    >
+                        <ImageView
+                            android:id="@+id/ivContactPerson"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="@dimen/activity_margin_small"
+                            android:src="@drawable/ic_person"/>
+
+                        <TextView
+                            android:id="@+id/tvContactPerson"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toEndOf="@+id/ivContactPerson"
+                            android:layout_toRightOf="@+id/ivContactPerson"
+                            android:gravity="center_vertical"
+                            android:text="Coming soon..."
+                            android:textColor="@color/app_text_color_dark"
+                            android:textSize="@dimen/text_size_medium"/>
+                    </RelativeLayout>
+
+
                     <RelativeLayout
                         android:id="@+id/rlPhone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/rlAddress"
+                        android:layout_below="@+id/rlContactPerson"
                         android:layout_marginTop="@dimen/activity_margin">
                         <ImageView
 
@@ -154,12 +184,6 @@
                             android:layout_toEndOf="@+id/ivPhone"
                             android:layout_toRightOf="@+id/ivPhone"
                             android:orientation="vertical">
-
-                            <TextView android:layout_width="match_parent"
-                                      android:layout_height="match_parent"
-                                      android:text="Coming soon..."
-                                      android:textColor="@color/app_text_color_dark"
-                                      android:textSize="@dimen/text_size_medium"/>
 
                         </LinearLayout>
 

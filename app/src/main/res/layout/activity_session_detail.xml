@@ -88,6 +88,7 @@
                     xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_margin_small"
                     android:orientation="vertical">
 
                     <RelativeLayout
@@ -134,7 +135,7 @@
                                 android:gravity="center"
                                 android:text="Session Title"
                                 android:textColor="@color/app_text_color_dark"
-                                android:textSize="@dimen/text_size_large"
+                                android:textSize="@dimen/text_size_extra_large"
                                 android:textStyle="bold"
                                 android:visibility="visible"/>
                             <TextView
@@ -189,102 +190,14 @@
                         android:orientation="horizontal"
                         android:visibility="gone"/>
 
-                    <RelativeLayout
-                        android:id="@+id/rl1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@+id/rl0"
-                        android:layout_marginLeft="@dimen/activity_margin_small"
-                        android:layout_marginRight="@dimen/activity_margin_small">
-
-                        <ImageView
-                            android:id="@+id/ivServiceIcon"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@color/text_color_white"
-                            android:padding="@dimen/activity_margin_small"
-                            android:src="@drawable/ic_list"/>
-
-                        <TextView
-                            android:id="@+id/tvServiceName"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_alignBottom="@+id/ivServiceIcon"
-                            android:layout_alignTop="@+id/ivServiceIcon"
-                            android:layout_toEndOf="@+id/ivServiceIcon"
-                            android:layout_toRightOf="@+id/ivServiceIcon"
-                            android:background="@color/primary"
-                            android:gravity="center_vertical"
-                            android:paddingEnd="@dimen/activity_margin_small"
-                            android:paddingLeft="@dimen/activity_margin_small"
-                            android:paddingRight="@dimen/activity_margin_small"
-                            android:paddingStart="@dimen/activity_margin_small"
-                            android:text="TOPICS COVERED"
-                            android:textColor="@color/text_color_white"
-                            android:textSize="@dimen/text_size_large"
-                            android:textStyle="bold"/>
-
-                        <LinearLayout
-                            android:id="@+id/llTopics"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/tvServiceName"
-                            android:layout_marginTop="@dimen/activity_margin_small"
-                            android:layout_toEndOf="@+id/ivServiceIcon"
-                            android:layout_toRightOf="@+id/ivServiceIcon"
-                            android:orientation="vertical"></LinearLayout>
-                        <!--
-                                        <TextView
-                                            android:id="@+id/tvImpaction"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:layout_below="@+id/tvServiceName"
-                                            android:layout_marginTop="@dimen/activity_margin_small"
-                                            android:layout_toEndOf="@+id/ivServiceIcon"
-                                            android:layout_toRightOf="@+id/ivServiceIcon"
-                                            android:gravity="start"
-                                            android:text="Impaction"
-                                            android:textColor="@color/text_color_black"
-                                            android:textSize="15sp"/>
-
-                                        <TextView
-                                            android:id="@+id/tvImpantology"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:layout_below="@+id/tvImpaction"
-                                            android:layout_toRightOf="@+id/ivServiceIcon"
-                                            android:gravity="left"
-                                            android:paddingTop="5dp"
-                                            android:text="Implantology"
-                                            android:textColor="@color/text_color_black"
-                                            android:textSize="15sp"/>
-
-                                        <TextView
-                                            android:id="@+id/tvSurgery"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:layout_below="@+id/tvImpantology"
-                                            android:layout_toRightOf="@+id/ivServiceIcon"
-                                            android:gravity="left"
-                                            android:paddingBottom="5dp"
-                                            android:paddingTop="5dp"
-                                            android:text="Tmj Surgery"
-                                            android:textColor="@color/text_color_black"
-                                            android:textSize="15sp"/>
-
-                                        -->
-                    </RelativeLayout>
 
                     <RelativeLayout
                         android:id="@+id/rl2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/rl1"
+                        android:layout_below="@+id/rl0"
                         android:layout_marginLeft="@dimen/activity_margin_small"
-                        android:layout_marginRight="@dimen/activity_margin_small"
-                        android:layout_marginTop="@dimen/activity_margin_small">
+                        android:layout_marginRight="@dimen/activity_margin_small">
 
                         <ImageView
                             android:id="@+id/ivSchedule"
@@ -363,6 +276,94 @@
                             android:text="Category: International Speakers"
                             android:textColor="@color/text_color_black"
                             android:textSize="@dimen/text_size_medium"/>
+                    </RelativeLayout>
+                    <RelativeLayout
+                        android:id="@+id/rl1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_below="@+id/rl2"
+                        android:layout_marginLeft="@dimen/activity_margin_small"
+                        android:layout_marginRight="@dimen/activity_margin_small"
+                        android:layout_marginTop="@dimen/activity_margin_small">
+
+                        <ImageView
+                            android:id="@+id/ivServiceIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@color/text_color_white"
+                            android:padding="@dimen/activity_margin_small"
+                            android:src="@drawable/ic_list"/>
+
+                        <TextView
+                            android:id="@+id/tvServiceName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignBottom="@+id/ivServiceIcon"
+                            android:layout_alignTop="@+id/ivServiceIcon"
+                            android:layout_toEndOf="@+id/ivServiceIcon"
+                            android:layout_toRightOf="@+id/ivServiceIcon"
+                            android:background="@color/primary"
+                            android:gravity="center_vertical"
+                            android:paddingEnd="@dimen/activity_margin_small"
+                            android:paddingLeft="@dimen/activity_margin_small"
+                            android:paddingRight="@dimen/activity_margin_small"
+                            android:paddingStart="@dimen/activity_margin_small"
+                            android:text="TOPICS COVERED"
+                            android:textColor="@color/text_color_white"
+                            android:textSize="@dimen/text_size_large"
+                            android:textStyle="bold"/>
+
+                        <LinearLayout
+                            android:id="@+id/llTopics"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/tvServiceName"
+                            android:layout_marginTop="@dimen/activity_margin_small"
+                            android:layout_toEndOf="@+id/ivServiceIcon"
+                            android:layout_toRightOf="@+id/ivServiceIcon"
+                            android:orientation="vertical"></LinearLayout>
+                        <!--
+                                        <TextView
+                                            android:id="@+id/tvImpaction"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_below="@+id/tvServiceName"
+                                            android:layout_marginTop="@dimen/activity_margin_small"
+                                            android:layout_toEndOf="@+id/ivServiceIcon"
+                                            android:layout_toRightOf="@+id/ivServiceIcon"
+                                            android:gravity="start"
+                                            android:text="Impaction"
+                                            android:textColor="@color/text_color_black"
+                                            android:textSize="15sp"/>
+
+                                        <TextView
+                                            android:id="@+id/tvImpantology"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_below="@+id/tvImpaction"
+                                            android:layout_toRightOf="@+id/ivServiceIcon"
+                                            android:gravity="left"
+                                            android:paddingTop="5dp"
+                                            android:text="Implantology"
+                                            android:textColor="@color/text_color_black"
+                                            android:textSize="15sp"/>
+
+                                        <TextView
+                                            android:id="@+id/tvSurgery"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_below="@+id/tvImpantology"
+                                            android:layout_toRightOf="@+id/ivServiceIcon"
+                                            android:gravity="left"
+                                            android:paddingBottom="5dp"
+                                            android:paddingTop="5dp"
+                                            android:text="Tmj Surgery"
+                                            android:textColor="@color/text_color_black"
+                                            android:textSize="15sp"/>
+
+                                        -->
                     </RelativeLayout>
 
                 </RelativeLayout>

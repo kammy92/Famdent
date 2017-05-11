@@ -176,9 +176,9 @@ public class ExhibitorListActivity extends AppCompatActivity {
             @Override
             public void onClick (View v) {
 //                Toast.makeText (ExhibitorListActivity.this, "karman open", Toast.LENGTH_SHORT).show ();
-                ivFilter.setVisibility (View.GONE);
+//                ivFilter.setVisibility (View.GONE);
                 ivBack.setVisibility (View.GONE);
-                ivSort.setVisibility (View.GONE);
+//                ivSort.setVisibility (View.GONE);
                 tvTitle.setVisibility (View.GONE);
             }
         });
@@ -191,14 +191,15 @@ public class ExhibitorListActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange (String newText) {
-                int textlength = newText.length ();
                 tempExhibitorList.clear ();
-
                 for (Exhibitor exhibitor : exhibitorList) {
-                    if (textlength <= exhibitor.getExhibitor_name ().length ()) {
-                        if (exhibitor.getExhibitor_name ().contains (newText.toString ().toLowerCase ())) {
-                            tempExhibitorList.add (exhibitor);
-                        }
+                    List<StallDetail> tempStallDetailList = exhibitor.getStallDetailList ();
+                    StallDetail stallDetail = tempStallDetailList.get (0);
+                    if (exhibitor.getExhibitor_name ().toUpperCase ().contains (newText.toUpperCase ()) ||
+                            exhibitor.getExhibitor_name ().toLowerCase ().contains (newText.toLowerCase ()) ||
+                            stallDetail.getStall_number ().toLowerCase ().contains (newText.toLowerCase ()) ||
+                            stallDetail.getStall_number ().toUpperCase ().contains (newText.toUpperCase ())) {
+                        tempExhibitorList.add (exhibitor);
                     }
                 }
                 exhibitorAdapter = new ExhibitorAdapter (ExhibitorListActivity.this, tempExhibitorList);
@@ -207,8 +208,6 @@ public class ExhibitorListActivity extends AppCompatActivity {
                 rvExhibitor.setLayoutManager (new LinearLayoutManager (ExhibitorListActivity.this, LinearLayoutManager.VERTICAL, false));
                 rvExhibitor.addItemDecoration (new SimpleDividerItemDecoration (ExhibitorListActivity.this));
                 rvExhibitor.setItemAnimator (new DefaultItemAnimator ());
-
-
                 return true;
             }
         });
@@ -217,9 +216,9 @@ public class ExhibitorListActivity extends AppCompatActivity {
             @Override
             public boolean onClose () {
 //                Toast.makeText (ExhibitorListActivity.this, "karman close", Toast.LENGTH_SHORT).show ();
-                ivFilter.setVisibility (View.VISIBLE);
+//                ivFilter.setVisibility (View.VISIBLE);
                 ivBack.setVisibility (View.VISIBLE);
-                ivSort.setVisibility (View.VISIBLE);
+//                ivSort.setVisibility (View.VISIBLE);
                 tvTitle.setVisibility (View.VISIBLE);
                 return false;
             }

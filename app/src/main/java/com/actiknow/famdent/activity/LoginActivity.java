@@ -88,7 +88,7 @@ public class LoginActivity extends AppCompatActivity {
     Spinner spType;
     String visitor_id, name, email, mobile, login_key;
     int otp;
-    private String[] user_type = new String[] {"I am a..", "Dentist", "Student", "Dealer"};
+    private String[] user_type = new String[] {"I am a..", "Dentist", "Student", "Dealer", "Others"};
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -415,7 +415,7 @@ public class LoginActivity extends AppCompatActivity {
                                             @Override
                                             public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                                 if (dialog.getInputEditText ().getText ().length () > 0) {
-                                                    if (Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == otp || Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == 123456) {
+                                                    if (Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == otp) {
                                                         PackageInfo pInfo = null;
                                                         try {
                                                             pInfo = getPackageManager ().getPackageInfo (getPackageName (), 0);
@@ -484,7 +484,7 @@ public class LoginActivity extends AppCompatActivity {
                                         }
 
 
-                                        dialog.getInputEditText ().setText (jsonObj.getString (AppConfigTags.OTP));
+//                                        dialog.getInputEditText ().setText (jsonObj.getString (AppConfigTags.OTP));
 
                                         dialog.getActionButton (DialogAction.POSITIVE).setOnClickListener (new CustomListener (LoginActivity.this, dialog, DialogAction.POSITIVE));
                                         dialog.getActionButton (DialogAction.NEUTRAL).setOnClickListener (new CustomListener (LoginActivity.this, dialog, DialogAction.NEUTRAL));
@@ -655,10 +655,10 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void onClick (View v) {
             if (dialogAction == DialogAction.NEUTRAL) {
-                Utils.showToast (activity, "resend", true);
+                getOTP (etMobile.getText ().toString ());
             } else if (dialogAction == DialogAction.POSITIVE) {
                 if (dialog.getInputEditText ().getText ().length () > 0) {
-                    if (Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == otp || Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == 123456) {
+                    if (Integer.parseInt (dialog.getInputEditText ().getText ().toString ()) == otp) {
 
                         PackageInfo pInfo = null;
                         try {

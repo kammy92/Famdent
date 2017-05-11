@@ -52,6 +52,7 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
     int exhibitor_id;
     TextView tvExhibitorName;
     TextView tvFullAddress;
+    TextView tvContactPerson;
     TextView tvEmail;
     TextView tvWebsite;
     FloatingActionButton fabAddNote;
@@ -84,6 +85,7 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
     private void initView () {
         tvExhibitorName = (TextView) findViewById (R.id.tvExhibitorName);
         tvFullAddress = (TextView) findViewById (R.id.tvFullAddress);
+        tvContactPerson = (TextView) findViewById (R.id.tvContactPerson);
         tvEmail = (TextView) findViewById (R.id.tvEmail);
         tvWebsite = (TextView) findViewById (R.id.tvWebsite);
         tvAddFavourite = (TextView) findViewById (R.id.tvAddFavourite);
@@ -387,6 +389,7 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
                                                 jsonObj.getBoolean (AppConfigTags.EXHIBITOR_FAVOURITE),
                                                 jsonObj.getString (AppConfigTags.EXHIBITOR_LOGO),
                                                 jsonObj.getString (AppConfigTags.EXHIBITOR_NAME),
+                                                jsonObj.getString (AppConfigTags.EXHIBITOR_CONTACT_PERSON),
                                                 jsonObj.getString (AppConfigTags.EXHIBITOR_ADDRESS),
                                                 jsonObj.getString (AppConfigTags.EXHIBITOR_EMAIL),
                                                 jsonObj.getString (AppConfigTags.EXHIBITOR_WEBSITE),
@@ -416,7 +419,8 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
                                         tvExhibitorName.setText (exhibitorDetail.getExhibitor_name ());
 
 
-                                        tvFullAddress.setText (exhibitorDetail.getAddress ());
+                                        tvFullAddress.setText ("Stall Number :" + exhibitorDetail.getAddress ());
+                                        tvContactPerson.setText (exhibitorDetail.getContact_person ());
                                         tvEmail.setText (Html.fromHtml ("<u><font color='blue'>" + exhibitorDetail.getEmail () + "</font></u>"), TextView.BufferType.SPANNABLE);
                                         tvWebsite.setText (Html.fromHtml ("<u><font color='blue'>" + exhibitorDetail.getWebsite () + "</font></u>"), TextView.BufferType.SPANNABLE);
                                         tvNotes.setText (exhibitorDetail.getNotes ());

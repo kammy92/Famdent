@@ -222,7 +222,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/rlEmail"
-                        android:layout_marginTop="@dimen/activity_margin">
+                        android:layout_marginTop="@dimen/activity_margin"
+                        android:visibility="gone">
 
 
                         <ImageView

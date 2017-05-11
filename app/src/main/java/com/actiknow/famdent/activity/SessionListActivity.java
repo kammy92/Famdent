@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,9 +19,11 @@ import com.actiknow.famdent.utils.AppConfigTags;
 import com.actiknow.famdent.utils.AppConfigURL;
 import com.actiknow.famdent.utils.Constants;
 import com.actiknow.famdent.utils.NetworkConnection;
+import com.actiknow.famdent.utils.SetTypeFace;
 import com.actiknow.famdent.utils.SimpleDividerItemDecoration;
 import com.actiknow.famdent.utils.Utils;
 import com.actiknow.famdent.utils.VisitorDetailsPref;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -41,11 +44,21 @@ public class SessionListActivity extends AppCompatActivity {
     RecyclerView rvSession;
     SwipeRefreshLayout swipeRefreshLayout;
     List<Session> sessionList = new ArrayList<> ();
+    List<Session> tempSessionList = new ArrayList<> ();
+
+    List<String> sessionCategories = new ArrayList<> ();
+
     SessionAdapter sessionAdapter;
 
     TextView tvNoResult;
 
-    //karman
+    ImageView ivFilter;
+    ImageView ivSort;
+    TextView tvTitle;
+    SearchView searchView;
+
+    String category;
+
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -54,7 +67,7 @@ public class SessionListActivity extends AppCompatActivity {
         initView ();
         initData ();
         initListener ();
-        getSessionListFromServer ();
+        selectSessionCategoryDialog ();
     }
 
     private void initView () {
@@ -62,27 +75,23 @@ public class SessionListActivity extends AppCompatActivity {
         tvNoResult = (TextView) findViewById (R.id.tvNoResult);
         rvSession = (RecyclerView) findViewById (R.id.rvSession);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById (R.id.swipeRefreshLayout);
+
+        ivFilter = (ImageView) findViewById (R.id.ivFilter);
+        ivSort = (ImageView) findViewById (R.id.ivSort);
+        tvTitle = (TextView) findViewById (R.id.tvTitle);
+        searchView = (SearchView) findViewById (R.id.searchView);
     }
 
     private void initData () {
+
+        sessionCategories.add ("International Speakers");
+        sessionCategories.add ("Live Dentistry Arena");
+        sessionCategories.add ("Famdent Awards Exceptional Speakers");
+        sessionCategories.add ("Power Of 10");
+        sessionCategories.add ("How To Series");
+        sessionCategories.add ("Most Challenging Cases");
+
         swipeRefreshLayout.setRefreshing (true);
-
-//        scientificSessionList.add (new Programme (1, "Orthodontics Workshop", "Dr Nikita Jain", "27/04/2017", "15:22"));
-//        scientificSessionList.add (new Programme (2, "Esthetic Implants", "Dr Rahul Jain", "27/05/2017", "15:22"));
-//        scientificSessionList.add (new Programme (3, "Basic Endodontics", "Dr Sumit", "27/05/2017", "15:22"));
-//        scientificSessionList.add (new Programme (4, "Smile Designing", "Dr Karman Singh", "27/05/2017", "15:22"));
-//        scientificSessionList.add (new Programme (5, "Orthodontics Workshop", "Dr Nikita Jain", "27/04/2017", "15:22"));
-//        scientificSessionList.add (new Programme (6, "Aesthetic Implants", "Dr Rahul Jain", "27/05/2017", "15:22"));
-//        scientificSessionList.add (new Programme (7, "Basic Endodontics", "Dr Rahul Jain", "27/05/2017", "15:22"));
-//        scientificSessionList.add (new Programme (8, "Smile Designing", "Dr Karman Singh", "27/05/2017", "15:22"));
-
-        //    scientificSessionAdapter = new ScientificSessionAdapter (this, scientificSessionList);
-        //   rvScientificSessionList.setAdapter (scientificSessionAdapter);
-        //   rvScientificSessionList.setHasFixedSize (true);
-        //   rvScientificSessionList.setLayoutManager (new LinearLayoutManager (this, LinearLayoutManager.VERTICAL, false));
-        // rvScientificSessionList.addItemDecoration (new SimpleDividerItemDecoration (this));
-        // rvScientificSessionList.setItemAnimator (new DefaultItemAnimator ());
-
 
         swipeRefreshLayout.setColorSchemeColors (getResources ().getColor (R.color.colorPrimaryDark));
 
@@ -93,7 +102,6 @@ public class SessionListActivity extends AppCompatActivity {
         rvSession.addItemDecoration (new SimpleDividerItemDecoration (SessionListActivity.this));
         rvSession.setItemAnimator (new DefaultItemAnimator ());
 
-
         Utils.setTypefaceToAllViews (this, ivBack);
     }
 
@@ -102,7 +110,7 @@ public class SessionListActivity extends AppCompatActivity {
             @Override
             public void onRefresh () {
                 swipeRefreshLayout.setRefreshing (true);
-                getSessionListFromServer ();
+                getSessionListFromServer (category);
             }
         });
         ivBack.setOnClickListener (new View.OnClickListener () {
@@ -113,9 +121,60 @@ public class SessionListActivity extends AppCompatActivity {
             }
         });
 
+        searchView.setOnSearchClickListener (new View.OnClickListener () {
+            @Override
+            public void onClick (View v) {
+//                Toast.makeText (ExhibitorListActivity.this, "karman open", Toast.LENGTH_SHORT).show ();
+//                ivFilter.setVisibility (View.GONE);
+                ivBack.setVisibility (View.GONE);
+//                ivSort.setVisibility (View.GONE);
+                tvTitle.setVisibility (View.GONE);
+            }
+        });
+
+        searchView.setOnQueryTextListener (new SearchView.OnQueryTextListener () {
+            @Override
+            public boolean onQueryTextSubmit (String query) {
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange (String newText) {
+                tempSessionList.clear ();
+                for (Session session : sessionList) {
+                    if (session.getDoctor_name ().toUpperCase ().contains (newText.toUpperCase ()) ||
+                            session.getDoctor_name ().toLowerCase ().contains (newText.toLowerCase ()) ||
+                            session.getProgram_name ().toLowerCase ().contains (newText.toLowerCase ()) ||
+                            session.getProgram_name ().toUpperCase ().contains (newText.toUpperCase ()) ||
+                            session.getLocation ().toUpperCase ().contains (newText.toUpperCase ()) ||
+                            session.getLocation ().toLowerCase ().contains (newText.toLowerCase ())) {
+                        tempSessionList.add (session);
+                    }
+                }
+                sessionAdapter = new SessionAdapter (SessionListActivity.this, tempSessionList);
+                rvSession.setAdapter (sessionAdapter);
+                rvSession.setHasFixedSize (true);
+                rvSession.setLayoutManager (new LinearLayoutManager (SessionListActivity.this, LinearLayoutManager.VERTICAL, false));
+                rvSession.addItemDecoration (new SimpleDividerItemDecoration (SessionListActivity.this));
+                rvSession.setItemAnimator (new DefaultItemAnimator ());
+                return true;
+            }
+        });
+
+        searchView.setOnCloseListener (new SearchView.OnCloseListener () {
+            @Override
+            public boolean onClose () {
+//                Toast.makeText (ExhibitorListActivity.this, "karman close", Toast.LENGTH_SHORT).show ();
+//                ivFilter.setVisibility (View.VISIBLE);
+                ivBack.setVisibility (View.VISIBLE);
+//                ivSort.setVisibility (View.VISIBLE);
+                tvTitle.setVisibility (View.VISIBLE);
+                return false;
+            }
+        });
     }
 
-    private void getSessionListFromServer () {
+    private void getSessionListFromServer (final String category) {
         if (NetworkConnection.isNetworkAvailable (this)) {
             Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_SESSION_LIST, true);
             StringRequest strRequest = new StringRequest (Request.Method.GET, AppConfigURL.URL_SESSION_LIST,
@@ -134,14 +193,23 @@ public class SessionListActivity extends AppCompatActivity {
                                         for (int i = 0; i < jsonArray.length (); i++) {
                                             JSONObject jsonObject = jsonArray.getJSONObject (i);
                                             Session session = new Session ();
-                                            session.setId (jsonObject.getInt (AppConfigTags.SESSION_ID));
-                                            session.setProgram_name (jsonObject.getString (AppConfigTags.SESSION_NAME));
-                                            session.setDoctor_name (jsonObject.getString (AppConfigTags.SESSION_SPEAKERS));
-                                            session.setDate (jsonObject.getString (AppConfigTags.SESSION_DATE));
-                                            session.setTime (jsonObject.getString (AppConfigTags.SESSION_TIME));
-                                            session.setLocation (jsonObject.getString (AppConfigTags.SESSION_LOCATION));
-                                            session.setCategory (jsonObject.getString (AppConfigTags.SESSION_CATEGORY));
-                                            sessionList.add (session);
+
+                                            if (jsonObject.getString (AppConfigTags.SESSION_CATEGORY).equalsIgnoreCase (category)) {
+                                                session.setId (jsonObject.getInt (AppConfigTags.SESSION_ID));
+                                                session.setProgram_name (jsonObject.getString (AppConfigTags.SESSION_NAME));
+                                                session.setDoctor_name (jsonObject.getString (AppConfigTags.SESSION_SPEAKERS));
+                                                session.setDate (jsonObject.getString (AppConfigTags.SESSION_DATE));
+                                                session.setTime (jsonObject.getString (AppConfigTags.SESSION_TIME));
+                                                session.setLocation (jsonObject.getString (AppConfigTags.SESSION_LOCATION));
+                                                session.setCategory (jsonObject.getString (AppConfigTags.SESSION_CATEGORY));
+                                                sessionList.add (session);
+                                            }
+
+//                                            Log.e ("karman category name", category);
+//                                            Log.e ("karman session category", session.getCategory ());
+
+//                                            if (session.getCategory ().equalsIgnoreCase (category)){
+//                                            }
                                         }
                                         sessionAdapter.notifyDataSetChanged ();
                                         if (jsonArray.length () > 0) {
@@ -191,6 +259,37 @@ public class SessionListActivity extends AppCompatActivity {
             swipeRefreshLayout.setRefreshing (false);
             tvNoResult.setVisibility (View.VISIBLE);
         }
+    }
+
+    private void applyFilterInList (String category) {
+        List<Session> sessionList1 = sessionList;
+        sessionList.clear ();
+        for (Session session : sessionList1) {
+            if (session.getCategory ().toUpperCase ().contains (category.toUpperCase ()) ||
+                    session.getCategory ().toLowerCase ().contains (category.toLowerCase ())) {
+                Log.e ("karman", "in if");
+                sessionList.add (session);
+            }
+        }
+        sessionAdapter.notifyDataSetChanged ();
+    }
+
+    private void selectSessionCategoryDialog () {
+        new MaterialDialog.Builder (this)
+                .title ("Select Category")
+                .items (sessionCategories)
+                .typeface (SetTypeFace.getTypeface (this), SetTypeFace.getTypeface (this))
+                .canceledOnTouchOutside (false)
+                .cancelable (false)
+                .itemsCallback (new MaterialDialog.ListCallback () {
+                    @Override
+                    public void onSelection (MaterialDialog dialog, View view, int which, CharSequence text) {
+//                        Utils.showToast (SessionListActivity.this, "tt" + text.toString (), false);
+                        category = text.toString ();
+                        getSessionListFromServer (category);
+                    }
+                })
+                .show ();
     }
 
     @Override

@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -40,9 +41,15 @@ public class ProgrammeListActivity extends AppCompatActivity {
     ImageView ivBack;
     RecyclerView rvProgrammesList;
     SwipeRefreshLayout swipeRefreshLayout;
-    List<Programme> programmeList= new ArrayList<>();
+    List<Programme> programmeList = new ArrayList<> ();
+    List<Programme> tempProgrammeList = new ArrayList<> ();
     ProgrammeAdapter programmeAdapter;
     TextView tvNoResult;
+
+    ImageView ivFilter;
+    ImageView ivSort;
+    TextView tvTitle;
+    SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +66,11 @@ public class ProgrammeListActivity extends AppCompatActivity {
         rvProgrammesList=(RecyclerView)findViewById(R.id.rvProgrammerList);
         swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.swipeRefreshLayout);
         tvNoResult = (TextView) findViewById (R.id.tvNoResult);
+
+        ivFilter = (ImageView) findViewById (R.id.ivFilter);
+        ivSort = (ImageView) findViewById (R.id.ivSort);
+        tvTitle = (TextView) findViewById (R.id.tvTitle);
+        searchView = (SearchView) findViewById (R.id.searchView);
     }
 
     private void initData() {
@@ -101,6 +113,55 @@ public class ProgrammeListActivity extends AppCompatActivity {
             }
         });
 
+        searchView.setOnSearchClickListener (new View.OnClickListener () {
+            @Override
+            public void onClick (View v) {
+//                Toast.makeText (ExhibitorListActivity.this, "karman open", Toast.LENGTH_SHORT).show ();
+//                ivFilter.setVisibility (View.GONE);
+                ivBack.setVisibility (View.GONE);
+//                ivSort.setVisibility (View.GONE);
+                tvTitle.setVisibility (View.GONE);
+            }
+        });
+
+        searchView.setOnQueryTextListener (new SearchView.OnQueryTextListener () {
+            @Override
+            public boolean onQueryTextSubmit (String query) {
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange (String newText) {
+                tempProgrammeList.clear ();
+                for (Programme programme : programmeList) {
+                    if (programme.getProgram_name ().toUpperCase ().contains (newText.toUpperCase ()) ||
+                            programme.getProgram_name ().toLowerCase ().contains (newText.toLowerCase ()) ||
+                            programme.getDoctor_name ().toLowerCase ().contains (newText.toLowerCase ()) ||
+                            programme.getDoctor_name ().toUpperCase ().contains (newText.toUpperCase ())) {
+                        tempProgrammeList.add (programme);
+                    }
+                }
+                programmeAdapter = new ProgrammeAdapter (ProgrammeListActivity.this, tempProgrammeList);
+                rvProgrammesList.setAdapter (programmeAdapter);
+                rvProgrammesList.setHasFixedSize (true);
+                rvProgrammesList.setLayoutManager (new LinearLayoutManager (ProgrammeListActivity.this, LinearLayoutManager.VERTICAL, false));
+                rvProgrammesList.addItemDecoration (new SimpleDividerItemDecoration (ProgrammeListActivity.this));
+                rvProgrammesList.setItemAnimator (new DefaultItemAnimator ());
+                return true;
+            }
+        });
+
+        searchView.setOnCloseListener (new SearchView.OnCloseListener () {
+            @Override
+            public boolean onClose () {
+//                Toast.makeText (ExhibitorListActivity.this, "karman close", Toast.LENGTH_SHORT).show ();
+//                ivFilter.setVisibility (View.VISIBLE);
+                ivBack.setVisibility (View.VISIBLE);
+//                ivSort.setVisibility (View.VISIBLE);
+                tvTitle.setVisibility (View.VISIBLE);
+                return false;
+            }
+        });
     }
 
     private void getProgramListFromServer () {

@@ -12,13 +12,14 @@ public class ExhibitorDetail {
     boolean favourite;
     ArrayList<String> contactList = new ArrayList<> ();
     ArrayList<StallDetail> stallDetailList = new ArrayList<> ();
-    String exhibitor_logo, exhibitor_name, address, email, website, notes;
+    String exhibitor_logo, exhibitor_name, contact_person, address, email, website, notes;
 
-    public ExhibitorDetail (int id, boolean favourite, String exhibitor_logo, String exhibitor_name, String address, String email, String website, String notes) {
+    public ExhibitorDetail (int id, boolean favourite, String exhibitor_logo, String exhibitor_name, String contact_person, String address, String email, String website, String notes) {
         this.id = id;
         this.favourite = favourite;
         this.exhibitor_logo = exhibitor_logo;
         this.exhibitor_name = exhibitor_name;
+        this.contact_person = contact_person;
         this.address = address;
         this.email = email;
         this.website = website;
@@ -63,6 +64,14 @@ public class ExhibitorDetail {
 
     public void setExhibitor_name (String exhibitor_name) {
         this.exhibitor_name = exhibitor_name;
+    }
+
+    public String getContact_person () {
+        return contact_person;
+    }
+
+    public void setContact_person (String contact_person) {
+        this.contact_person = contact_person;
     }
 
     public String getAddress () {

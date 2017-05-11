@@ -21,7 +21,7 @@ public class Constants {
     public static String location_tagging_end_time = "20:00";
     public static String api_key = "697d84087c8ca8a61caf94e720f261c8";
 
-        public static String sms_provider = "+917011396606";
-//    public static String sms_provider = "BLDKNT";
+    //        public static String sms_provider = "+917011396606";
+    public static String sms_provider = "INSPLY";
 
 }

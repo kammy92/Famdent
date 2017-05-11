@@ -70,6 +70,7 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
     CoordinatorLayout clMain;
     RelativeLayout rlMain;
 
+    TextView tvProgrammeName;
     ImageView ivSpeakerImage;
     ProgressBar progressBar;
     TextView tvSpeakerName;
@@ -247,6 +248,9 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
         ivSpeakerImage = (ImageView) findViewById (R.id.ivSpeakerImage);
         progressBar = (ProgressBar) findViewById (R.id.progressBar);
         tvSpeakerName = (TextView) findViewById (R.id.tvSpeakerName);
+
+        tvProgrammeName = (TextView) findViewById (R.id.tvProgrammeName);
+
         //tvSpeakerQualification = (ExpandableTextView) findViewById (R.id.tvSpeakerQualification);
         tvSpeakerQualification = (TextView) findViewById (R.id.tvSpeakerQualification);
     }
@@ -344,6 +348,8 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                                                 })
                                                 .into (ivSpeakerImage);
                                     }
+
+                                    tvProgrammeName.setText (programmeDetail.getName ());
 
                                     tvDate.setText ("Date: " + Utils.convertTimeFormat (programmeDetail.getDate (), "yyyy-MM-dd", "dd/MM/yyyy"));
                                     tvTime.setText ("Time: " + Utils.convertTimeFormat (programmeDetail.getTime (), "HH:mm", "hh:mm a"));

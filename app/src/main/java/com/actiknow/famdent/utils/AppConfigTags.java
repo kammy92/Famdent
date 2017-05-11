@@ -63,6 +63,7 @@ public class AppConfigTags {
     public static final String EXHIBITOR = "exhibitors";
     public static final String EXHIBITOR_LOGO = "exhibitor_logo";
     public static final String EXHIBITOR_NAME = "exhibitor_name";
+    public static final String EXHIBITOR_CONTACT_PERSON = "exhibitor_contact_person";
     public static final String STALL_DETAILS = "stall_details";
     public static final String STALL_NAME = "stall_name";
     public static final String HALL_NUMBER = "hall_number";

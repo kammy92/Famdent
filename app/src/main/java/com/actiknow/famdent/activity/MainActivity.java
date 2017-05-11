@@ -482,6 +482,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed () {
+/*
         MaterialDialog dialog = new MaterialDialog.Builder (this)
                 .content (R.string.dialog_text_quit_application)
                 .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
@@ -520,6 +521,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }).build ();
         dialog.show ();
+*/
+        super.onBackPressed ();
+        visitorDetailsPref.putBooleanPref (MainActivity.this, VisitorDetailsPref.LOGGED_IN_SESSION, false);
+        finish ();
     }
 
     public void checkPermissions () {

@@ -1,6 +1,8 @@
 package com.actiknow.famdent.activity;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.webkit.WebSettings;
@@ -16,7 +18,7 @@ public class HallPlanActivity extends AppCompatActivity {
     ImageView ivBack;
     //TouchImageView ivHallPlan;
     WebView webView;
-
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -24,6 +26,7 @@ public class HallPlanActivity extends AppCompatActivity {
         setContentView (R.layout.activity_hall_plan);
         initView ();
         initData ();
+
         //   CopyReadAssets();
         initListener ();
     }
@@ -36,13 +39,25 @@ public class HallPlanActivity extends AppCompatActivity {
     }
 
     private void initData () {
+        progressDialog = new ProgressDialog (this);
+        Utils.showProgressDialog (progressDialog, "Loading...", false);
+
+        final Handler handler = new Handler ();
+        handler.postDelayed (new Runnable () {
+            @Override
+            public void run () {
+                progressDialog.dismiss ();
+            }
+        }, 5000);
+
+
         // ivHallPlan.setZoom (1);
         webView.setScrollbarFadingEnabled (true);
         webView.getSettings ().setJavaScriptEnabled (true);
         webView.getSettings ().setPluginState (WebSettings.PluginState.ON);
         webView.getSettings ().setDisplayZoomControls (false);
         webView.getSettings ().setLoadWithOverviewMode (true);
-        webView.getSettings ().setSupportZoom (true);
+        webView.getSettings ().setSupportZoom (false);
         webView.getSettings ().setNeedInitialFocus (true);
         webView.getSettings ().setDefaultZoom (WebSettings.ZoomDensity.FAR);
         webView.getSettings ().setBuiltInZoomControls (true);

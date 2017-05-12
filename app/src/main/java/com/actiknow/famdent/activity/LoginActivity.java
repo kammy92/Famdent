@@ -15,6 +15,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -403,9 +404,13 @@ public class LoginActivity extends AppCompatActivity {
                                                 .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
                                                 .neutralColor (getResources ().getColor (R.color.app_text_color_dark))
                                                 .typeface (SetTypeFace.getTypeface (LoginActivity.this), SetTypeFace.getTypeface (LoginActivity.this))
+                                                .canceledOnTouchOutside (false)
+                                                .cancelable (false)
                                                 .inputType (InputType.TYPE_CLASS_NUMBER)
                                                 .positiveText (R.string.dialog_action_submit)
                                                 .neutralText (R.string.dialog_action_resend_otp);
+
+
                                         mBuilder.input ("OTP", null, new MaterialDialog.InputCallback () {
                                             @Override
                                             public void onInput (MaterialDialog dialog, CharSequence input) {
@@ -446,15 +451,30 @@ public class LoginActivity extends AppCompatActivity {
                                             }
                                         });
 
+
                                         InputFilter[] FilterArray = new InputFilter[1];
                                         FilterArray[0] = new InputFilter.LengthFilter (6);
                                         final MaterialDialog dialog = mBuilder.build ();
                                         try {
+
+                                            dialog.getActionButton (DialogAction.NEUTRAL).setEnabled (false);
                                             dialog.getInputEditText ().setFilters (FilterArray);
+
+                                            new CountDownTimer (15000, 1000) {
+                                                public void onTick (long leftTimeInMilliseconds) {
+                                                    long seconds = leftTimeInMilliseconds / 1000;
+                                                    dialog.getInputEditText ().setHint ("Resend OTP in 00:" + String.format ("%02d", seconds));
+                                                    dialog.getActionButton (DialogAction.NEUTRAL).setEnabled (false);
+                                                }
+
+                                                public void onFinish () {
+                                                    dialog.getInputEditText ().setHint ("Still not received, Resend");
+                                                    dialog.getActionButton (DialogAction.NEUTRAL).setEnabled (true);
+                                                }
+                                            }.start ();
                                         } catch (Exception e) {
                                             e.printStackTrace ();
                                         }
-
 
                                         dialog.getActionButton (DialogAction.POSITIVE).setEnabled (false);
                                         try {
@@ -655,6 +675,20 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void onClick (View v) {
             if (dialogAction == DialogAction.NEUTRAL) {
+                dialog.getActionButton (DialogAction.NEUTRAL).setEnabled (false);
+                new CountDownTimer (15000, 1000) {
+                    public void onTick (long leftTimeInMilliseconds) {
+                        long seconds = leftTimeInMilliseconds / 1000;
+                        dialog.getInputEditText ().setHint ("Resend OTP in 00:" + String.format ("%02d", seconds));
+                        dialog.getActionButton (DialogAction.NEUTRAL).setEnabled (false);
+                    }
+
+                    public void onFinish () {
+                        dialog.getInputEditText ().setHint ("Still not received, Resend");
+                        dialog.getActionButton (DialogAction.NEUTRAL).setEnabled (true);
+                    }
+                }.start ();
+                dialog.dismiss ();
                 getOTP (etMobile.getText ().toString ());
             } else if (dialogAction == DialogAction.POSITIVE) {
                 if (dialog.getInputEditText ().getText ().length () > 0) {

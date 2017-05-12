@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.actiknow.famdent.R;
 import com.actiknow.famdent.adapter.ExhibitorAdapter;
+import com.actiknow.famdent.helper.DatabaseHandler;
 import com.actiknow.famdent.model.Exhibitor;
 import com.actiknow.famdent.model.StallDetail;
 import com.actiknow.famdent.utils.AppConfigTags;
@@ -64,6 +65,8 @@ public class ExhibitorListActivity extends AppCompatActivity {
 
     List<StallDetail> stallDetailList = new ArrayList<> ();
 
+    DatabaseHandler db;
+
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -73,8 +76,18 @@ public class ExhibitorListActivity extends AppCompatActivity {
         initData ();
         initListener ();
 
-        getExhibitorList ();
+//        getExhibitorList ();
+        getOfflineExhibitorList ();
+    }
 
+    private void getOfflineExhibitorList () {
+        Utils.showLog (Log.DEBUG, AppConfigTags.TAG, "Getting all the exhibitors from local database", true);
+        exhibitorList.clear ();
+        ArrayList<Exhibitor> offlineExhibitor = db.getAllExhibitorList ();
+        for (Exhibitor exhibitor : offlineExhibitor)
+            exhibitorList.add (exhibitor);
+        exhibitorAdapter.notifyDataSetChanged ();
+        swipeRefreshLayout.setRefreshing (false);
     }
 
     private void initView () {
@@ -91,6 +104,8 @@ public class ExhibitorListActivity extends AppCompatActivity {
     }
 
     private void initData () {
+        db = new DatabaseHandler (getApplicationContext ());
+
         category = new String[] {"Air Abrasion", "Curing Lights", "Disposable Needles"};
 
         swipeRefreshLayout.setRefreshing (true);
@@ -117,7 +132,8 @@ public class ExhibitorListActivity extends AppCompatActivity {
             @Override
             public void onRefresh () {
                 swipeRefreshLayout.setRefreshing (true);
-                getExhibitorList ();
+                getOfflineExhibitorList ();
+//                getExhibitorList ();
             }
         });
         ivBack.setOnClickListener (new View.OnClickListener () {
@@ -262,7 +278,7 @@ public class ExhibitorListActivity extends AppCompatActivity {
                                             }
                                             exhibitorList.add (i, exhibitor);
                                             exhibitorAdapter.notifyDataSetChanged ();
-                                        }
+                                            }
                                         if (jsonArrayExhibitor.length () > 0) {
                                             swipeRefreshLayout.setRefreshing (false);
                                         } else {
@@ -322,6 +338,8 @@ public class ExhibitorListActivity extends AppCompatActivity {
             tvNoResult.setVisibility (View.VISIBLE);
         }
     }
+
+
 /*
     @Override
     public boolean onCreateOptionsMenu (Menu menu) {

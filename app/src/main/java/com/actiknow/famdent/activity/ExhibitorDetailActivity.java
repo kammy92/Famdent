@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actiknow.famdent.R;
+import com.actiknow.famdent.helper.DatabaseHandler;
 import com.actiknow.famdent.model.ExhibitorDetail;
 import com.actiknow.famdent.model.StallDetail;
 import com.actiknow.famdent.utils.AppConfigTags;
@@ -71,6 +72,8 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
 
     ProgressDialog progressDialog;
 
+    DatabaseHandler db;
+
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
@@ -79,7 +82,8 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
         initView ();
         initData ();
         initListener ();
-        getExhibitorDetails (exhibitor_id);
+        getOfflineExhibitorDetails (exhibitor_id);
+//        getExhibitorDetails (exhibitor_id);
     }
 
     private void initView () {
@@ -104,6 +108,8 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
     }
 
     private void initData () {
+        db = new DatabaseHandler (getApplicationContext ());
+
         progressDialog = new ProgressDialog (this);
 
 
@@ -367,6 +373,62 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
     private void getExtras () {
         Intent intent = getIntent ();
         exhibitor_id = intent.getIntExtra (AppConfigTags.EXHIBITOR_ID, 0);
+    }
+
+    private void getOfflineExhibitorDetails (int exhibitor_id) {
+
+        exhibitorDetail = db.getExhibitorDetail (exhibitor_id);
+
+        tvExhibitorName.setText (exhibitorDetail.getExhibitor_name ());
+
+
+        tvFullAddress.setText ("Stall Number :" + exhibitorDetail.getAddress ());
+        tvContactPerson.setText (exhibitorDetail.getContact_person ());
+        tvEmail.setText (Html.fromHtml ("<u><font color='blue'>" + exhibitorDetail.getEmail () + "</font></u>"), TextView.BufferType.SPANNABLE);
+        tvWebsite.setText (Html.fromHtml ("<u><font color='blue'>" + exhibitorDetail.getWebsite () + "</font></u>"), TextView.BufferType.SPANNABLE);
+        tvNotes.setText (exhibitorDetail.getNotes ());
+
+        for (int i = 0; i < exhibitorDetail.getContactList ().size (); i++) {
+            final ArrayList<String> contactList2 = exhibitorDetail.getContactList ();
+            TextView tv = new TextView (ExhibitorDetailActivity.this);
+            tv.setText (Html.fromHtml ("<u><font color='blue'>" + contactList2.get (i) + "</font></u>"), TextView.BufferType.SPANNABLE);
+            tv.setTextSize (14);
+            tv.setPadding (0, 5, 0, 5);
+            tv.setTypeface (SetTypeFace.getTypeface (ExhibitorDetailActivity.this, Constants.font_name));
+            tv.setTextColor (getResources ().getColor (R.color.app_text_color_dark));
+            final int finalI = i;
+            tv.setOnClickListener (new View.OnClickListener () {
+                @Override
+                public void onClick (View v) {
+                    Intent sIntent = new Intent (Intent.ACTION_DIAL, Uri.parse ("tel:" + contactList2.get (finalI)));
+                    sIntent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity (sIntent);
+                }
+            });
+            llPhone.addView (tv);
+        }
+
+
+        if (exhibitorDetail.isFavourite ()) {
+            ivFavourite.setImageResource (R.drawable.ic_star);
+            tvAddFavourite.setVisibility (View.GONE);
+            llButtons.setWeightSum (1);
+        } else {
+            ivFavourite.setImageResource (R.drawable.ic_star_border);
+            tvAddFavourite.setVisibility (View.VISIBLE);
+            llButtons.setWeightSum (2);
+        }
+
+        if (exhibitorDetail.getNotes ().length () > 0) {
+            tvNotes.setText (exhibitorDetail.getNotes ());
+            rlNotes.setVisibility (View.VISIBLE);
+            tvAddNotes.setText ("EDIT NOTES");
+        } else {
+            rlNotes.setVisibility (View.GONE);
+            tvAddNotes.setText ("ADD NOTES");
+        }
+
+        rlMain.setVisibility (View.VISIBLE);
     }
 
     private void getExhibitorDetails (final int exhibitor_id) {

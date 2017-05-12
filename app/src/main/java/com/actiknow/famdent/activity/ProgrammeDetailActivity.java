@@ -349,8 +349,8 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                                                 .into (ivSpeakerImage);
                                     }
 
-                                    tvProgrammeName.setText (programmeDetail.getName ());
 
+                                    tvProgrammeName.setText (programmeDetail.getName ());
                                     tvDate.setText ("Date: " + Utils.convertTimeFormat (programmeDetail.getDate (), "yyyy-MM-dd", "dd/MM/yyyy"));
                                     tvTime.setText ("Time: " + Utils.convertTimeFormat (programmeDetail.getTime (), "HH:mm", "hh:mm a"));
                                     tvDuration.setText ("Duration: " + programmeDetail.getDuration ());
@@ -428,12 +428,12 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                                             programmeDetail.setFavourite (true);
                                             ivFavourite.setImageResource (R.drawable.ic_star);
                                             tvAddFavourite.setVisibility (View.GONE);
-                                            Utils.showSnackBar (ProgrammeDetailActivity.this, clMain, "Exhibitor added to favourites", Snackbar.LENGTH_LONG, null, null);
+                                            Utils.showSnackBar (ProgrammeDetailActivity.this, clMain, "Programme added to favourites", Snackbar.LENGTH_LONG, null, null);
                                         } else {
                                             programmeDetail.setFavourite (false);
                                             ivFavourite.setImageResource (R.drawable.ic_star_border);
                                             tvAddFavourite.setVisibility (View.VISIBLE);
-                                            Utils.showSnackBar (ProgrammeDetailActivity.this, clMain, "Exhibitor removed from favourites", Snackbar.LENGTH_LONG, getResources ().getString (R.string.snackbar_action_undo), new View.OnClickListener () {
+                                            Utils.showSnackBar (ProgrammeDetailActivity.this, clMain, "Programme removed from favourites", Snackbar.LENGTH_LONG, getResources ().getString (R.string.snackbar_action_undo), new View.OnClickListener () {
                                                 @Override
                                                 public void onClick (View v) {
                                                     updateFavouriteStatus (true, event_id);

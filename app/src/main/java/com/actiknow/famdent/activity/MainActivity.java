@@ -35,7 +35,10 @@ import android.widget.TextView;
 
 import com.actiknow.famdent.R;
 import com.actiknow.famdent.adapter.HomeServiceAdapter;
+import com.actiknow.famdent.helper.DatabaseHandler;
+import com.actiknow.famdent.model.ExhibitorDetail;
 import com.actiknow.famdent.model.HomeService;
+import com.actiknow.famdent.model.StallDetail;
 import com.actiknow.famdent.utils.AppConfigTags;
 import com.actiknow.famdent.utils.AppConfigURL;
 import com.actiknow.famdent.utils.Constants;
@@ -57,6 +60,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.bugsnag.android.Bugsnag;
 import com.google.zxing.WriterException;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -77,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
     ProgressDialog progressDialog;
     ProgressBar progressBar;
+    DatabaseHandler db;
 
     RecyclerView rvHomeServiceList;
     List<HomeService> homeServices = new ArrayList<> ();
@@ -92,11 +97,12 @@ public class MainActivity extends AppCompatActivity {
 //        checkPermissions ();
         initListener ();
         isLogin ();
-//        initApplication ();
+        initApplication ();
 
         if (! visitorDetailsPref.getBooleanPref (this, VisitorDetailsPref.LOGGED_IN_SESSION)) {
 //            checkVersionUpdate ();
         }
+        db.closeDB ();
     }
 
     private void initView () {
@@ -110,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
     private void initData () {
         Bugsnag.init (this);
         visitorDetailsPref = VisitorDetailsPref.getInstance ();
+        db = new DatabaseHandler (getApplicationContext ());
 
 
         progressDialog = new ProgressDialog (this);
@@ -445,7 +452,49 @@ public class MainActivity extends AppCompatActivity {
                                     JSONObject jsonObj = new JSONObject (response);
                                     boolean error = jsonObj.getBoolean (AppConfigTags.ERROR);
                                     String message = jsonObj.getString (AppConfigTags.MESSAGE);
-                                    progressDialog.dismiss ();
+                                    if (! error) {
+                                        db.deleteAllExhibitors ();
+                                        db.deleteAllStallDetails ();
+                                        JSONArray jsonArrayExhibitor = jsonObj.getJSONArray (AppConfigTags.EXHIBITOR);
+                                        for (int i = 0; i < jsonArrayExhibitor.length (); i++) {
+                                            JSONObject jsonObjectExhibitor = jsonArrayExhibitor.getJSONObject (i);
+                                            ExhibitorDetail exhibitorDetail = new ExhibitorDetail (
+                                                    jsonObjectExhibitor.getInt (AppConfigTags.EXHIBITOR_ID),
+                                                    jsonObjectExhibitor.getBoolean (AppConfigTags.EXHIBITOR_FAVOURITE),
+                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_LOGO),
+                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_NAME),
+                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_CONTACT_PERSON),
+                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_ADDRESS),
+                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_EMAIL),
+                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_WEBSITE),
+                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_NOTES));
+
+                                            ArrayList<String> contactList = new ArrayList<> ();
+                                            JSONArray jsonArrayContacts = jsonObjectExhibitor.getJSONArray (AppConfigTags.EXHIBITOR_CONTACTS);
+                                            for (int j = 0; j < jsonArrayContacts.length (); j++) {
+                                                JSONObject jsonObjectContactDetail = jsonArrayContacts.getJSONObject (j);
+                                                contactList.add (jsonObjectContactDetail.getString (AppConfigTags.CONTACT));
+                                            }
+                                            exhibitorDetail.setContactList (contactList);
+
+                                            db.createExhibitor (exhibitorDetail);
+
+                                            JSONArray jsonArrayStallDetails = jsonObjectExhibitor.getJSONArray (AppConfigTags.STALL_DETAILS);
+                                            exhibitorDetail.clearStallDetailList ();
+                                            for (int j = 0; j < jsonArrayStallDetails.length (); j++) {
+                                                JSONObject jsonObjectStallDetail = jsonArrayStallDetails.getJSONObject (j);
+                                                StallDetail stallDetail = new StallDetail (
+                                                        jsonObjectStallDetail.getString (AppConfigTags.STALL_NAME),
+                                                        jsonObjectStallDetail.getString (AppConfigTags.HALL_NUMBER),
+                                                        jsonObjectStallDetail.getString (AppConfigTags.STALL_NUMBER)
+                                                );
+                                                db.createExhibitorStallDetail (stallDetail, jsonObjectExhibitor.getInt (AppConfigTags.EXHIBITOR_ID));
+                                            }
+                                        }
+
+
+                                        progressDialog.dismiss ();
+                                    }
                                 } catch (Exception e) {
                                     progressDialog.dismiss ();
                                     e.printStackTrace ();

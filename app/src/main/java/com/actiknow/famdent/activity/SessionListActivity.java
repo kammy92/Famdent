@@ -1,5 +1,6 @@
 package com.actiknow.famdent.activity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -91,7 +92,6 @@ public class SessionListActivity extends AppCompatActivity {
         sessionCategories.add ("How To Series");
         sessionCategories.add ("Most Challenging Cases");
 
-        swipeRefreshLayout.setRefreshing (true);
 
         swipeRefreshLayout.setColorSchemeColors (getResources ().getColor (R.color.colorPrimaryDark));
 
@@ -110,7 +110,7 @@ public class SessionListActivity extends AppCompatActivity {
             @Override
             public void onRefresh () {
                 swipeRefreshLayout.setRefreshing (true);
-                getSessionListFromServer (category);
+                getSessionListFromServer ();
             }
         });
         ivBack.setOnClickListener (new View.OnClickListener () {
@@ -174,7 +174,8 @@ public class SessionListActivity extends AppCompatActivity {
         });
     }
 
-    private void getSessionListFromServer (final String category) {
+    private void getSessionListFromServer () {
+        swipeRefreshLayout.setRefreshing (true);
         if (NetworkConnection.isNetworkAvailable (this)) {
             Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_SESSION_LIST, true);
             StringRequest strRequest = new StringRequest (Request.Method.GET, AppConfigURL.URL_SESSION_LIST,
@@ -194,7 +195,18 @@ public class SessionListActivity extends AppCompatActivity {
                                             JSONObject jsonObject = jsonArray.getJSONObject (i);
                                             Session session = new Session ();
 
-                                            if (jsonObject.getString (AppConfigTags.SESSION_CATEGORY).equalsIgnoreCase (category)) {
+                                            if (category.length () > 0) {
+                                                if (jsonObject.getString (AppConfigTags.SESSION_CATEGORY).equalsIgnoreCase (category)) {
+                                                    session.setId (jsonObject.getInt (AppConfigTags.SESSION_ID));
+                                                    session.setProgram_name (jsonObject.getString (AppConfigTags.SESSION_NAME));
+                                                    session.setDoctor_name (jsonObject.getString (AppConfigTags.SESSION_SPEAKERS));
+                                                    session.setDate (jsonObject.getString (AppConfigTags.SESSION_DATE));
+                                                    session.setTime (jsonObject.getString (AppConfigTags.SESSION_TIME));
+                                                    session.setLocation (jsonObject.getString (AppConfigTags.SESSION_LOCATION));
+                                                    session.setCategory (jsonObject.getString (AppConfigTags.SESSION_CATEGORY));
+                                                    sessionList.add (session);
+                                                }
+                                            } else {
                                                 session.setId (jsonObject.getInt (AppConfigTags.SESSION_ID));
                                                 session.setProgram_name (jsonObject.getString (AppConfigTags.SESSION_NAME));
                                                 session.setDoctor_name (jsonObject.getString (AppConfigTags.SESSION_SPEAKERS));
@@ -277,16 +289,33 @@ public class SessionListActivity extends AppCompatActivity {
     private void selectSessionCategoryDialog () {
         new MaterialDialog.Builder (this)
                 .title ("Select Category")
+//                .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+//                .positiveText (R.string.dialog_action_show_all)
                 .items (sessionCategories)
                 .typeface (SetTypeFace.getTypeface (this), SetTypeFace.getTypeface (this))
-                .canceledOnTouchOutside (false)
-                .cancelable (false)
+                .canceledOnTouchOutside (true)
+                .cancelable (true)
                 .itemsCallback (new MaterialDialog.ListCallback () {
                     @Override
                     public void onSelection (MaterialDialog dialog, View view, int which, CharSequence text) {
 //                        Utils.showToast (SessionListActivity.this, "tt" + text.toString (), false);
                         category = text.toString ();
-                        getSessionListFromServer (category);
+                        getSessionListFromServer ();
+                    }
+                })
+//                .onPositive (new MaterialDialog.SingleButtonCallback () {
+//                    @Override
+//                    public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+//                        category = "";
+//                        getSessionListFromServer ();
+//                    }
+//                })
+                .cancelListener (new DialogInterface.OnCancelListener () {
+                    @Override
+                    public void onCancel (DialogInterface dialog) {
+                        category = "";
+                        getSessionListFromServer ();
                     }
                 })
                 .show ();

@@ -2,12 +2,11 @@ package com.actiknow.famdent.model;
 
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Exhibitor {
     int id;
     String exhibitor_logo, exhibitor_name;
-    List<StallDetail> stallDetailList = new ArrayList<> ();
+    ArrayList<StallDetail> stallDetailList = new ArrayList<> ();
 
     public Exhibitor (int id, String exhibitor_logo, String exhibitor_name) {
         this.id = id;
@@ -39,11 +38,11 @@ public class Exhibitor {
         this.exhibitor_name = exhibitor_name;
     }
 
-    public List<StallDetail> getStallDetailList () {
+    public ArrayList<StallDetail> getStallDetailList () {
         return stallDetailList;
     }
 
-    public void setStallDetailList (List<StallDetail> stallDetailList) {
+    public void setStallDetailList (ArrayList<StallDetail> stallDetailList) {
         this.stallDetailList = stallDetailList;
     }
 

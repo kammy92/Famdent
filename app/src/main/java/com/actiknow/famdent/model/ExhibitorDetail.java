@@ -1,7 +1,6 @@
 package com.actiknow.famdent.model;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by l on 27/04/2017.
@@ -110,7 +109,7 @@ public class ExhibitorDetail {
         this.contactList.add (contact);
     }
 
-    public List<StallDetail> getStallDetailList () {
+    public ArrayList<StallDetail> getStallDetailList () {
         return stallDetailList;
     }
 

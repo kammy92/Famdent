@@ -51,7 +51,7 @@ public class ExhibitorAdapter extends RecyclerView.Adapter<ExhibitorAdapter.View
             TextView tv = new TextView (activity);
             tv.setTypeface (SetTypeFace.getTypeface (activity));
             tv.setLayoutParams (lparams);
-            tv.setText ("Stall Number : " + stallDetails.get (i).getStall_number ());
+            tv.setText ("Stall : " + stallDetails.get (i).getStall_number ());
             holder.llStallDetails.addView (tv);
         }
 

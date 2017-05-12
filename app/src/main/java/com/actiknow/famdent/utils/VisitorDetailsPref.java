@@ -13,6 +13,7 @@ public class VisitorDetailsPref {
     public static String VISITOR_LOGIN_KEY = "visitor_login_key";
     public static String VISITOR_FIREBASE_ID = "visitor_firebase_id";
     public static String LOGGED_IN_SESSION = "logged_in_session";
+    public static String DATABASE_VERSION = "database_version";
     private static VisitorDetailsPref visitorDetailsPref;
     private String USER_DETAILS = "USER_DETAILS";
 

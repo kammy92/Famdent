@@ -59,7 +59,7 @@
                         android:layout_toRightOf="@+id/ivBack"
                         android:layout_toStartOf="@+id/ivSort"
                         android:gravity="left"
-                        android:text="@string/activity_programme_list_title"
+                        android:text="@string/activity_event_list_title"
                         android:textColor="@color/text_color_white"
                         android:textSize="@dimen/text_size_large"
                         android:textStyle="bold"/>
@@ -142,7 +142,7 @@
                             android:layout_centerVertical="true"
                             android:gravity="center"
                             android:padding="@dimen/edittext_padding"
-                            android:text="@string/activity_programme_list_text_no_programme_found"
+                            android:text="@string/activity_event_list_text_no_programme_found"
                             android:textSize="@dimen/text_size_large"
                             android:visibility="gone"/>
                     </RelativeLayout>

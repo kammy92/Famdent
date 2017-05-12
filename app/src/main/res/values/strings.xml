@@ -32,14 +32,14 @@
     <string name="activity_exhibitor_list_text_no_exhibitor_found">No Exhibitor Found</string>
 
 
-    <string name="activity_programme_list_title">PROGRAMME LIST</string>
-    <string name="activity_programme_list_text_no_programme_found">No Programme Found</string>
+    <string name="activity_event_list_title">EVENT LIST</string>
+    <string name="activity_event_list_text_no_programme_found">No Event Found</string>
 
     <string name="activity_hall_plan_title">HALL PLAN</string>
 
     <string name="activity_my_favourites_title">MY FAVOURITES</string>
 
-    <string name="activity_programme_detail_title">PROGRAMME DETAIL</string>
+    <string name="activity_event_detail_title">EVENT DETAIL</string>
 
     <string name="activity_exhibitor_detail_title">EXHIBITOR DETAIL</string>
 
@@ -94,11 +94,11 @@
         favourites?
     </string>
 
-    <string name="dialog_text_remove_favourite_programme">Do you want to remove this programme from
+    <string name="dialog_text_remove_favourite_programme">Do you want to remove this event from
         your
         favourites?
     </string>
-    <string name="dialog_text_add_favourite_programme">Do you want to add this programme to your
+    <string name="dialog_text_add_favourite_programme">Do you want to add this event to your
         favourites?
     </string>
     <string name="dialog_text_remove_favourite_session">Do you want to remove this session from your

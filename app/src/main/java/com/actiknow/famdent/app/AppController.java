@@ -2,8 +2,8 @@ package com.actiknow.famdent.app;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.multidex.MultiDex;
 import android.text.TextUtils;
-
 
 import com.actiknow.famdent.utils.LruBitmapCache;
 import com.android.volley.Request;
@@ -25,6 +25,12 @@ public class AppController extends Application {
 
 	public static Context getAppContext () {
 		return AppController.context;
+	}
+
+	@Override
+	protected void attachBaseContext (Context context) {
+		super.attachBaseContext (context);
+		MultiDex.install (this);
 	}
 
 	@Override

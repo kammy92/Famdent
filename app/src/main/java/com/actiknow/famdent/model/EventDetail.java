@@ -6,21 +6,23 @@ import java.util.ArrayList;
  * Created by l on 27/04/2017.
  */
 
-public class ProgrammeDetail {
+public class EventDetail {
     int id;
     boolean favourite;
-    String name, date, time, duration, fees;
-    ArrayList<ProgrammeSpeaker> programmeSpeakerList = new ArrayList<> ();
+    String name, date, time, duration, location, fees, notes;
+    ArrayList<EventSpeaker> eventSpeakerList = new ArrayList<> ();
     ArrayList<String> topicList = new ArrayList<> ();
 
-    public ProgrammeDetail (int id, boolean favourite, String name, String date, String time, String duration, String fees) {
+    public EventDetail (int id, boolean favourite, String name, String date, String time, String duration, String location, String fees, String notes) {
         this.id = id;
         this.favourite = favourite;
         this.name = name;
         this.date = date;
         this.time = time;
         this.duration = duration;
+        this.location = location;
         this.fees = fees;
+        this.notes = notes;
     }
 
     public int getId () {
@@ -71,12 +73,28 @@ public class ProgrammeDetail {
         this.duration = duration;
     }
 
+    public String getLocation () {
+        return location;
+    }
+
+    public void setLocation (String location) {
+        this.location = location;
+    }
+
     public String getFees () {
         return fees;
     }
 
     public void setFees (String fees) {
         this.fees = fees;
+    }
+
+    public String getNotes () {
+        return notes;
+    }
+
+    public void setNotes (String notes) {
+        this.notes = notes;
     }
 
     public ArrayList<String> getTopicList () {
@@ -91,11 +109,11 @@ public class ProgrammeDetail {
         this.topicList.add (topic);
     }
 
-    public ArrayList<ProgrammeSpeaker> getProgrammeSpeakerList () {
-        return programmeSpeakerList;
+    public ArrayList<EventSpeaker> getEventSpeakerList () {
+        return eventSpeakerList;
     }
 
-    public void setProgrammeSpeakerList (ArrayList<ProgrammeSpeaker> programmeSpeakerList) {
-        this.programmeSpeakerList = programmeSpeakerList;
+    public void setEventSpeakerList (ArrayList<EventSpeaker> eventSpeakerList) {
+        this.eventSpeakerList = eventSpeakerList;
     }
 }

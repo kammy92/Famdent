@@ -15,9 +15,6 @@ public class SessionSpeaker {
 
     }
 
-    public SessionSpeaker () {
-
-    }
 
     public int getId () {
         return id;

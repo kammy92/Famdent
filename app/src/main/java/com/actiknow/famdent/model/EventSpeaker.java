@@ -4,11 +4,11 @@ package com.actiknow.famdent.model;
  * Created by l on 27/04/2017.
  */
 
-public class ProgrammeSpeaker {
+public class EventSpeaker {
     int id;
     String image, name, qualification, experience;
 
-    public ProgrammeSpeaker (int id, String image, String name, String qualification, String experience) {
+    public EventSpeaker (int id, String image, String name, String qualification, String experience) {
         this.id = id;
         this.image = image;
         this.name = name;

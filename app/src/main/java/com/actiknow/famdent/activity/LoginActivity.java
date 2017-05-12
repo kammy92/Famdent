@@ -319,6 +319,7 @@ public class LoginActivity extends AppCompatActivity {
                                         visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_MOBILE, jsonObj.getString (AppConfigTags.VISITOR_MOBILE));
                                         visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_TYPE, jsonObj.getString (AppConfigTags.VISITOR_TYPE));
                                         visitorDetailsPref.putStringPref (LoginActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY, jsonObj.getString (AppConfigTags.VISITOR_LOGIN_KEY));
+                                        visitorDetailsPref.putIntPref (LoginActivity.this, VisitorDetailsPref.DATABASE_VERSION, 0);
                                         Intent intent = new Intent (LoginActivity.this, MainActivity.class);
                                         intent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         startActivity (intent);

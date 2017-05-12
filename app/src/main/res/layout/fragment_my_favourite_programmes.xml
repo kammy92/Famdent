@@ -48,7 +48,7 @@
                         android:layout_centerVertical="true"
                         android:gravity="center"
                         android:padding="@dimen/edittext_padding"
-                        android:text="@string/activity_programme_list_text_no_programme_found"
+                        android:text="@string/activity_event_list_text_no_programme_found"
                         android:textSize="@dimen/text_size_large"
                         android:visibility="gone" />
                 </RelativeLayout>

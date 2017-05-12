@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.actiknow.famdent.R;
 import com.actiknow.famdent.adapter.SessionAdapter;
+import com.actiknow.famdent.helper.DatabaseHandler;
 import com.actiknow.famdent.model.Session;
 import com.actiknow.famdent.utils.AppConfigTags;
 import com.actiknow.famdent.utils.AppConfigURL;
@@ -60,6 +61,7 @@ public class SessionListActivity extends AppCompatActivity {
 
     String category;
 
+    DatabaseHandler db;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -68,7 +70,18 @@ public class SessionListActivity extends AppCompatActivity {
         initView ();
         initData ();
         initListener ();
-        selectSessionCategoryDialog ();
+        getOfflineSessionList ();
+//        selectSessionCategoryDialog ();
+    }
+
+    private void getOfflineSessionList () {
+        Utils.showLog (Log.DEBUG, AppConfigTags.TAG, "Getting all the sessions from local database", true);
+        sessionList.clear ();
+        ArrayList<Session> offlineSessions = db.getAllSessionList ();
+        for (Session session : offlineSessions)
+            sessionList.add (session);
+        sessionAdapter.notifyDataSetChanged ();
+        swipeRefreshLayout.setRefreshing (false);
     }
 
     private void initView () {
@@ -84,6 +97,7 @@ public class SessionListActivity extends AppCompatActivity {
     }
 
     private void initData () {
+        db = new DatabaseHandler (getApplicationContext ());
 
         sessionCategories.add ("International Speakers");
         sessionCategories.add ("Live Dentistry Arena");
@@ -91,7 +105,6 @@ public class SessionListActivity extends AppCompatActivity {
         sessionCategories.add ("Power Of 10");
         sessionCategories.add ("How To Series");
         sessionCategories.add ("Most Challenging Cases");
-
 
         swipeRefreshLayout.setColorSchemeColors (getResources ().getColor (R.color.colorPrimaryDark));
 
@@ -110,7 +123,8 @@ public class SessionListActivity extends AppCompatActivity {
             @Override
             public void onRefresh () {
                 swipeRefreshLayout.setRefreshing (true);
-                getSessionListFromServer ();
+                getOfflineSessionList ();
+//                getSessionListFromServer ();
             }
         });
         ivBack.setOnClickListener (new View.OnClickListener () {

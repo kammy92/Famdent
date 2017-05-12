@@ -16,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actiknow.famdent.R;
+import com.actiknow.famdent.helper.DatabaseHandler;
 import com.actiknow.famdent.model.SessionDetail;
 import com.actiknow.famdent.model.SessionSpeaker;
 import com.actiknow.famdent.utils.AppConfigTags;
@@ -72,9 +73,11 @@ public class SessionDetailActivity extends AppCompatActivity {
     int session_id;
 
 
-    //    ArrayList<ProgrammeSpeaker> programmeSpeakerList = new ArrayList<> ();
+    //    ArrayList<EventSpeaker> programmeSpeakerList = new ArrayList<> ();
     TextView tvAddFavourite;
     ProgressDialog progressDialog;
+
+    DatabaseHandler db;
 
     //    private WrappingViewPager viewPager;
 
@@ -88,7 +91,62 @@ public class SessionDetailActivity extends AppCompatActivity {
         initData ();
         initListener ();
 
-        getSessionDetailFromServer (session_id);
+        getOfflineSessionDetails (session_id);
+//        getSessionDetailFromServer (session_id);
+    }
+
+    private void getOfflineSessionDetails (int session_id) {
+        sessionDetail = db.getSessionDetail (session_id);
+
+        for (int i = 0; i < sessionDetail.getTopicList ().size (); i++) {
+            ArrayList<String> topicListTemp = sessionDetail.getTopicList ();
+            TextView tv = new TextView (SessionDetailActivity.this);
+            tv.setText ("\u25B8 " + topicListTemp.get (i));
+            tv.setTextSize (16);
+            tv.setTypeface (SetTypeFace.getTypeface (SessionDetailActivity.this, Constants.font_name));
+            tv.setTextColor (getResources ().getColor (R.color.app_text_color_dark));
+            llTopics.addView (tv);
+        }
+
+        for (int i = 0; i < sessionDetail.getSessionSpeakerList ().size (); i++) {
+            ArrayList<SessionSpeaker> sessionSpeakerList = sessionDetail.getSessionSpeakerList ();
+            SessionSpeaker sessionSpeaker = sessionSpeakerList.get (i);
+            tvSpeakerName.setText ("by " + sessionSpeaker.getName ());
+            Glide.with (SessionDetailActivity.this)
+                    .load (sessionSpeaker.getImage ())
+                    .listener (new RequestListener<String, GlideDrawable> () {
+                        @Override
+                        public boolean onException (Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            progressBar.setVisibility (View.GONE);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady (GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            progressBar.setVisibility (View.GONE);
+                            return false;
+                        }
+                    })
+                    .into (ivSpeakerImage);
+        }
+
+
+        tvSessionTitle.setText (sessionDetail.getTitle ());
+        tvDate.setText ("Date: " + Utils.convertTimeFormat (sessionDetail.getDate (), "yyyy-MM-dd", "dd/MM/yyyy"));
+        tvTime.setText ("Time: " + Utils.convertTimeFormat (sessionDetail.getTime (), "HH:mm", "hh:mm a"));
+        tvLocation.setText ("Location: " + sessionDetail.getLocation ());
+        tvCategory.setText ("Category: " + sessionDetail.getCategory ());
+
+        if (sessionDetail.isFavourite ()) {
+            ivFavourite.setImageResource (R.drawable.ic_star);
+            tvAddFavourite.setVisibility (View.GONE);
+        } else {
+            ivFavourite.setImageResource (R.drawable.ic_star_border);
+            tvAddFavourite.setVisibility (View.VISIBLE);
+        }
+
+
+        rlMain.setVisibility (View.VISIBLE);
     }
 
     private void initListener () {
@@ -205,6 +263,8 @@ public class SessionDetailActivity extends AppCompatActivity {
     }
 
     private void initData () {
+        db = new DatabaseHandler (getApplicationContext ());
+
         progressDialog = new ProgressDialog (this);
         Utils.setTypefaceToAllViews (this, tvSpeakerName);
     }
@@ -244,10 +304,11 @@ public class SessionDetailActivity extends AppCompatActivity {
                                         ArrayList<SessionSpeaker> sessionSpeakerList = new ArrayList<> ();
                                         for (int i = 0; i < jsonArraySpeakers.length (); i++) {
                                             JSONObject jsonObjectSpeakers = jsonArraySpeakers.getJSONObject (i);
-                                            SessionSpeaker sessionSpeaker = new SessionSpeaker ();
-                                            sessionSpeaker.setId (jsonObjectSpeakers.getInt (AppConfigTags.EVENT_DETAIL_SPEAKER_ID));
-                                            sessionSpeaker.setName (jsonObjectSpeakers.getString (AppConfigTags.SESSION_DETAILS_SPEAKER_NAME));
-                                            sessionSpeaker.setImage (jsonObjectSpeakers.getString (AppConfigTags.SESSION_DETAILS_SPEAKER_IMAGE));
+                                            SessionSpeaker sessionSpeaker = new SessionSpeaker (
+                                                    jsonObjectSpeakers.getInt (AppConfigTags.EVENT_DETAIL_SPEAKER_ID),
+                                                    jsonObjectSpeakers.getString (AppConfigTags.SESSION_DETAILS_SPEAKER_IMAGE),
+                                                    jsonObjectSpeakers.getString (AppConfigTags.SESSION_DETAILS_SPEAKER_NAME)
+                                            );
                                             sessionSpeakerList.add (sessionSpeaker);
                                         }
                                         sessionDetail.setSessionSpeakerList (sessionSpeakerList);

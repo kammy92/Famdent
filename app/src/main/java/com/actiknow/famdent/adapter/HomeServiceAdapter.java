@@ -19,11 +19,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.actiknow.famdent.R;
+import com.actiknow.famdent.activity.EventListActivity;
 import com.actiknow.famdent.activity.ExhibitorListActivity;
 import com.actiknow.famdent.activity.HallPlanActivity;
 import com.actiknow.famdent.activity.InformationActivity;
 import com.actiknow.famdent.activity.MyFavouriteActivity;
-import com.actiknow.famdent.activity.ProgrammeListActivity;
 import com.actiknow.famdent.activity.SessionListActivity;
 import com.actiknow.famdent.model.HomeService;
 import com.actiknow.famdent.utils.SetTypeFace;
@@ -102,7 +102,7 @@ public class HomeServiceAdapter extends RecyclerView.Adapter<HomeServiceAdapter.
                     activity.overridePendingTransition (R.anim.slide_in_right, R.anim.slide_out_left);
                     break;
                 case 2:
-                    Intent intent2 = new Intent (activity, ProgrammeListActivity.class);
+                    Intent intent2 = new Intent (activity, EventListActivity.class);
                     activity.startActivity (intent2);
                     activity.overridePendingTransition (R.anim.slide_in_right, R.anim.slide_out_left);
                     break;

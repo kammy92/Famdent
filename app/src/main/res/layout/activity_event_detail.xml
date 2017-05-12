@@ -59,7 +59,7 @@
                         android:layout_toRightOf="@+id/ivBack"
                         android:layout_toStartOf="@+id/ivFavourite"
                         android:gravity="left"
-                        android:text="@string/activity_programme_detail_title"
+                        android:text="@string/activity_event_detail_title"
                         android:textColor="@color/text_color_white"
                         android:textSize="@dimen/text_size_large"
                         android:textStyle="bold"/>
@@ -82,7 +82,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/appBar"
-            android:visibility="gone">
+            android:visibility="visible">
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -432,12 +432,23 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/tvFees"
-                            android:layout_marginBottom="@dimen/activity_margin"
                             android:layout_marginTop="@dimen/activity_margin_small"
                             android:layout_toEndOf="@+id/ivFees"
                             android:layout_toRightOf="@+id/ivFees"
                             android:gravity="start"
                             android:text="The Seminar costs Rs 10,000."
+                            android:textColor="@color/text_color_black"
+                            android:textSize="@dimen/text_size_medium"/>
+
+                        <TextView
+                            android:id="@+id/tvNotes"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/tvCost"
+                            android:layout_toEndOf="@+id/ivFees"
+                            android:layout_toRightOf="@+id/ivFees"
+                            android:gravity="start"
+                            android:text="Notes"
                             android:textColor="@color/text_color_black"
                             android:textSize="@dimen/text_size_medium"/>
                     </RelativeLayout>

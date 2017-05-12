@@ -13,8 +13,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.actiknow.famdent.R;
-import com.actiknow.famdent.adapter.ProgrammeAdapter;
-import com.actiknow.famdent.model.Programme;
+import com.actiknow.famdent.adapter.EventAdapter;
+import com.actiknow.famdent.helper.DatabaseHandler;
+import com.actiknow.famdent.model.Event;
 import com.actiknow.famdent.utils.AppConfigTags;
 import com.actiknow.famdent.utils.AppConfigURL;
 import com.actiknow.famdent.utils.Constants;
@@ -37,28 +38,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ProgrammeListActivity extends AppCompatActivity {
+public class EventListActivity extends AppCompatActivity {
     ImageView ivBack;
     RecyclerView rvProgrammesList;
     SwipeRefreshLayout swipeRefreshLayout;
-    List<Programme> programmeList = new ArrayList<> ();
-    List<Programme> tempProgrammeList = new ArrayList<> ();
-    ProgrammeAdapter programmeAdapter;
+    List<Event> eventList = new ArrayList<> ();
+    List<Event> tempEventList = new ArrayList<> ();
+    EventAdapter eventAdapter;
     TextView tvNoResult;
 
     ImageView ivFilter;
     ImageView ivSort;
     TextView tvTitle;
     SearchView searchView;
+    DatabaseHandler db;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_programme_list);
+        setContentView (R.layout.activity_event_list);
         initView();
         initData();
         initListener();
-        getProgramListFromServer ();
+        getOfflineEventList ();
+//        getProgramListFromServer ();
     }
 
     private void initView() {
@@ -74,21 +78,22 @@ public class ProgrammeListActivity extends AppCompatActivity {
     }
 
     private void initData() {
+        db = new DatabaseHandler (getApplicationContext ());
         swipeRefreshLayout.setRefreshing (true);
 
-//        programmeList.add (new Programme (1, "Orthodontics Workshop", "Dr Nikita Jain", "27/04/2017", "15:22"));
-//        programmeList.add (new Programme (2, "Esthetic Implants", "Dr Rahul Jain", "27/05/2017", "15:22"));
-//        programmeList.add (new Programme (3, "Basic Endodontics", "Dr Sumit", "27/05/2017", "15:22"));
-//        programmeList.add (new Programme (4, "Smile Designing", "Dr Karman Singh", "27/05/2017", "15:22"));
-//        programmeList.add (new Programme (5, "Orthodontics Workshop", "Dr Nikita Jain", "27/04/2017", "15:22"));
-//        programmeList.add (new Programme (6, "Aesthetic Implants", "Dr Rahul Jain", "27/05/2017", "15:22"));
-//        programmeList.add (new Programme (7, "Basic Endodontics", "Dr Rahul Jain", "27/05/2017", "15:22"));
-//        programmeList.add (new Programme (8, "Smile Designing", "Dr Karman Singh", "27/05/2017", "15:22"));
+//        eventList.add (new Event (1, "Orthodontics Workshop", "Dr Nikita Jain", "27/04/2017", "15:22"));
+//        eventList.add (new Event (2, "Esthetic Implants", "Dr Rahul Jain", "27/05/2017", "15:22"));
+//        eventList.add (new Event (3, "Basic Endodontics", "Dr Sumit", "27/05/2017", "15:22"));
+//        eventList.add (new Event (4, "Smile Designing", "Dr Karman Singh", "27/05/2017", "15:22"));
+//        eventList.add (new Event (5, "Orthodontics Workshop", "Dr Nikita Jain", "27/04/2017", "15:22"));
+//        eventList.add (new Event (6, "Aesthetic Implants", "Dr Rahul Jain", "27/05/2017", "15:22"));
+//        eventList.add (new Event (7, "Basic Endodontics", "Dr Rahul Jain", "27/05/2017", "15:22"));
+//        eventList.add (new Event (8, "Smile Designing", "Dr Karman Singh", "27/05/2017", "15:22"));
 
         swipeRefreshLayout.setColorSchemeColors (getResources ().getColor (R.color.colorPrimaryDark));
 
-        programmeAdapter = new ProgrammeAdapter (this, programmeList);
-        rvProgrammesList.setAdapter (programmeAdapter);
+        eventAdapter = new EventAdapter (this, eventList);
+        rvProgrammesList.setAdapter (eventAdapter);
         rvProgrammesList.setHasFixedSize (true);
         rvProgrammesList.setLayoutManager (new LinearLayoutManager (this, LinearLayoutManager.VERTICAL, false));
         rvProgrammesList.addItemDecoration (new SimpleDividerItemDecoration (this));
@@ -102,7 +107,8 @@ public class ProgrammeListActivity extends AppCompatActivity {
             @Override
             public void onRefresh () {
                 swipeRefreshLayout.setRefreshing (true);
-                getProgramListFromServer ();
+                getOfflineEventList ();
+//                getProgramListFromServer ();
             }
         });
         ivBack.setOnClickListener (new View.OnClickListener () {
@@ -132,20 +138,20 @@ public class ProgrammeListActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange (String newText) {
-                tempProgrammeList.clear ();
-                for (Programme programme : programmeList) {
-                    if (programme.getProgram_name ().toUpperCase ().contains (newText.toUpperCase ()) ||
-                            programme.getProgram_name ().toLowerCase ().contains (newText.toLowerCase ()) ||
-                            programme.getDoctor_name ().toLowerCase ().contains (newText.toLowerCase ()) ||
-                            programme.getDoctor_name ().toUpperCase ().contains (newText.toUpperCase ())) {
-                        tempProgrammeList.add (programme);
+                tempEventList.clear ();
+                for (Event event : eventList) {
+                    if (event.getProgram_name ().toUpperCase ().contains (newText.toUpperCase ()) ||
+                            event.getProgram_name ().toLowerCase ().contains (newText.toLowerCase ()) ||
+                            event.getDoctor_name ().toLowerCase ().contains (newText.toLowerCase ()) ||
+                            event.getDoctor_name ().toUpperCase ().contains (newText.toUpperCase ())) {
+                        tempEventList.add (event);
                     }
                 }
-                programmeAdapter = new ProgrammeAdapter (ProgrammeListActivity.this, tempProgrammeList);
-                rvProgrammesList.setAdapter (programmeAdapter);
+                eventAdapter = new EventAdapter (EventListActivity.this, tempEventList);
+                rvProgrammesList.setAdapter (eventAdapter);
                 rvProgrammesList.setHasFixedSize (true);
-                rvProgrammesList.setLayoutManager (new LinearLayoutManager (ProgrammeListActivity.this, LinearLayoutManager.VERTICAL, false));
-                rvProgrammesList.addItemDecoration (new SimpleDividerItemDecoration (ProgrammeListActivity.this));
+                rvProgrammesList.setLayoutManager (new LinearLayoutManager (EventListActivity.this, LinearLayoutManager.VERTICAL, false));
+                rvProgrammesList.addItemDecoration (new SimpleDividerItemDecoration (EventListActivity.this));
                 rvProgrammesList.setItemAnimator (new DefaultItemAnimator ());
                 return true;
             }
@@ -164,6 +170,16 @@ public class ProgrammeListActivity extends AppCompatActivity {
         });
     }
 
+    private void getOfflineEventList () {
+        Utils.showLog (Log.DEBUG, AppConfigTags.TAG, "Getting all the events from local database", true);
+        eventList.clear ();
+        ArrayList<Event> offlineEvents = db.getAllEventList ();
+        for (Event event : offlineEvents)
+            eventList.add (event);
+        eventAdapter.notifyDataSetChanged ();
+        swipeRefreshLayout.setRefreshing (false);
+    }
+
     private void getProgramListFromServer () {
         if (NetworkConnection.isNetworkAvailable (this)) {
             Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_EVENT_LIST, true);
@@ -171,7 +187,7 @@ public class ProgrammeListActivity extends AppCompatActivity {
                     new Response.Listener<String> () {
                         @Override
                         public void onResponse (String response) {
-                            programmeList.clear ();
+                            eventList.clear ();
                             Utils.showLog (Log.INFO, AppConfigTags.SERVER_RESPONSE, response, true);
                             if (response != null) {
                                 try {
@@ -182,15 +198,15 @@ public class ProgrammeListActivity extends AppCompatActivity {
                                         JSONArray jsonArrayEvent = jsonObj.getJSONArray (AppConfigTags.EVENTS);
                                         for (int i = 0; i < jsonArrayEvent.length (); i++) {
                                             JSONObject jsonObject = jsonArrayEvent.getJSONObject (i);
-                                            Programme programme = new Programme (
+                                            Event event = new Event (
                                                     jsonObject.getInt (AppConfigTags.EVENT_ID),
                                                     jsonObject.getString (AppConfigTags.EVENT_NAME),
                                                     jsonObject.getString (AppConfigTags.EVENT_SPEAKERS),
                                                     jsonObject.getString (AppConfigTags.EVENT_DATE),
                                                     jsonObject.getString (AppConfigTags.EVENT_TIME));
-                                            programmeList.add (programme);
+                                            eventList.add (event);
                                         }
-                                        programmeAdapter.notifyDataSetChanged ();
+                                        eventAdapter.notifyDataSetChanged ();
                                         if (jsonArrayEvent.length () > 0) {
                                             swipeRefreshLayout.setRefreshing (false);
                                         } else {
@@ -231,7 +247,7 @@ public class ProgrammeListActivity extends AppCompatActivity {
                     Map<String, String> params = new HashMap<> ();
                     VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
                     params.put (AppConfigTags.HEADER_API_KEY, Constants.api_key);
-                    params.put (AppConfigTags.VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (ProgrammeListActivity.this, visitorDetailsPref.VISITOR_LOGIN_KEY));
+                    params.put (AppConfigTags.VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (EventListActivity.this, visitorDetailsPref.VISITOR_LOGIN_KEY));
                     Utils.showLog (Log.INFO, AppConfigTags.HEADERS_SENT_TO_THE_SERVER, "" + params, false);
                     return params;
                 }

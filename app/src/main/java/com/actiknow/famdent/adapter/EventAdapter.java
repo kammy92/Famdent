@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.actiknow.famdent.R;
-import com.actiknow.famdent.activity.ProgrammeDetailActivity;
-import com.actiknow.famdent.model.Programme;
+import com.actiknow.famdent.activity.EventDetailActivity;
+import com.actiknow.famdent.model.Event;
 import com.actiknow.famdent.utils.AppConfigTags;
 import com.actiknow.famdent.utils.SetTypeFace;
 import com.actiknow.famdent.utils.Utils;
@@ -23,14 +23,14 @@ import java.util.List;
  */
 
 
-public class ProgrammeAdapter extends RecyclerView.Adapter<ProgrammeAdapter.ViewHolder> {
+public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
     OnItemClickListener mItemClickListener;
     private Activity activity;
-    private List<Programme> programmeList = new ArrayList<Programme>();
+    private List<Event> eventList = new ArrayList<Event> ();
 
-    public ProgrammeAdapter(Activity activity, List<Programme> programmeList) {
+    public EventAdapter (Activity activity, List<Event> eventList) {
         this.activity = activity;
-        this.programmeList = programmeList;
+        this.eventList = eventList;
     }
 
     @Override
@@ -42,23 +42,23 @@ public class ProgrammeAdapter extends RecyclerView.Adapter<ProgrammeAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {//        runEnterAnimation (holder.itemView);
-        final Programme programme = programmeList.get(position);
+        final Event event = eventList.get (position);
 
         holder.tvProgrammeName.setTypeface (SetTypeFace.getTypeface (activity));
         holder.tvDoctorName.setTypeface (SetTypeFace.getTypeface (activity));
         holder.tvDate.setTypeface (SetTypeFace.getTypeface (activity));
         holder.tvTime.setTypeface (SetTypeFace.getTypeface (activity));
 
-        holder.tvProgrammeName.setText(programme.getProgram_name());
-        holder.tvDoctorName.setText(programme.getDoctor_name());
-        holder.tvDate.setText (Utils.convertTimeFormat (programme.getDate (), "yyyy-MM-dd", "dd/MM/yyyy"));
-        holder.tvTime.setText (Utils.convertTimeFormat (programme.getTime (), "HH:mm", "hh:mm a"));
+        holder.tvProgrammeName.setText (event.getProgram_name ());
+        holder.tvDoctorName.setText (event.getDoctor_name ());
+        holder.tvDate.setText (Utils.convertTimeFormat (event.getDate (), "yyyy-MM-dd", "dd/MM/yyyy"));
+        holder.tvTime.setText (Utils.convertTimeFormat (event.getTime (), "HH:mm", "hh:mm a"));
         //Glide.with(activity).load("").placeholder(homeService.getIcon()).into(holder.ivIcon);
     }
 
     @Override
     public int getItemCount() {
-        return programmeList.size();
+        return eventList.size ();
     }
 
     public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
@@ -86,9 +86,9 @@ public class ProgrammeAdapter extends RecyclerView.Adapter<ProgrammeAdapter.View
 
         @Override
         public void onClick(View v) {
-            Programme programme = programmeList.get(getLayoutPosition());
-            Intent intent = new Intent (activity, ProgrammeDetailActivity.class);
-            intent.putExtra (AppConfigTags.EVENT_ID, programme.getId ());
+            Event event = eventList.get (getLayoutPosition ());
+            Intent intent = new Intent (activity, EventDetailActivity.class);
+            intent.putExtra (AppConfigTags.EVENT_ID, event.getId ());
             activity.startActivity (intent);
             activity.overridePendingTransition (R.anim.slide_in_right, R.anim.slide_out_left);
         }

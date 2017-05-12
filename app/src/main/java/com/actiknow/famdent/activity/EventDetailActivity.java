@@ -22,8 +22,9 @@ import android.widget.TextView;
 
 import com.actiknow.famdent.R;
 import com.actiknow.famdent.fragment.ProgrammeSpeakerFragment;
-import com.actiknow.famdent.model.ProgrammeDetail;
-import com.actiknow.famdent.model.ProgrammeSpeaker;
+import com.actiknow.famdent.helper.DatabaseHandler;
+import com.actiknow.famdent.model.EventDetail;
+import com.actiknow.famdent.model.EventSpeaker;
 import com.actiknow.famdent.utils.AppConfigTags;
 import com.actiknow.famdent.utils.AppConfigURL;
 import com.actiknow.famdent.utils.Constants;
@@ -57,13 +58,13 @@ import java.util.Map;
  * Created by actiknow on 4/28/17.
  */
 
-public class ProgrammeDetailActivity extends AppCompatActivity {
+public class EventDetailActivity extends AppCompatActivity {
     TextView tvDate;
     TextView tvTime;
     TextView tvDuration;
     TextView tvCost;
     LinearLayout llTopics;
-    ProgrammeDetail programmeDetail;
+    EventDetail eventDetail;
     ViewPagerAdapter adapter;
     ImageView ivFavourite;
     ImageView ivBack;
@@ -77,15 +78,17 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
     //    ExpandableTextView tvSpeakerQualification;
     TextView tvSpeakerQualification;
 
+    TextView tvNotes;
+
     int event_id;
 
 
-    //    ArrayList<ProgrammeSpeaker> programmeSpeakerList = new ArrayList<> ();
+    //    ArrayList<EventSpeaker> programmeSpeakerList = new ArrayList<> ();
     TextView tvAddFavourite;
     ProgressDialog progressDialog;
 
     //    private WrappingViewPager viewPager;
-
+    DatabaseHandler db;
     private ViewPager viewPager2;
     private LinearLayout dotsLayout;
     private TextView[] dots;
@@ -107,13 +110,13 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
-        setContentView (R.layout.activity_programme_detail);
+        setContentView (R.layout.activity_event_detail);
         getExtras ();
         initView ();
         initData ();
         initListener ();
-
-        getEventDetailFromServer (event_id);
+        getOfflineEventDetails (event_id);
+//        getEventDetailFromServer (event_id);
     }
 
     private void initListener () {
@@ -128,13 +131,13 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
         ivFavourite.setOnClickListener (new View.OnClickListener () {
             @Override
             public void onClick (View v) {
-                if (programmeDetail.isFavourite ()) {
-                    MaterialDialog dialog = new MaterialDialog.Builder (ProgrammeDetailActivity.this)
+                if (eventDetail.isFavourite ()) {
+                    MaterialDialog dialog = new MaterialDialog.Builder (EventDetailActivity.this)
                             .content (R.string.dialog_text_remove_favourite_programme)
                             .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
                             .contentColor (getResources ().getColor (R.color.app_text_color_dark))
                             .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
-                            .typeface (SetTypeFace.getTypeface (ProgrammeDetailActivity.this), SetTypeFace.getTypeface (ProgrammeDetailActivity.this))
+                            .typeface (SetTypeFace.getTypeface (EventDetailActivity.this), SetTypeFace.getTypeface (EventDetailActivity.this))
                             .canceledOnTouchOutside (false)
                             .cancelable (false)
                             .positiveText (R.string.dialog_action_yes)
@@ -147,12 +150,12 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                             }).build ();
                     dialog.show ();
                 } else {
-                    MaterialDialog dialog = new MaterialDialog.Builder (ProgrammeDetailActivity.this)
+                    MaterialDialog dialog = new MaterialDialog.Builder (EventDetailActivity.this)
                             .content (R.string.dialog_text_add_favourite_programme)
                             .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
                             .contentColor (getResources ().getColor (R.color.app_text_color_dark))
                             .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
-                            .typeface (SetTypeFace.getTypeface (ProgrammeDetailActivity.this), SetTypeFace.getTypeface (ProgrammeDetailActivity.this))
+                            .typeface (SetTypeFace.getTypeface (EventDetailActivity.this), SetTypeFace.getTypeface (EventDetailActivity.this))
                             .canceledOnTouchOutside (false)
                             .cancelable (false)
                             .positiveText (R.string.dialog_action_yes)
@@ -171,13 +174,13 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
         tvAddFavourite.setOnClickListener (new View.OnClickListener () {
             @Override
             public void onClick (View v) {
-                if (programmeDetail.isFavourite ()) {
-                    MaterialDialog dialog = new MaterialDialog.Builder (ProgrammeDetailActivity.this)
+                if (eventDetail.isFavourite ()) {
+                    MaterialDialog dialog = new MaterialDialog.Builder (EventDetailActivity.this)
                             .content (R.string.dialog_text_remove_favourite_programme)
                             .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
                             .contentColor (getResources ().getColor (R.color.app_text_color_dark))
                             .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
-                            .typeface (SetTypeFace.getTypeface (ProgrammeDetailActivity.this), SetTypeFace.getTypeface (ProgrammeDetailActivity.this))
+                            .typeface (SetTypeFace.getTypeface (EventDetailActivity.this), SetTypeFace.getTypeface (EventDetailActivity.this))
                             .canceledOnTouchOutside (false)
                             .cancelable (false)
                             .positiveText (R.string.dialog_action_yes)
@@ -190,12 +193,12 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                             }).build ();
                     dialog.show ();
                 } else {
-                    MaterialDialog dialog = new MaterialDialog.Builder (ProgrammeDetailActivity.this)
+                    MaterialDialog dialog = new MaterialDialog.Builder (EventDetailActivity.this)
                             .content (R.string.dialog_text_add_favourite_programme)
                             .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
                             .contentColor (getResources ().getColor (R.color.app_text_color_dark))
                             .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
-                            .typeface (SetTypeFace.getTypeface (ProgrammeDetailActivity.this), SetTypeFace.getTypeface (ProgrammeDetailActivity.this))
+                            .typeface (SetTypeFace.getTypeface (EventDetailActivity.this), SetTypeFace.getTypeface (EventDetailActivity.this))
                             .canceledOnTouchOutside (false)
                             .cancelable (false)
                             .positiveText (R.string.dialog_action_yes)
@@ -214,14 +217,14 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
         tvSpeakerQualification.setOnClickListener (new View.OnClickListener () {
             @Override
             public void onClick (View v) {
-                ArrayList<ProgrammeSpeaker> programmeSpeakerList = programmeDetail.getProgrammeSpeakerList ();
-                ProgrammeSpeaker programmeSpeaker = programmeSpeakerList.get (0);
-                MaterialDialog dialog = new MaterialDialog.Builder (ProgrammeDetailActivity.this)
-                        .title (programmeSpeaker.getName ())
-                        .content (programmeSpeaker.getQualification ())
+                ArrayList<EventSpeaker> eventSpeakerList = eventDetail.getEventSpeakerList ();
+                EventSpeaker eventSpeaker = eventSpeakerList.get (0);
+                MaterialDialog dialog = new MaterialDialog.Builder (EventDetailActivity.this)
+                        .title (eventSpeaker.getName ())
+                        .content (eventSpeaker.getQualification ())
                         .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
                         .contentColor (getResources ().getColor (R.color.app_text_color_dark))
-                        .typeface (SetTypeFace.getTypeface (ProgrammeDetailActivity.this), SetTypeFace.getTypeface (ProgrammeDetailActivity.this))
+                        .typeface (SetTypeFace.getTypeface (EventDetailActivity.this), SetTypeFace.getTypeface (EventDetailActivity.this))
                         .canceledOnTouchOutside (false)
                         .cancelable (false)
                         .positiveText (R.string.dialog_action_ok)
@@ -251,11 +254,14 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
 
         tvProgrammeName = (TextView) findViewById (R.id.tvProgrammeName);
 
+        tvNotes = (TextView) findViewById (R.id.tvNotes);
+
         //tvSpeakerQualification = (ExpandableTextView) findViewById (R.id.tvSpeakerQualification);
         tvSpeakerQualification = (TextView) findViewById (R.id.tvSpeakerQualification);
     }
 
     private void initData () {
+        db = new DatabaseHandler (getApplicationContext ());
         progressDialog = new ProgressDialog (this);
         Utils.setTypefaceToAllViews (this, tvCost);
     }
@@ -263,6 +269,63 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
     private void getExtras () {
         Intent intent = getIntent ();
         event_id = intent.getIntExtra (AppConfigTags.EVENT_ID, 0);
+    }
+
+    private void getOfflineEventDetails (int event_id) {
+        eventDetail = db.getEventDetail (event_id);
+
+        for (int i = 0; i < eventDetail.getTopicList ().size (); i++) {
+            ArrayList<String> topicListTemp = eventDetail.getTopicList ();
+            TextView tv = new TextView (EventDetailActivity.this);
+            tv.setText ("\u25B8 " + topicListTemp.get (i));
+            tv.setTextSize (16);
+            tv.setTypeface (SetTypeFace.getTypeface (EventDetailActivity.this, Constants.font_name));
+            tv.setTextColor (getResources ().getColor (R.color.app_text_color_dark));
+            llTopics.addView (tv);
+        }
+
+        for (int i = 0; i < eventDetail.getEventSpeakerList ().size (); i++) {
+            ArrayList<EventSpeaker> eventSpeakerList = eventDetail.getEventSpeakerList ();
+            EventSpeaker eventSpeaker = eventSpeakerList.get (i);
+            tvSpeakerName.setText (eventSpeaker.getName ());
+            tvSpeakerQualification.setText (eventSpeaker.getQualification ());
+
+
+            Glide.with (EventDetailActivity.this)
+                    .load (eventSpeaker.getImage ())
+                    .listener (new RequestListener<String, GlideDrawable> () {
+                        @Override
+                        public boolean onException (Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            progressBar.setVisibility (View.GONE);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady (GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            progressBar.setVisibility (View.GONE);
+                            return false;
+                        }
+                    })
+                    .into (ivSpeakerImage);
+        }
+
+
+        tvProgrammeName.setText (eventDetail.getName ());
+        tvDate.setText ("Date: " + Utils.convertTimeFormat (eventDetail.getDate (), "yyyy-MM-dd", "dd/MM/yyyy"));
+        tvTime.setText ("Time: " + Utils.convertTimeFormat (eventDetail.getTime (), "HH:mm", "hh:mm a"));
+        tvDuration.setText ("Duration: " + eventDetail.getDuration ());
+        tvCost.setText (eventDetail.getFees ());
+        tvNotes.setText (eventDetail.getNotes ());
+
+        if (eventDetail.isFavourite ()) {
+            ivFavourite.setImageResource (R.drawable.ic_star);
+            tvAddFavourite.setVisibility (View.GONE);
+        } else {
+            ivFavourite.setImageResource (R.drawable.ic_star_border);
+            tvAddFavourite.setVisibility (View.VISIBLE);
+        }
+
+        rlMain.setVisibility (View.VISIBLE);
     }
 
     private void getEventDetailFromServer (int event_id) {
@@ -280,29 +343,31 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                                     boolean error = jsonObj.getBoolean (AppConfigTags.ERROR);
                                     String message = jsonObj.getString (AppConfigTags.MESSAGE);
                                     if (! error) {
-                                        programmeDetail = new ProgrammeDetail (
+                                        eventDetail = new EventDetail (
                                                 jsonObj.getInt (AppConfigTags.EVENT_DETAIL_ID),
                                                 jsonObj.getBoolean (AppConfigTags.EVENT_DETAIL_FAVOURITE),
                                                 jsonObj.getString (AppConfigTags.EVENT_DETAIL_NAME),
                                                 jsonObj.getString (AppConfigTags.EVENT_DETAIL_DATE),
                                                 jsonObj.getString (AppConfigTags.EVENT_DETAIL_TIME),
                                                 jsonObj.getString (AppConfigTags.EVENT_DETAIL_DURATION),
-                                                jsonObj.getString (AppConfigTags.EVENT_DETAIL_FEES));
+                                                jsonObj.getString (AppConfigTags.EVENT_DETAIL_LOCATION),
+                                                jsonObj.getString (AppConfigTags.EVENT_DETAIL_FEES),
+                                                jsonObj.getString (AppConfigTags.EVENT_DETAIL_NOTES));
 
                                         JSONArray jsonArraySpeakers = jsonObj.getJSONArray (AppConfigTags.EVENT_DETAIL_SPEAKERS);
-                                        ArrayList<ProgrammeSpeaker> programmeSpeakerList = new ArrayList<> ();
+                                        ArrayList<EventSpeaker> eventSpeakerList = new ArrayList<> ();
                                         for (int i = 0; i < jsonArraySpeakers.length (); i++) {
                                             JSONObject jsonObjectSpeakers = jsonArraySpeakers.getJSONObject (i);
-                                            ProgrammeSpeaker programmeSpeaker = new ProgrammeSpeaker (
+                                            EventSpeaker eventSpeaker = new EventSpeaker (
                                                     jsonObjectSpeakers.getInt (AppConfigTags.EVENT_DETAIL_SPEAKER_ID),
                                                     jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_IMAGE),
                                                     jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_NAME),
                                                     jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_QUALIFICATION),
                                                     jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_EXPERIENCE)
                                             );
-                                            programmeSpeakerList.add (programmeSpeaker);
+                                            eventSpeakerList.add (eventSpeaker);
                                         }
-                                        programmeDetail.setProgrammeSpeakerList (programmeSpeakerList);
+                                        eventDetail.setEventSpeakerList (eventSpeakerList);
 
                                         ArrayList<String> topicList = new ArrayList<> ();
                                         JSONArray jsonArrayTopic = jsonObj.getJSONArray (AppConfigTags.EVENT_DETAIL_TOPICS);
@@ -310,29 +375,29 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                                             JSONObject jsonObjectTopic = jsonArrayTopic.getJSONObject (j);
                                             topicList.add (jsonObjectTopic.getString (AppConfigTags.EVENT_DETAIL_TOPIC_TEXT));
                                         }
-                                        programmeDetail.setTopicList (topicList);
+                                        eventDetail.setTopicList (topicList);
                                     }
 
 
-                                    for (int i = 0; i < programmeDetail.getTopicList ().size (); i++) {
-                                        ArrayList<String> topicListTemp = programmeDetail.getTopicList ();
-                                        TextView tv = new TextView (ProgrammeDetailActivity.this);
+                                    for (int i = 0; i < eventDetail.getTopicList ().size (); i++) {
+                                        ArrayList<String> topicListTemp = eventDetail.getTopicList ();
+                                        TextView tv = new TextView (EventDetailActivity.this);
                                         tv.setText ("\u25B8 " + topicListTemp.get (i));
                                         tv.setTextSize (16);
-                                        tv.setTypeface (SetTypeFace.getTypeface (ProgrammeDetailActivity.this, Constants.font_name));
+                                        tv.setTypeface (SetTypeFace.getTypeface (EventDetailActivity.this, Constants.font_name));
                                         tv.setTextColor (getResources ().getColor (R.color.app_text_color_dark));
                                         llTopics.addView (tv);
                                     }
 
-                                    for (int i = 0; i < programmeDetail.getProgrammeSpeakerList ().size (); i++) {
-                                        ArrayList<ProgrammeSpeaker> programmeSpeakerList = programmeDetail.getProgrammeSpeakerList ();
-                                        ProgrammeSpeaker programmeSpeaker = programmeSpeakerList.get (i);
-                                        tvSpeakerName.setText (programmeSpeaker.getName ());
-                                        tvSpeakerQualification.setText (programmeSpeaker.getQualification ());
+                                    for (int i = 0; i < eventDetail.getEventSpeakerList ().size (); i++) {
+                                        ArrayList<EventSpeaker> eventSpeakerList = eventDetail.getEventSpeakerList ();
+                                        EventSpeaker eventSpeaker = eventSpeakerList.get (i);
+                                        tvSpeakerName.setText (eventSpeaker.getName ());
+                                        tvSpeakerQualification.setText (eventSpeaker.getQualification ());
 
 
-                                        Glide.with (ProgrammeDetailActivity.this)
-                                                .load (programmeSpeaker.getImage ())
+                                        Glide.with (EventDetailActivity.this)
+                                                .load (eventSpeaker.getImage ())
                                                 .listener (new RequestListener<String, GlideDrawable> () {
                                                     @Override
                                                     public boolean onException (Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
@@ -350,13 +415,13 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                                     }
 
 
-                                    tvProgrammeName.setText (programmeDetail.getName ());
-                                    tvDate.setText ("Date: " + Utils.convertTimeFormat (programmeDetail.getDate (), "yyyy-MM-dd", "dd/MM/yyyy"));
-                                    tvTime.setText ("Time: " + Utils.convertTimeFormat (programmeDetail.getTime (), "HH:mm", "hh:mm a"));
-                                    tvDuration.setText ("Duration: " + programmeDetail.getDuration ());
-                                    tvCost.setText (programmeDetail.getFees ());
+                                    tvProgrammeName.setText (eventDetail.getName ());
+                                    tvDate.setText ("Date: " + Utils.convertTimeFormat (eventDetail.getDate (), "yyyy-MM-dd", "dd/MM/yyyy"));
+                                    tvTime.setText ("Time: " + Utils.convertTimeFormat (eventDetail.getTime (), "HH:mm", "hh:mm a"));
+                                    tvDuration.setText ("Duration: " + eventDetail.getDuration ());
+                                    tvCost.setText (eventDetail.getFees ());
 
-                                    if (programmeDetail.isFavourite ()) {
+                                    if (eventDetail.isFavourite ()) {
                                         ivFavourite.setImageResource (R.drawable.ic_star);
                                         tvAddFavourite.setVisibility (View.GONE);
                                     } else {
@@ -391,7 +456,7 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                     VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
                     Map<String, String> params = new HashMap<> ();
                     params.put (AppConfigTags.HEADER_API_KEY, Constants.api_key);
-                    params.put (AppConfigTags.HEADER_VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (ProgrammeDetailActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
+                    params.put (AppConfigTags.HEADER_VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (EventDetailActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
                     Utils.showLog (Log.INFO, AppConfigTags.HEADERS_SENT_TO_THE_SERVER, "" + params, false);
                     return params;
                 }
@@ -425,15 +490,15 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                                     String message = jsonObj.getString (AppConfigTags.MESSAGE);
                                     if (! error) {
                                         if (add_favourite) {
-                                            programmeDetail.setFavourite (true);
+                                            eventDetail.setFavourite (true);
                                             ivFavourite.setImageResource (R.drawable.ic_star);
                                             tvAddFavourite.setVisibility (View.GONE);
-                                            Utils.showSnackBar (ProgrammeDetailActivity.this, clMain, "Programme added to favourites", Snackbar.LENGTH_LONG, null, null);
+                                            Utils.showSnackBar (EventDetailActivity.this, clMain, "Event added to favourites", Snackbar.LENGTH_LONG, null, null);
                                         } else {
-                                            programmeDetail.setFavourite (false);
+                                            eventDetail.setFavourite (false);
                                             ivFavourite.setImageResource (R.drawable.ic_star_border);
                                             tvAddFavourite.setVisibility (View.VISIBLE);
-                                            Utils.showSnackBar (ProgrammeDetailActivity.this, clMain, "Programme removed from favourites", Snackbar.LENGTH_LONG, getResources ().getString (R.string.snackbar_action_undo), new View.OnClickListener () {
+                                            Utils.showSnackBar (EventDetailActivity.this, clMain, "Event removed from favourites", Snackbar.LENGTH_LONG, getResources ().getString (R.string.snackbar_action_undo), new View.OnClickListener () {
                                                 @Override
                                                 public void onClick (View v) {
                                                     updateFavouriteStatus (true, event_id);
@@ -473,7 +538,7 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
                     VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
                     Map<String, String> params = new HashMap<> ();
                     params.put (AppConfigTags.HEADER_API_KEY, Constants.api_key);
-                    params.put (AppConfigTags.HEADER_VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (ProgrammeDetailActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
+                    params.put (AppConfigTags.HEADER_VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (EventDetailActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
                     Utils.showLog (Log.INFO, AppConfigTags.HEADERS_SENT_TO_THE_SERVER, "" + params, false);
                     return params;
                 }
@@ -486,12 +551,12 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
     }
 
     private void setUpViewPager (ViewPager viewPager) {
-        ArrayList<ProgrammeSpeaker> programmeSpeakerList = programmeDetail.getProgrammeSpeakerList ();
+        ArrayList<EventSpeaker> eventSpeakerList = eventDetail.getEventSpeakerList ();
         adapter = new ViewPagerAdapter (getSupportFragmentManager ());
-        for (int i = 0; i < programmeSpeakerList.size (); i++) {
-            ProgrammeSpeaker programmeSpeaker = programmeSpeakerList.get (i);
-            Log.e ("kammy", " " + programmeSpeaker.getId ());
-            Log.e ("kammy", " " + programmeSpeaker.getName ());
+        for (int i = 0; i < eventSpeakerList.size (); i++) {
+            EventSpeaker eventSpeaker = eventSpeakerList.get (i);
+            Log.e ("kammy", " " + eventSpeaker.getId ());
+            Log.e ("kammy", " " + eventSpeaker.getName ());
             adapter.addFragment (new ProgrammeSpeakerFragment ());
         }
 
@@ -501,9 +566,9 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
     }
 
     private void addBottomDots (int currentPage) {
-        ArrayList<ProgrammeSpeaker> programmeSpeakerList = programmeDetail.getProgrammeSpeakerList ();
+        ArrayList<EventSpeaker> eventSpeakerList = eventDetail.getEventSpeakerList ();
 
-        dots = new TextView[programmeSpeakerList.size ()];
+        dots = new TextView[eventSpeakerList.size ()];
 
         dotsLayout.removeAllViews ();
         for (int i = 0; i < dots.length; i++) {
@@ -533,7 +598,7 @@ public class ProgrammeDetailActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem (int position) {
-            return ProgrammeSpeakerFragment.newInstance (position, programmeDetail.getProgrammeSpeakerList ());
+            return ProgrammeSpeakerFragment.newInstance (position, eventDetail.getEventSpeakerList ());
         }
 
         @Override

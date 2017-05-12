@@ -84,7 +84,9 @@ public class AppConfigTags {
     public static final String EVENT_DETAIL_DATE = "event_date";
     public static final String EVENT_DETAIL_TIME = "event_time";
     public static final String EVENT_DETAIL_DURATION = "event_duration";
+    public static final String EVENT_DETAIL_LOCATION = "event_location";
     public static final String EVENT_DETAIL_FEES = "event_fees";
+    public static final String EVENT_DETAIL_NOTES = "event_notes";
     public static final String EVENT_DETAIL_SPEAKERS = "event_speakers";
     public static final String EVENT_DETAIL_TOPICS = "event_topics";
 
@@ -137,6 +139,8 @@ public class AppConfigTags {
 
 
     public static final String DEVICE_DETAILS = "device_details";
+
+    public static final String DATABASE_VERSION = "database_version";
 
 
 }

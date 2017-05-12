@@ -41,10 +41,10 @@
         <activity android:name=".activity.ExhibitorDetailActivity"
                   android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".activity.ProgrammeListActivity"
+        <activity android:name=".activity.EventListActivity"
                   android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".activity.ProgrammeDetailActivity"
+        <activity android:name=".activity.EventDetailActivity"
                   android:screenOrientation="portrait">
         </activity>
         <activity android:name=".activity.SessionListActivity"

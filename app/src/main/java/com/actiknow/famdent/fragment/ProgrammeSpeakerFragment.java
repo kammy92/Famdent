@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.actiknow.famdent.R;
-import com.actiknow.famdent.model.ProgrammeSpeaker;
+import com.actiknow.famdent.model.EventSpeaker;
 import com.actiknow.famdent.utils.Utils;
 
 import java.util.ArrayList;
@@ -21,18 +21,18 @@ import java.util.ArrayList;
  */
 
 public class ProgrammeSpeakerFragment extends Fragment {
-    public static ArrayList<ProgrammeSpeaker> programmeSpeakerList2;
+    public static ArrayList<EventSpeaker> eventSpeakerList2;
     TextView tvSpeakerName;
     TextView tvSpeakerQualification;
     TextView tvExperience;
     ImageView ivSpeaker;
 
-    public static ProgrammeSpeakerFragment newInstance (int position, ArrayList<ProgrammeSpeaker> programmeSpeakerList) {
+    public static ProgrammeSpeakerFragment newInstance (int position, ArrayList<EventSpeaker> eventSpeakerList) {
         ProgrammeSpeakerFragment fragment = new ProgrammeSpeakerFragment ();
         Bundle args = new Bundle ();
         args.putInt ("position", position);
         fragment.setArguments (args);
-        programmeSpeakerList2 = programmeSpeakerList;
+        eventSpeakerList2 = eventSpeakerList;
         return fragment;
     }
 
@@ -53,12 +53,12 @@ public class ProgrammeSpeakerFragment extends Fragment {
     }
 
     private void initData () {
-        ProgrammeSpeaker programmeSpeaker = programmeSpeakerList2.get (getArguments ().getInt ("position"));
+        EventSpeaker eventSpeaker = eventSpeakerList2.get (getArguments ().getInt ("position"));
         Utils.setTypefaceToAllViews (getActivity (), tvSpeakerName);
-        Log.e ("NAME", "" + programmeSpeaker.getName ());
-        tvSpeakerName.setText (programmeSpeaker.getName ());
-        tvSpeakerQualification.setText (programmeSpeaker.getQualification ());
-        tvExperience.setText (programmeSpeaker.getExperience ());
+        Log.e ("NAME", "" + eventSpeaker.getName ());
+        tvSpeakerName.setText (eventSpeaker.getName ());
+        tvSpeakerQualification.setText (eventSpeaker.getQualification ());
+        tvExperience.setText (eventSpeaker.getExperience ());
     }
 
     private void initListener () {

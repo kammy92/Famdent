@@ -36,8 +36,12 @@ import android.widget.TextView;
 import com.actiknow.famdent.R;
 import com.actiknow.famdent.adapter.HomeServiceAdapter;
 import com.actiknow.famdent.helper.DatabaseHandler;
+import com.actiknow.famdent.model.EventDetail;
+import com.actiknow.famdent.model.EventSpeaker;
 import com.actiknow.famdent.model.ExhibitorDetail;
 import com.actiknow.famdent.model.HomeService;
+import com.actiknow.famdent.model.SessionDetail;
+import com.actiknow.famdent.model.SessionSpeaker;
 import com.actiknow.famdent.model.StallDetail;
 import com.actiknow.famdent.utils.AppConfigTags;
 import com.actiknow.famdent.utils.AppConfigURL;
@@ -97,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
 //        checkPermissions ();
         initListener ();
         isLogin ();
-        initApplication ();
 
         if (! visitorDetailsPref.getBooleanPref (this, VisitorDetailsPref.LOGGED_IN_SESSION)) {
 //            checkVersionUpdate ();
@@ -433,6 +436,8 @@ public class MainActivity extends AppCompatActivity {
         if (visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY) == "") {
             Intent myIntent = new Intent (this, LoginActivity.class);
             startActivity (myIntent);
+        } else {
+            initApplication ();
         }
         if (visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY) == "")// || userDetailPref.getStringPref (MainActivity.this, VisitorDetailsPref.HOSPITAL_DEFAULT_PATIENT_ID) == "")
             finish ();
@@ -440,59 +445,146 @@ public class MainActivity extends AppCompatActivity {
 
     private void initApplication () {
         if (NetworkConnection.isNetworkAvailable (this)) {
-            Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_initializing), false);
-            Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_INIT, true);
-            StringRequest strRequest = new StringRequest (Request.Method.GET, AppConfigURL.URL_INIT,
+            Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_INIT + "/" + visitorDetailsPref.getIntPref (MainActivity.this, VisitorDetailsPref.DATABASE_VERSION), true);
+            StringRequest strRequest = new StringRequest (Request.Method.GET, AppConfigURL.URL_INIT + "/" + visitorDetailsPref.getIntPref (MainActivity.this, VisitorDetailsPref.DATABASE_VERSION),
                     new Response.Listener<String> () {
                         @Override
                         public void onResponse (String response) {
                             Utils.showLog (Log.INFO, AppConfigTags.SERVER_RESPONSE, response, true);
                             if (response != null) {
                                 try {
+                                    // status 1=> already latest, 2=> update required
                                     JSONObject jsonObj = new JSONObject (response);
                                     boolean error = jsonObj.getBoolean (AppConfigTags.ERROR);
                                     String message = jsonObj.getString (AppConfigTags.MESSAGE);
+                                    int status = jsonObj.getInt (AppConfigTags.STATUS);
+                                    int db_version = jsonObj.getInt (AppConfigTags.DATABASE_VERSION);
+                                    visitorDetailsPref.putIntPref (MainActivity.this, VisitorDetailsPref.DATABASE_VERSION, db_version);
                                     if (! error) {
-                                        db.deleteAllExhibitors ();
-                                        db.deleteAllStallDetails ();
-                                        JSONArray jsonArrayExhibitor = jsonObj.getJSONArray (AppConfigTags.EXHIBITOR);
-                                        for (int i = 0; i < jsonArrayExhibitor.length (); i++) {
-                                            JSONObject jsonObjectExhibitor = jsonArrayExhibitor.getJSONObject (i);
-                                            ExhibitorDetail exhibitorDetail = new ExhibitorDetail (
-                                                    jsonObjectExhibitor.getInt (AppConfigTags.EXHIBITOR_ID),
-                                                    jsonObjectExhibitor.getBoolean (AppConfigTags.EXHIBITOR_FAVOURITE),
-                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_LOGO),
-                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_NAME),
-                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_CONTACT_PERSON),
-                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_ADDRESS),
-                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_EMAIL),
-                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_WEBSITE),
-                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_NOTES));
+                                        switch (status) {
+                                            case 1:
+                                                break;
+                                            case 2:
+                                                Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_initializing), false);
+                                                db.deleteAllExhibitors ();
+                                                db.deleteAllStallDetails ();
 
-                                            ArrayList<String> contactList = new ArrayList<> ();
-                                            JSONArray jsonArrayContacts = jsonObjectExhibitor.getJSONArray (AppConfigTags.EXHIBITOR_CONTACTS);
-                                            for (int j = 0; j < jsonArrayContacts.length (); j++) {
-                                                JSONObject jsonObjectContactDetail = jsonArrayContacts.getJSONObject (j);
-                                                contactList.add (jsonObjectContactDetail.getString (AppConfigTags.CONTACT));
-                                            }
-                                            exhibitorDetail.setContactList (contactList);
+                                                db.deleteAllEvents ();
+                                                db.deleteAllEventSpeakers ();
+                                                db.deleteAllEventTopics ();
 
-                                            db.createExhibitor (exhibitorDetail);
+                                                db.deleteAllSessions ();
+                                                db.deleteAllSessionSpeakers ();
+                                                db.deleteAllSessionTopics ();
 
-                                            JSONArray jsonArrayStallDetails = jsonObjectExhibitor.getJSONArray (AppConfigTags.STALL_DETAILS);
-                                            exhibitorDetail.clearStallDetailList ();
-                                            for (int j = 0; j < jsonArrayStallDetails.length (); j++) {
-                                                JSONObject jsonObjectStallDetail = jsonArrayStallDetails.getJSONObject (j);
-                                                StallDetail stallDetail = new StallDetail (
-                                                        jsonObjectStallDetail.getString (AppConfigTags.STALL_NAME),
-                                                        jsonObjectStallDetail.getString (AppConfigTags.HALL_NUMBER),
-                                                        jsonObjectStallDetail.getString (AppConfigTags.STALL_NUMBER)
-                                                );
-                                                db.createExhibitorStallDetail (stallDetail, jsonObjectExhibitor.getInt (AppConfigTags.EXHIBITOR_ID));
-                                            }
+
+                                                JSONArray jsonArrayExhibitor = jsonObj.getJSONArray (AppConfigTags.EXHIBITOR);
+                                                for (int i = 0; i < jsonArrayExhibitor.length (); i++) {
+                                                    JSONObject jsonObjectExhibitor = jsonArrayExhibitor.getJSONObject (i);
+                                                    ExhibitorDetail exhibitorDetail = new ExhibitorDetail (
+                                                            jsonObjectExhibitor.getInt (AppConfigTags.EXHIBITOR_ID),
+                                                            jsonObjectExhibitor.getBoolean (AppConfigTags.EXHIBITOR_FAVOURITE),
+                                                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_LOGO),
+                                                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_NAME),
+                                                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_CONTACT_PERSON),
+                                                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_ADDRESS),
+                                                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_EMAIL),
+                                                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_WEBSITE),
+                                                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_NOTES));
+
+                                                    ArrayList<String> contactList = new ArrayList<> ();
+                                                    JSONArray jsonArrayContacts = jsonObjectExhibitor.getJSONArray (AppConfigTags.EXHIBITOR_CONTACTS);
+                                                    for (int j = 0; j < jsonArrayContacts.length (); j++) {
+                                                        JSONObject jsonObjectContactDetail = jsonArrayContacts.getJSONObject (j);
+                                                        contactList.add (jsonObjectContactDetail.getString (AppConfigTags.CONTACT));
+                                                    }
+                                                    exhibitorDetail.setContactList (contactList);
+
+                                                    db.createExhibitor (exhibitorDetail);
+
+                                                    JSONArray jsonArrayStallDetails = jsonObjectExhibitor.getJSONArray (AppConfigTags.STALL_DETAILS);
+                                                    exhibitorDetail.clearStallDetailList ();
+                                                    for (int j = 0; j < jsonArrayStallDetails.length (); j++) {
+                                                        JSONObject jsonObjectStallDetail = jsonArrayStallDetails.getJSONObject (j);
+                                                        StallDetail stallDetail = new StallDetail (
+                                                                jsonObjectStallDetail.getString (AppConfigTags.STALL_NAME),
+                                                                jsonObjectStallDetail.getString (AppConfigTags.HALL_NUMBER),
+                                                                jsonObjectStallDetail.getString (AppConfigTags.STALL_NUMBER)
+                                                        );
+                                                        db.createExhibitorStallDetail (stallDetail, jsonObjectExhibitor.getInt (AppConfigTags.EXHIBITOR_ID));
+                                                    }
+                                                }
+
+
+                                                JSONArray jsonArrayEvent = jsonObj.getJSONArray (AppConfigTags.EVENTS);
+                                                for (int i = 0; i < jsonArrayEvent.length (); i++) {
+                                                    JSONObject jsonObjectEvent = jsonArrayEvent.getJSONObject (i);
+                                                    EventDetail eventDetail = new EventDetail (
+                                                            jsonObjectEvent.getInt (AppConfigTags.EVENT_DETAIL_ID),
+                                                            jsonObjectEvent.getBoolean (AppConfigTags.EVENT_DETAIL_FAVOURITE),
+                                                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_NAME),
+                                                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_DATE),
+                                                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_TIME),
+                                                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_DURATION),
+                                                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_LOCATION),
+                                                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_FEES),
+                                                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_NOTES));
+                                                    db.createEvent (eventDetail);
+
+                                                    JSONArray jsonArraySpeakers = jsonObjectEvent.getJSONArray (AppConfigTags.EVENT_DETAIL_SPEAKERS);
+                                                    for (int j = 0; j < jsonArraySpeakers.length (); j++) {
+                                                        JSONObject jsonObjectSpeakers = jsonArraySpeakers.getJSONObject (j);
+                                                        EventSpeaker eventSpeaker = new EventSpeaker (
+                                                                jsonObjectSpeakers.getInt (AppConfigTags.EVENT_DETAIL_SPEAKER_ID),
+                                                                jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_IMAGE),
+                                                                jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_NAME),
+                                                                jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_QUALIFICATION),
+                                                                jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_EXPERIENCE)
+                                                        );
+                                                        db.createEventSpeaker (eventSpeaker, jsonObjectEvent.getInt (AppConfigTags.EVENT_DETAIL_ID));
+                                                    }
+
+                                                    JSONArray jsonArrayTopic = jsonObjectEvent.getJSONArray (AppConfigTags.EVENT_DETAIL_TOPICS);
+                                                    for (int k = 0; k < jsonArrayTopic.length (); k++) {
+                                                        JSONObject jsonObjectTopic = jsonArrayTopic.getJSONObject (k);
+                                                        db.createEventTopic (jsonObjectTopic.getString (AppConfigTags.EVENT_DETAIL_TOPIC_TEXT), jsonObjectEvent.getInt (AppConfigTags.EVENT_DETAIL_ID));
+                                                    }
+                                                }
+
+
+                                                JSONArray jsonArraySessions = jsonObj.getJSONArray (AppConfigTags.SESSIONS);
+                                                for (int i = 0; i < jsonArraySessions.length (); i++) {
+                                                    JSONObject jsonObjectSession = jsonArraySessions.getJSONObject (i);
+                                                    SessionDetail sessionDetail = new SessionDetail (
+                                                            jsonObjectSession.getInt (AppConfigTags.SESSION_DETAILS_ID),
+                                                            jsonObjectSession.getBoolean (AppConfigTags.SESSION_DETAILS_FAVOURITE),
+                                                            jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_TITLE),
+                                                            jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_DATE),
+                                                            jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_TIME),
+                                                            jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_LOCATION),
+                                                            jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_CATEGORY));
+
+                                                    db.createSession (sessionDetail);
+
+                                                    JSONArray jsonArraySpeakers = jsonObjectSession.getJSONArray (AppConfigTags.SESSION_SPEAKERS);
+                                                    for (int j = 0; j < jsonArraySpeakers.length (); j++) {
+                                                        JSONObject jsonObjectSpeakers = jsonArraySpeakers.getJSONObject (j);
+                                                        SessionSpeaker sessionSpeaker = new SessionSpeaker (
+                                                                jsonObjectSpeakers.getInt (AppConfigTags.SESSION_DETAILS_SPEAKER_ID),
+                                                                jsonObjectSpeakers.getString (AppConfigTags.SESSION_DETAILS_SPEAKER_IMAGE),
+                                                                jsonObjectSpeakers.getString (AppConfigTags.SESSION_DETAILS_SPEAKER_NAME)
+                                                        );
+                                                        db.createSessionSpeaker (sessionSpeaker, jsonObjectSpeakers.getInt (AppConfigTags.SESSION_DETAILS_SPEAKER_ID));
+                                                    }
+
+                                                    JSONArray jsonArrayTopic = jsonObjectSession.getJSONArray (AppConfigTags.SESSION_DETAILS_TOPICS);
+                                                    for (int k = 0; k < jsonArrayTopic.length (); k++) {
+                                                        JSONObject jsonObjectTopic = jsonArrayTopic.getJSONObject (k);
+                                                        db.createSessionTopic (jsonObjectTopic.getString (AppConfigTags.SESSION_DETAILS_TOPIC_TEXT), jsonObjectSession.getInt (AppConfigTags.SESSION_DETAILS_ID));
+                                                    }
+                                                    break;
+                                                }
                                         }
-
-
                                         progressDialog.dismiss ();
                                     }
                                 } catch (Exception e) {

@@ -7,8 +7,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.actiknow.famdent.model.Event;
+import com.actiknow.famdent.model.EventDetail;
+import com.actiknow.famdent.model.EventSpeaker;
 import com.actiknow.famdent.model.Exhibitor;
 import com.actiknow.famdent.model.ExhibitorDetail;
+import com.actiknow.famdent.model.Session;
+import com.actiknow.famdent.model.SessionDetail;
+import com.actiknow.famdent.model.SessionSpeaker;
 import com.actiknow.famdent.model.StallDetail;
 import com.actiknow.famdent.utils.AppConfigTags;
 import com.actiknow.famdent.utils.Utils;
@@ -20,12 +26,27 @@ import java.util.Locale;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
     // Database Version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 4;
     // Database Name
     private static final String DATABASE_NAME = "famdent";
+
     // Table Names
     private static final String TABLE_EXHIBITORS = "tbl_exhibitors";
     private static final String TABLE_EXHIBITION_PLAN = "tbl_exhibition_plan";
+
+    private static final String TABLE_EVENTS = "tbl_events";
+    private static final String TABLE_EVENT_TOPICS = "tbl_event_topics";
+    private static final String TABLE_EVENT_SPEAKERS = "tbl_event_speakers";
+
+    private static final String TABLE_SESSIONS = "tbl_sessions";
+    private static final String TABLE_SESSION_TOPICS = "tbl_session_topics";
+    private static final String TABLE_SESSION_SPEAKERS = "tbl_session_speakers";
+
+    private static final String TABLE_FAVOURITE = "tbl_favourites";
+
+    private static final String TABLE_NOTES = "tbl_notes";
+
+
     // Exhibitors Table - column names
     private static final String EXHBTR_ID = "exhbtr_id";
     private static final String EXHBTR_NAME = "exhbtr_name";
@@ -37,7 +58,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String EXHBTR_CONTACT1 = "exhbtr_contact1";
     private static final String EXHBTR_CONTACT2 = "exhbtr_contact2";
     private static final String EXHBTR_CONTACT3 = "exhbtr_contact3";
-    private static final String EXHBTR_ACTIVE = "exhbtr_active";
     private static final String EXHBTR_CREATED_AT = "exhbtr_created_at";
     // Exhibition Plan Table - column names
     private static final String EXHBTN_PLN_ID = "exhbtn_pln_id";
@@ -45,6 +65,72 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String EXHBTN_PLN_HALL_NUMBER = "exhbtn_pln_hall_number";
     private static final String EXHBTN_PLN_STALL_NUMBER = "exhbtn_pln_stall_number";
     private static final String EXHBTN_PLN_STALL_NAME = "exhbtn_pln_stall_name";
+
+    // Events Table - column names
+    private static final String EVNT_ID = "envt_id";
+    private static final String EVNT_NAME = "envt_name";
+    private static final String EVNT_DATE = "envt_date";
+    private static final String EVNT_TIME = "envt_time";
+    private static final String EVNT_DURATION = "envt_duration";
+    private static final String EVNT_LOCATION = "envt_location";
+    private static final String EVNT_FEES = "envt_fees";
+    private static final String EVNT_NOTES = "envt_notes";
+    private static final String EVNT_CREATED_AT = "envt_created_at";
+
+    // Event Topics Table - column names
+    private static final String EVNT_TOPC_ID = "envt_topc_id";
+    private static final String EVNT_TOPC_EVNT_ID = "envt_topc_evnt_id";
+    private static final String EVNT_TOPC_TEXT = "envt_topc_text";
+
+    // Event Topics Table - column names
+    private static final String EVNT_SPKR_ID = "envt_spkr_id";
+    private static final String EVNT_SPKR_EVNT_ID = "envt_spkr_evnt_id";
+    private static final String EVNT_SPKR_IMAGE = "envt_spkr_image";
+    private static final String EVNT_SPKR_NAME = "envt_spkr_name";
+    private static final String EVNT_SPKR_QUALIFICATION = "envt_spkr_qualification";
+    private static final String EVNT_SPKR_EXPERIENCE = "envt_spkr_experience";
+
+    // Session Table - column names
+    private static final String SSION_ID = "ssion_id";
+    private static final String SSION_TITLE = "ssion_title";
+    private static final String SSION_DATE = "ssion_date";
+    private static final String SSION_TIME = "ssion_time";
+    private static final String SSION_LOCATION = "ssion_location";
+    private static final String SSION_CATEGORY = "ssion_category";
+    private static final String SSION_CREATED_AT = "ssion_created_at";
+
+    // Event Topics Table - column names
+    private static final String SSION_TOPC_ID = "ssion_topc_id";
+    private static final String SSION_TOPC_SSION_ID = "ssion_topc_ssion_id";
+    private static final String SSION_TOPC_TEXT = "ssion_topc_text";
+
+    // Event Topics Table - column names
+    private static final String SSION_SPKR_ID = "ssion_spkr_id";
+    private static final String SSION_SPKR_SSION_ID = "ssion_spkr_ssion_id";
+    private static final String SSION_SPKR_NAME = "ssion_spkr_name";
+    private static final String SSION_SPKR_IMAGE = "ssion_spkr_image";
+
+
+    // Favourites Table - column names
+    private static final String FAV_ID = "fav_id";
+    private static final String FAV_EVNT_ID = "fav_evnt_id";
+    private static final String FAV_EXHBTR_ID = "fav_exhbtr_id";
+    private static final String FAV_SSION_ID = "fav_ssion_id";
+    private static final String FAV_TYPE = "fav_type";
+    private static final String FAV_CREATED_AT = "fav_created_at";
+
+    // Notes Table - column names
+    private static final String NOTS_ID = "nots_id";
+    private static final String NOTS_EVNT_ID = "nots_evnt_id";
+    private static final String NOTS_EXHBTR_ID = "nots_exhbtr_id";
+    private static final String NOTS_SSION_ID = "nots_ssion_id";
+    private static final String NOTS_TYPE = "nots_type";
+    private static final String NOTS_TEXT = "nots_text";
+    private static final String NOTS_UPDATED_AT = "nots_updated_at";
+    private static final String NOTS_CREATED_AT = "nots_created_at";
+
+
+
     // Question table Create Statements
     private static final String CREATE_TABLE_EXHIBITORS = "CREATE TABLE "
             + TABLE_EXHIBITORS + "(" +
@@ -68,6 +154,88 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             EXHBTN_PLN_STALL_NUMBER + " TEXT," +
             EXHBTN_PLN_STALL_NAME + " TEXT" + ")";
     //Show database logs
+
+    // Event table Create Statements
+    private static final String CREATE_TABLE_EVENTS = "CREATE TABLE "
+            + TABLE_EVENTS + "(" +
+            EVNT_ID + " INTEGER PRIMARY KEY," +
+            EVNT_NAME + " TEXT," +
+            EVNT_DATE + " DATE," +
+            EVNT_TIME + " TIME," +
+            EVNT_DURATION + " TEXT," +
+            EVNT_LOCATION + " TEXT," +
+            EVNT_FEES + " TEXT," +
+            EVNT_NOTES + " TEXT," +
+            EVNT_CREATED_AT + " DATETIME" + ")";
+
+    // Event Topic table Create Statements
+    private static final String CREATE_TABLE_EVENT_TOPICS = "CREATE TABLE "
+            + TABLE_EVENT_TOPICS + "(" +
+            EVNT_TOPC_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            EVNT_TOPC_EVNT_ID + " INTEGER," +
+            EVNT_TOPC_TEXT + " TEXT" + ")";
+
+    // Event Speaker table Create Statements
+    private static final String CREATE_TABLE_EVENT_SPEAKERS = "CREATE TABLE "
+            + TABLE_EVENT_SPEAKERS + "(" +
+            EVNT_SPKR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            EVNT_SPKR_EVNT_ID + " INTEGER," +
+            EVNT_SPKR_IMAGE + " TEXT," +
+            EVNT_SPKR_NAME + " TEXT," +
+            EVNT_SPKR_QUALIFICATION + " TEXT," +
+            EVNT_SPKR_EXPERIENCE + " TEXT" + ")";
+
+
+    // Event table Create Statements
+    private static final String CREATE_TABLE_SESSIONS = "CREATE TABLE "
+            + TABLE_SESSIONS + "(" +
+            SSION_ID + " INTEGER PRIMARY KEY," +
+            SSION_TITLE + " TEXT," +
+            SSION_DATE + " DATE," +
+            SSION_TIME + " TIME," +
+            SSION_LOCATION + " TEXT," +
+            SSION_CATEGORY + " TEXT," +
+            SSION_CREATED_AT + " DATETIME" + ")";
+
+    // Event Topic table Create Statements
+    private static final String CREATE_TABLE_SESSION_TOPICS = "CREATE TABLE "
+            + TABLE_SESSION_TOPICS + "(" +
+            SSION_TOPC_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            SSION_TOPC_SSION_ID + " INTEGER," +
+            SSION_TOPC_TEXT + " TEXT" + ")";
+
+    // Event Speaker table Create Statements
+    private static final String CREATE_TABLE_SESSION_SPEAKERS = "CREATE TABLE "
+            + TABLE_SESSION_SPEAKERS + "(" +
+            SSION_SPKR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            SSION_SPKR_SSION_ID + " INTEGER," +
+            SSION_SPKR_NAME + " TEXT," +
+            SSION_SPKR_IMAGE + " TEXT" + ")";
+
+
+    // Favourites table Create Statements
+    private static final String CREATE_TABLE_FAVOURITES = "CREATE TABLE "
+            + TABLE_FAVOURITE + "(" +
+            FAV_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            FAV_EVNT_ID + " INTEGER," +
+            FAV_EXHBTR_ID + " INTEGER," +
+            FAV_SSION_ID + " INTEGER," +
+            FAV_TYPE + " TEXT," +
+            FAV_CREATED_AT + " DATETIME" + ")";
+
+    // Notes table Create Statements
+    private static final String CREATE_TABLE_NOTES = "CREATE TABLE "
+            + TABLE_NOTES + "(" +
+            NOTS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            NOTS_EVNT_ID + " INTEGER," +
+            NOTS_EXHBTR_ID + " INTEGER," +
+            NOTS_SSION_ID + " INTEGER," +
+            NOTS_TYPE + " TEXT," +
+            NOTS_TEXT + " TEXT," +
+            NOTS_UPDATED_AT + " DATETIME," +
+            NOTS_CREATED_AT + " DATETIME" + ")";
+
+
     private boolean LOG_FLAG = false;
 
     public DatabaseHandler (Context context) {
@@ -78,12 +246,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate (SQLiteDatabase db) {
         db.execSQL (CREATE_TABLE_EXHIBITORS);
         db.execSQL (CREATE_TABLE_EXHIBITION_PLAN);
+        db.execSQL (CREATE_TABLE_EVENTS);
+        db.execSQL (CREATE_TABLE_EVENT_SPEAKERS);
+        db.execSQL (CREATE_TABLE_EVENT_TOPICS);
+        db.execSQL (CREATE_TABLE_SESSIONS);
+        db.execSQL (CREATE_TABLE_SESSION_SPEAKERS);
+        db.execSQL (CREATE_TABLE_SESSION_TOPICS);
     }
 
     @Override
     public void onUpgrade (SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL ("DROP TABLE IF EXISTS " + TABLE_EXHIBITORS);
         db.execSQL ("DROP TABLE IF EXISTS " + TABLE_EXHIBITION_PLAN);
+        db.execSQL ("DROP TABLE IF EXISTS " + TABLE_EVENTS);
+        db.execSQL ("DROP TABLE IF EXISTS " + TABLE_EVENT_SPEAKERS);
+        db.execSQL ("DROP TABLE IF EXISTS " + TABLE_EVENT_TOPICS);
+        db.execSQL ("DROP TABLE IF EXISTS " + TABLE_SESSIONS);
+        db.execSQL ("DROP TABLE IF EXISTS " + TABLE_SESSION_SPEAKERS);
+        db.execSQL ("DROP TABLE IF EXISTS " + TABLE_SESSION_TOPICS);
         onCreate (db);
     }
 
@@ -231,6 +411,306 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete all stall details", LOG_FLAG);
         db.execSQL ("delete from " + TABLE_EXHIBITION_PLAN);
     }
+
+    // ------------------------ "Events" table methods ----------------//
+
+    public long createEvent (EventDetail eventDetail) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Creating Event", LOG_FLAG);
+        ContentValues values = new ContentValues ();
+        values.put (EVNT_ID, eventDetail.getId ());
+        values.put (EVNT_NAME, eventDetail.getName ());
+        values.put (EVNT_DATE, eventDetail.getDate ());
+        values.put (EVNT_TIME, eventDetail.getTime ());
+        values.put (EVNT_DURATION, eventDetail.getDuration ());
+        values.put (EVNT_LOCATION, eventDetail.getLocation ());
+        values.put (EVNT_FEES, eventDetail.getFees ());
+        values.put (EVNT_NOTES, eventDetail.getNotes ());
+        values.put (EVNT_CREATED_AT, getDateTime ());
+        long exhibitor_id = db.insert (TABLE_EVENTS, null, values);
+        return exhibitor_id;
+    }
+
+    public long createEventSpeaker (EventSpeaker eventSpeaker, long event_id) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Creating event speaker", LOG_FLAG);
+        ContentValues values = new ContentValues ();
+        values.put (EVNT_SPKR_EVNT_ID, event_id);
+        values.put (EVNT_SPKR_IMAGE, eventSpeaker.getImage ());
+        values.put (EVNT_SPKR_NAME, eventSpeaker.getName ());
+        values.put (EVNT_SPKR_QUALIFICATION, eventSpeaker.getQualification ());
+        values.put (EVNT_SPKR_EXPERIENCE, eventSpeaker.getExperience ());
+        long event_speaker_id = db.insert (TABLE_EVENT_SPEAKERS, null, values);
+        return event_speaker_id;
+    }
+
+    public long createEventTopic (String topic, long event_id) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Creating event topic", LOG_FLAG);
+        ContentValues values = new ContentValues ();
+        values.put (EVNT_TOPC_EVNT_ID, event_id);
+        values.put (EVNT_TOPC_TEXT, topic);
+        long event_topic_id = db.insert (TABLE_EVENT_TOPICS, null, values);
+        return event_topic_id;
+    }
+
+    public EventDetail getEventDetail (long event_id) {
+        SQLiteDatabase db = this.getReadableDatabase ();
+        String selectQuery = "SELECT  * FROM " + TABLE_EVENTS + " WHERE " + EVNT_ID + " = " + event_id;
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get Event where ID = " + event_id, LOG_FLAG);
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c != null)
+            c.moveToFirst ();
+
+        EventDetail eventDetail = new EventDetail (
+                c.getInt (c.getColumnIndex (EVNT_ID)),
+                false,
+                c.getString (c.getColumnIndex (EVNT_NAME)),
+                c.getString (c.getColumnIndex (EVNT_DATE)),
+                c.getString (c.getColumnIndex (EVNT_TIME)),
+                c.getString (c.getColumnIndex (EVNT_DURATION)),
+                c.getString (c.getColumnIndex (EVNT_LOCATION)),
+                c.getString (c.getColumnIndex (EVNT_FEES)),
+                c.getString (c.getColumnIndex (EVNT_NOTES))
+        );
+
+        eventDetail.setTopicList (getAllEventTopics (c.getInt (c.getColumnIndex (EVNT_ID))));
+        eventDetail.setEventSpeakerList (getAllEventSpeakers (c.getInt (c.getColumnIndex (EVNT_ID))));
+
+        return eventDetail;
+    }
+
+    public ArrayList<EventSpeaker> getAllEventSpeakers (long event_id) {
+        ArrayList<EventSpeaker> eventSpeakerList = new ArrayList<EventSpeaker> ();
+        String selectQuery = "SELECT * FROM " + TABLE_EVENT_SPEAKERS + " WHERE " + EVNT_SPKR_EVNT_ID + " = " + event_id;
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get event speaker List", LOG_FLAG);
+        SQLiteDatabase db = this.getReadableDatabase ();
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c.moveToFirst ()) {
+            do {
+                try {
+                    eventSpeakerList.add (new EventSpeaker (
+                            0,
+                            c.getString (c.getColumnIndex (EVNT_SPKR_IMAGE)),
+                            c.getString (c.getColumnIndex (EVNT_SPKR_NAME)),
+                            c.getString (c.getColumnIndex (EVNT_SPKR_QUALIFICATION)),
+                            c.getString (c.getColumnIndex (EVNT_SPKR_EXPERIENCE))
+                    ));
+                } catch (Exception e) {
+                    e.printStackTrace ();
+                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), true);
+                }
+            } while (c.moveToNext ());
+        }
+        return eventSpeakerList;
+    }
+
+    public ArrayList<String> getAllEventTopics (long event_id) {
+        ArrayList<String> eventTopicList = new ArrayList<> ();
+        String selectQuery = "SELECT * FROM " + TABLE_EVENT_TOPICS + " WHERE " + EVNT_TOPC_EVNT_ID + " = " + event_id;
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get event topic List", LOG_FLAG);
+        SQLiteDatabase db = this.getReadableDatabase ();
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c.moveToFirst ()) {
+            do {
+                try {
+                    eventTopicList.add (c.getString (c.getColumnIndex (EVNT_TOPC_TEXT)));
+                } catch (Exception e) {
+                    e.printStackTrace ();
+                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), true);
+                }
+            } while (c.moveToNext ());
+        }
+        return eventTopicList;
+    }
+
+    public ArrayList<Event> getAllEventList () {
+        ArrayList<Event> eventList = new ArrayList<Event> ();
+        String selectQuery = "SELECT *, (SELECT GROUP_CONCAT(" + EVNT_SPKR_NAME + ") FROM " + TABLE_EVENT_SPEAKERS + " WHERE " + EVNT_SPKR_EVNT_ID + " = " + EVNT_ID + ") as `evnt_speakers`  FROM " + TABLE_EVENTS;
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Events", false);
+        SQLiteDatabase db = this.getReadableDatabase ();
+        Cursor c = db.rawQuery (selectQuery, null);
+        // looping through all rows and adding to list
+        if (c.moveToFirst ()) {
+            do {
+                eventList.add (new Event (
+                        c.getInt ((c.getColumnIndex (EVNT_ID))),
+                        c.getString ((c.getColumnIndex (EVNT_NAME))),
+                        c.getString ((c.getColumnIndex ("evnt_speakers"))),
+                        c.getString ((c.getColumnIndex (EVNT_DATE))),
+                        c.getString ((c.getColumnIndex (EVNT_TIME)))
+                ));
+
+            } while (c.moveToNext ());
+        }
+        return eventList;
+    }
+
+    public void deleteAllEvents () {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete all events", LOG_FLAG);
+        db.execSQL ("delete from " + TABLE_EVENTS);
+    }
+
+    public void deleteAllEventTopics () {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete all event topic details", LOG_FLAG);
+        db.execSQL ("delete from " + TABLE_EVENT_TOPICS);
+    }
+
+    public void deleteAllEventSpeakers () {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete all event speaker details", LOG_FLAG);
+        db.execSQL ("delete from " + TABLE_EVENT_SPEAKERS);
+    }
+
+
+    // ------------------------ "Sessions" table methods ----------------//
+
+    public long createSession (SessionDetail sessionDetail) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Creating Session", LOG_FLAG);
+        ContentValues values = new ContentValues ();
+        values.put (SSION_ID, sessionDetail.getId ());
+        values.put (SSION_TITLE, sessionDetail.getTitle ());
+        values.put (SSION_DATE, sessionDetail.getDate ());
+        values.put (SSION_TIME, sessionDetail.getTime ());
+        values.put (SSION_LOCATION, sessionDetail.getLocation ());
+        values.put (SSION_CATEGORY, sessionDetail.getCategory ());
+        values.put (SSION_CREATED_AT, getDateTime ());
+        long session_id = db.insert (TABLE_SESSIONS, null, values);
+        return session_id;
+    }
+
+    public long createSessionSpeaker (SessionSpeaker sessionSpeaker, long session_id) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Creating session speaker", LOG_FLAG);
+        ContentValues values = new ContentValues ();
+        values.put (SSION_SPKR_SSION_ID, session_id);
+        values.put (SSION_SPKR_NAME, sessionSpeaker.getName ());
+        values.put (SSION_SPKR_IMAGE, sessionSpeaker.getImage ());
+        long session_speaker_id = db.insert (TABLE_SESSION_SPEAKERS, null, values);
+        return session_speaker_id;
+    }
+
+    public long createSessionTopic (String topic, long session_id) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Creating session topic", LOG_FLAG);
+        ContentValues values = new ContentValues ();
+        values.put (SSION_TOPC_SSION_ID, session_id);
+        values.put (SSION_TOPC_TEXT, topic);
+        long session_topic_id = db.insert (TABLE_SESSION_TOPICS, null, values);
+        return session_topic_id;
+    }
+
+    public SessionDetail getSessionDetail (long session_id) {
+        SQLiteDatabase db = this.getReadableDatabase ();
+        String selectQuery = "SELECT  * FROM " + TABLE_SESSIONS + " WHERE " + SSION_ID + " = " + session_id;
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get session where ID = " + session_id, LOG_FLAG);
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c != null)
+            c.moveToFirst ();
+
+        SessionDetail sessionDetail = new SessionDetail (
+                c.getInt (c.getColumnIndex (SSION_ID)),
+                false,
+                c.getString (c.getColumnIndex (SSION_TITLE)),
+                c.getString (c.getColumnIndex (SSION_DATE)),
+                c.getString (c.getColumnIndex (SSION_TIME)),
+                c.getString (c.getColumnIndex (SSION_LOCATION)),
+                c.getString (c.getColumnIndex (SSION_CATEGORY))
+        );
+
+        sessionDetail.setTopicList (getAllSessionTopics (c.getInt (c.getColumnIndex (SSION_ID))));
+        sessionDetail.setSessionSpeakerList (getAllSessionSpeakers (c.getInt (c.getColumnIndex (SSION_ID))));
+
+        return sessionDetail;
+    }
+
+    public ArrayList<SessionSpeaker> getAllSessionSpeakers (long session_id) {
+        ArrayList<SessionSpeaker> sessionSpeakerList = new ArrayList<SessionSpeaker> ();
+        String selectQuery = "SELECT * FROM " + TABLE_SESSION_SPEAKERS + " WHERE " + SSION_SPKR_SSION_ID + " = " + session_id;
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get session speaker List", LOG_FLAG);
+        SQLiteDatabase db = this.getReadableDatabase ();
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c.moveToFirst ()) {
+            do {
+                try {
+                    sessionSpeakerList.add (new SessionSpeaker (
+                            c.getInt (c.getColumnIndex (SSION_SPKR_ID)),
+                            c.getString (c.getColumnIndex (SSION_SPKR_IMAGE)),
+                            c.getString (c.getColumnIndex (SSION_SPKR_NAME))
+                    ));
+                } catch (Exception e) {
+                    e.printStackTrace ();
+                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), true);
+                }
+            } while (c.moveToNext ());
+        }
+        return sessionSpeakerList;
+    }
+
+    public ArrayList<String> getAllSessionTopics (long session_id) {
+        ArrayList<String> sessionTopicList = new ArrayList<> ();
+        String selectQuery = "SELECT * FROM " + TABLE_SESSION_TOPICS + " WHERE " + SSION_TOPC_SSION_ID + " = " + session_id;
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get session topic List", LOG_FLAG);
+        SQLiteDatabase db = this.getReadableDatabase ();
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c.moveToFirst ()) {
+            do {
+                try {
+                    sessionTopicList.add (c.getString (c.getColumnIndex (SSION_TOPC_TEXT)));
+                } catch (Exception e) {
+                    e.printStackTrace ();
+                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), true);
+                }
+            } while (c.moveToNext ());
+        }
+        return sessionTopicList;
+    }
+
+    public ArrayList<Session> getAllSessionList () {
+        ArrayList<Session> sessionList = new ArrayList<Session> ();
+        String selectQuery = "SELECT *, (SELECT GROUP_CONCAT(" + SSION_SPKR_NAME + ") FROM " + TABLE_SESSION_SPEAKERS + " WHERE " + SSION_SPKR_SSION_ID + " = " + SSION_ID + ") as `ssion_speakers`  FROM " + TABLE_SESSIONS;
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Sessions", false);
+        SQLiteDatabase db = this.getReadableDatabase ();
+        Cursor c = db.rawQuery (selectQuery, null);
+        // looping through all rows and adding to list
+        if (c.moveToFirst ()) {
+            do {
+                sessionList.add (new Session (
+                        c.getInt ((c.getColumnIndex (SSION_ID))),
+                        c.getString ((c.getColumnIndex (SSION_TITLE))),
+                        c.getString ((c.getColumnIndex ("ssion_speakers"))),
+                        c.getString ((c.getColumnIndex (SSION_DATE))),
+                        c.getString ((c.getColumnIndex (SSION_TIME))),
+                        c.getString ((c.getColumnIndex (SSION_LOCATION))),
+                        c.getString ((c.getColumnIndex (SSION_CATEGORY)))
+                ));
+
+            } while (c.moveToNext ());
+        }
+        return sessionList;
+    }
+
+    public void deleteAllSessions () {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete all sessions", LOG_FLAG);
+        db.execSQL ("delete from " + TABLE_SESSIONS);
+    }
+
+    public void deleteAllSessionTopics () {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete all session topic details", LOG_FLAG);
+        db.execSQL ("delete from " + TABLE_SESSION_TOPICS);
+    }
+
+    public void deleteAllSessionSpeakers () {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete all session speaker details", LOG_FLAG);
+        db.execSQL ("delete from " + TABLE_SESSION_SPEAKERS);
+    }
+
 
     public void closeDB () {
         SQLiteDatabase db = this.getReadableDatabase ();

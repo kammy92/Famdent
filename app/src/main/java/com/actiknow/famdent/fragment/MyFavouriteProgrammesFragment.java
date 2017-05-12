@@ -13,8 +13,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.actiknow.famdent.R;
-import com.actiknow.famdent.adapter.ProgrammeAdapter;
-import com.actiknow.famdent.model.Programme;
+import com.actiknow.famdent.adapter.EventAdapter;
+import com.actiknow.famdent.model.Event;
 import com.actiknow.famdent.utils.AppConfigTags;
 import com.actiknow.famdent.utils.AppConfigURL;
 import com.actiknow.famdent.utils.Constants;
@@ -44,8 +44,8 @@ import java.util.Map;
 public class MyFavouriteProgrammesFragment extends Fragment {
     RecyclerView rvProgrammesList;
     SwipeRefreshLayout swipeRefreshLayout;
-    List<Programme> programmeList = new ArrayList<> ();
-    ProgrammeAdapter programmeAdapter;
+    List<Event> eventList = new ArrayList<> ();
+    EventAdapter eventAdapter;
     TextView tvNoResult;
 
     @Override
@@ -68,8 +68,8 @@ public class MyFavouriteProgrammesFragment extends Fragment {
         swipeRefreshLayout.setRefreshing (true);
         swipeRefreshLayout.setColorSchemeColors (getResources ().getColor (R.color.colorPrimaryDark));
 
-        programmeAdapter = new ProgrammeAdapter (getActivity (), programmeList);
-        rvProgrammesList.setAdapter (programmeAdapter);
+        eventAdapter = new EventAdapter (getActivity (), eventList);
+        rvProgrammesList.setAdapter (eventAdapter);
         rvProgrammesList.setHasFixedSize (true);
         rvProgrammesList.setLayoutManager (new LinearLayoutManager (getActivity (), LinearLayoutManager.VERTICAL, false));
         rvProgrammesList.addItemDecoration (new SimpleDividerItemDecoration (getActivity ()));
@@ -95,7 +95,7 @@ public class MyFavouriteProgrammesFragment extends Fragment {
                     new Response.Listener<String> () {
                         @Override
                         public void onResponse (String response) {
-                            programmeList.clear ();
+                            eventList.clear ();
                             Utils.showLog (Log.INFO, AppConfigTags.SERVER_RESPONSE, response, true);
                             if (response != null) {
                                 try {
@@ -106,15 +106,15 @@ public class MyFavouriteProgrammesFragment extends Fragment {
                                         JSONArray jsonArrayEvent = jsonObj.getJSONArray (AppConfigTags.EVENTS);
                                         for (int i = 0; i < jsonArrayEvent.length (); i++) {
                                             JSONObject jsonObject = jsonArrayEvent.getJSONObject (i);
-                                            Programme programme = new Programme (
+                                            Event event = new Event (
                                                     jsonObject.getInt (AppConfigTags.EVENT_ID),
                                                     jsonObject.getString (AppConfigTags.EVENT_NAME),
                                                     jsonObject.getString (AppConfigTags.EVENT_SPEAKERS),
                                                     jsonObject.getString (AppConfigTags.EVENT_DATE),
                                                     jsonObject.getString (AppConfigTags.EVENT_TIME));
-                                            programmeList.add (programme);
+                                            eventList.add (event);
                                         }
-                                        programmeAdapter.notifyDataSetChanged ();
+                                        eventAdapter.notifyDataSetChanged ();
                                         if (jsonArrayEvent.length () > 0) {
                                             swipeRefreshLayout.setRefreshing (false);
                                         } else {

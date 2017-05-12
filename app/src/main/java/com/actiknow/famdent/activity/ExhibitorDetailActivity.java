@@ -382,7 +382,7 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
         tvExhibitorName.setText (exhibitorDetail.getExhibitor_name ());
 
 
-        tvFullAddress.setText ("Stall Number :" + exhibitorDetail.getAddress ());
+        tvFullAddress.setText ("Stall :" + exhibitorDetail.getAddress ());
         tvContactPerson.setText (exhibitorDetail.getContact_person ());
         tvEmail.setText (Html.fromHtml ("<u><font color='blue'>" + exhibitorDetail.getEmail () + "</font></u>"), TextView.BufferType.SPANNABLE);
         tvWebsite.setText (Html.fromHtml ("<u><font color='blue'>" + exhibitorDetail.getWebsite () + "</font></u>"), TextView.BufferType.SPANNABLE);

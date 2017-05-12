@@ -582,8 +582,9 @@ public class MainActivity extends AppCompatActivity {
                                                         JSONObject jsonObjectTopic = jsonArrayTopic.getJSONObject (k);
                                                         db.createSessionTopic (jsonObjectTopic.getString (AppConfigTags.SESSION_DETAILS_TOPIC_TEXT), jsonObjectSession.getInt (AppConfigTags.SESSION_DETAILS_ID));
                                                     }
-                                                    break;
+
                                                 }
+                                                break;
                                         }
                                         progressDialog.dismiss ();
                                     }

@@ -68,6 +68,7 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
     TextView tvAddNotes;
 
     RelativeLayout rlMain;
+    RelativeLayout rlWebsite;
     LinearLayout llButtons;
 
     ProgressDialog progressDialog;
@@ -97,6 +98,7 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
         fabAddNote = (FloatingActionButton) findViewById (R.id.fabAddNote);
 
         rlMain = (RelativeLayout) findViewById (R.id.rlMain);
+        rlWebsite = (RelativeLayout) findViewById (R.id.rlWebsite);
         llButtons = (LinearLayout) findViewById (R.id.llButtons);
 
         llPhone = (LinearLayout) findViewById (R.id.llPhone);
@@ -214,7 +216,8 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
                             .onPositive (new MaterialDialog.SingleButtonCallback () {
                                 @Override
                                 public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    updateFavouriteStatus (false, exhibitor_id);
+                                    updateOfflineFavouriteStatus (false, exhibitor_id);
+//                                    updateFavouriteStatus (false, exhibitor_id);
                                 }
                             }).build ();
                     dialog.show ();
@@ -232,7 +235,8 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
                             .onPositive (new MaterialDialog.SingleButtonCallback () {
                                 @Override
                                 public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    updateFavouriteStatus (true, exhibitor_id);
+                                    updateOfflineFavouriteStatus (true, exhibitor_id);
+//                                    updateFavouriteStatus (true, exhibitor_id);
                                 }
                             }).build ();
                     dialog.show ();
@@ -257,7 +261,8 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
                             .onPositive (new MaterialDialog.SingleButtonCallback () {
                                 @Override
                                 public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    updateFavouriteStatus (false, exhibitor_id);
+                                    updateOfflineFavouriteStatus (false, exhibitor_id);
+//                                    updateFavouriteStatus (false, exhibitor_id);
                                 }
                             }).build ();
                     dialog.show ();
@@ -275,7 +280,8 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
                             .onPositive (new MaterialDialog.SingleButtonCallback () {
                                 @Override
                                 public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    updateFavouriteStatus (true, exhibitor_id);
+                                    updateOfflineFavouriteStatus (true, exhibitor_id);
+//                                    updateFavouriteStatus (true, exhibitor_id);
                                 }
                             }).build ();
                     dialog.show ();
@@ -428,6 +434,12 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
             tvAddNotes.setText ("ADD NOTES");
         }
 
+        if (exhibitorDetail.getExhibitor_description ().length () > 0) {
+            rlWebsite.setVisibility (View.VISIBLE);
+        } else {
+            rlWebsite.setVisibility (View.GONE);
+        }
+
         rlMain.setVisibility (View.VISIBLE);
     }
 
@@ -451,6 +463,7 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
                                                 jsonObj.getBoolean (AppConfigTags.EXHIBITOR_FAVOURITE),
                                                 jsonObj.getString (AppConfigTags.EXHIBITOR_LOGO),
                                                 jsonObj.getString (AppConfigTags.EXHIBITOR_NAME),
+                                                jsonObj.getString (AppConfigTags.EXHIBITOR_DESCRIPTION),
                                                 jsonObj.getString (AppConfigTags.EXHIBITOR_CONTACT_PERSON),
                                                 jsonObj.getString (AppConfigTags.EXHIBITOR_ADDRESS),
                                                 jsonObj.getString (AppConfigTags.EXHIBITOR_EMAIL),
@@ -506,8 +519,6 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
                                             });
                                             llPhone.addView (tv);
                                         }
-
-
 
 
                                         if (exhibitorDetail.isFavourite ()) {
@@ -576,6 +587,29 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
             Utils.sendRequest (strRequest, 5);
         } else {
             progressDialog.dismiss ();
+        }
+    }
+
+    private void updateOfflineFavouriteStatus (final boolean add_favourite, final int exhibitor_id) {
+        if (add_favourite) {
+            db.addExhibitorToFavourite (exhibitor_id);
+            exhibitorDetail.setFavourite (true);
+            ivFavourite.setImageResource (R.drawable.ic_star);
+            tvAddFavourite.setVisibility (View.GONE);
+            llButtons.setWeightSum (1);
+            Utils.showSnackBar (ExhibitorDetailActivity.this, clMain, "Exhibitor added to favourites", Snackbar.LENGTH_LONG, null, null);
+        } else {
+            db.removeExhibitorFromFavourite (exhibitor_id);
+            exhibitorDetail.setFavourite (false);
+            ivFavourite.setImageResource (R.drawable.ic_star_border);
+            tvAddFavourite.setVisibility (View.VISIBLE);
+            llButtons.setWeightSum (2);
+            Utils.showSnackBar (ExhibitorDetailActivity.this, clMain, "Exhibitor removed from favourites", Snackbar.LENGTH_LONG, getResources ().getString (R.string.snackbar_action_undo), new View.OnClickListener () {
+                @Override
+                public void onClick (View v) {
+                    updateOfflineFavouriteStatus (true, exhibitor_id);
+                }
+            });
         }
     }
 
@@ -739,9 +773,4 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
         finish ();
         overridePendingTransition (R.anim.slide_in_left, R.anim.slide_out_right);
     }
-
-
 }
-
-
-

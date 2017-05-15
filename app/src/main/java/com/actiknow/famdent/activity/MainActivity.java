@@ -39,6 +39,7 @@ import com.actiknow.famdent.helper.DatabaseHandler;
 import com.actiknow.famdent.model.EventDetail;
 import com.actiknow.famdent.model.EventSpeaker;
 import com.actiknow.famdent.model.ExhibitorDetail;
+import com.actiknow.famdent.model.Favourite;
 import com.actiknow.famdent.model.HomeService;
 import com.actiknow.famdent.model.SessionDetail;
 import com.actiknow.famdent.model.SessionSpeaker;
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         homeServices.add (new HomeService (1, R.drawable.ic_list, "", "EXHIBITORS"));
-        homeServices.add (new HomeService (2, R.drawable.ic_program, "", "PROGRAMMES"));
+        homeServices.add (new HomeService (2, R.drawable.ic_program, "", "EVENTS"));
         homeServices.add (new HomeService (3, R.drawable.ic_program, "", "SCIENTIFIC SESSIONS"));
         homeServices.add (new HomeService (4, R.drawable.ic_hall_plan, "", "HALL PLAN"));
         homeServices.add (new HomeService (5, R.drawable.ic_favourite, "", "MY FAVOURITES"));
@@ -444,9 +445,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initApplication () {
+        final JSONArray jsonArrayFavourites = new JSONArray ();
+        try {
+            ArrayList<Favourite> favouriteList = db.getAllFavourites ();
+            for (int i = 0; i < favouriteList.size (); i++) {
+                Favourite favourite = favouriteList.get (i);
+                JSONObject jsonObject1 = new JSONObject ();
+                jsonObject1.put ("favourite_type", favourite.getType ());
+                switch (favourite.getType ()) {
+                    case "EXHIBITOR":
+                        jsonObject1.put ("favourite_exhibitor_id", favourite.getExhibitor_id ());
+                        break;
+                    case "EVENT":
+                        jsonObject1.put ("favourite_event_id", favourite.getEvent_id ());
+                        break;
+                    case "SESSION":
+                        jsonObject1.put ("favourite_session_id", favourite.getSession_id ());
+                        break;
+                }
+                jsonArrayFavourites.put (jsonObject1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace ();
+        }
+
+        Log.e ("karman", jsonArrayFavourites.toString ());
+
+        Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_initializing), false);
         if (NetworkConnection.isNetworkAvailable (this)) {
-            Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_INIT + "/" + visitorDetailsPref.getIntPref (MainActivity.this, VisitorDetailsPref.DATABASE_VERSION), true);
-            StringRequest strRequest = new StringRequest (Request.Method.GET, AppConfigURL.URL_INIT + "/" + visitorDetailsPref.getIntPref (MainActivity.this, VisitorDetailsPref.DATABASE_VERSION),
+            Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_INIT, true);
+            StringRequest strRequest = new StringRequest (Request.Method.POST, AppConfigURL.URL_INIT,
                     new Response.Listener<String> () {
                         @Override
                         public void onResponse (String response) {
@@ -465,7 +493,6 @@ public class MainActivity extends AppCompatActivity {
                                             case 1:
                                                 break;
                                             case 2:
-                                                Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_initializing), false);
                                                 db.deleteAllExhibitors ();
                                                 db.deleteAllStallDetails ();
 
@@ -483,14 +510,15 @@ public class MainActivity extends AppCompatActivity {
                                                     JSONObject jsonObjectExhibitor = jsonArrayExhibitor.getJSONObject (i);
                                                     ExhibitorDetail exhibitorDetail = new ExhibitorDetail (
                                                             jsonObjectExhibitor.getInt (AppConfigTags.EXHIBITOR_ID),
-                                                            jsonObjectExhibitor.getBoolean (AppConfigTags.EXHIBITOR_FAVOURITE),
+                                                            false,
                                                             jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_LOGO),
                                                             jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_NAME),
+                                                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_DESCRIPTION),
                                                             jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_CONTACT_PERSON),
                                                             jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_ADDRESS),
                                                             jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_EMAIL),
                                                             jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_WEBSITE),
-                                                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_NOTES));
+                                                            "");
 
                                                     ArrayList<String> contactList = new ArrayList<> ();
                                                     JSONArray jsonArrayContacts = jsonObjectExhibitor.getJSONArray (AppConfigTags.EXHIBITOR_CONTACTS);
@@ -521,14 +549,14 @@ public class MainActivity extends AppCompatActivity {
                                                     JSONObject jsonObjectEvent = jsonArrayEvent.getJSONObject (i);
                                                     EventDetail eventDetail = new EventDetail (
                                                             jsonObjectEvent.getInt (AppConfigTags.EVENT_DETAIL_ID),
-                                                            jsonObjectEvent.getBoolean (AppConfigTags.EVENT_DETAIL_FAVOURITE),
+                                                            false,
                                                             jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_NAME),
                                                             jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_DATE),
                                                             jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_TIME),
                                                             jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_DURATION),
                                                             jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_LOCATION),
                                                             jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_FEES),
-                                                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_NOTES));
+                                                            "");
                                                     db.createEvent (eventDetail);
 
                                                     JSONArray jsonArraySpeakers = jsonObjectEvent.getJSONArray (AppConfigTags.EVENT_DETAIL_SPEAKERS);
@@ -557,7 +585,7 @@ public class MainActivity extends AppCompatActivity {
                                                     JSONObject jsonObjectSession = jsonArraySessions.getJSONObject (i);
                                                     SessionDetail sessionDetail = new SessionDetail (
                                                             jsonObjectSession.getInt (AppConfigTags.SESSION_DETAILS_ID),
-                                                            jsonObjectSession.getBoolean (AppConfigTags.SESSION_DETAILS_FAVOURITE),
+                                                            false,
                                                             jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_TITLE),
                                                             jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_DATE),
                                                             jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_TIME),
@@ -582,7 +610,6 @@ public class MainActivity extends AppCompatActivity {
                                                         JSONObject jsonObjectTopic = jsonArrayTopic.getJSONObject (k);
                                                         db.createSessionTopic (jsonObjectTopic.getString (AppConfigTags.SESSION_DETAILS_TOPIC_TEXT), jsonObjectSession.getInt (AppConfigTags.SESSION_DETAILS_ID));
                                                     }
-
                                                 }
                                                 break;
                                         }
@@ -605,6 +632,17 @@ public class MainActivity extends AppCompatActivity {
                             Utils.showLog (Log.ERROR, AppConfigTags.VOLLEY_ERROR, error.toString (), true);
                         }
                     }) {
+
+                @Override
+                protected Map<String, String> getParams () throws AuthFailureError {
+                    Map<String, String> params = new Hashtable<String, String> ();
+                    params.put ("db_version", String.valueOf (visitorDetailsPref.getIntPref (MainActivity.this, VisitorDetailsPref.DATABASE_VERSION)));
+                    params.put ("favourites_json", jsonArrayFavourites.toString ());
+                    Utils.showLog (Log.INFO, AppConfigTags.PARAMETERS_SENT_TO_THE_SERVER, "" + params, true);
+                    return params;
+                }
+
+
                 @Override
                 public Map<String, String> getHeaders () throws AuthFailureError {
                     Map<String, String> params = new HashMap<> ();
@@ -750,5 +788,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 }

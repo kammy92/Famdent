@@ -95,6 +95,135 @@ public class SessionDetailActivity extends AppCompatActivity {
 //        getSessionDetailFromServer (session_id);
     }
 
+    private void initListener () {
+        ivBack.setOnClickListener (new View.OnClickListener () {
+            @Override
+            public void onClick (View v) {
+                finish ();
+                overridePendingTransition (R.anim.slide_in_left, R.anim.slide_out_right);
+            }
+        });
+
+        ivFavourite.setOnClickListener (new View.OnClickListener () {
+            @Override
+            public void onClick (View v) {
+                if (sessionDetail.isFavourite ()) {
+                    MaterialDialog dialog = new MaterialDialog.Builder (SessionDetailActivity.this)
+                            .content (R.string.dialog_text_remove_favourite_session)
+                            .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .typeface (SetTypeFace.getTypeface (SessionDetailActivity.this), SetTypeFace.getTypeface (SessionDetailActivity.this))
+                            .canceledOnTouchOutside (false)
+                            .cancelable (false)
+                            .positiveText (R.string.dialog_action_yes)
+                            .negativeText (R.string.dialog_action_no)
+                            .onPositive (new MaterialDialog.SingleButtonCallback () {
+                                @Override
+                                public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    updateOfflineFavouriteStatus (false, session_id);
+//                                    updateFavouriteStatus (false, session_id);
+                                }
+                            }).build ();
+                    dialog.show ();
+                } else {
+                    MaterialDialog dialog = new MaterialDialog.Builder (SessionDetailActivity.this)
+                            .content (R.string.dialog_text_add_favourite_session)
+                            .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .typeface (SetTypeFace.getTypeface (SessionDetailActivity.this), SetTypeFace.getTypeface (SessionDetailActivity.this))
+                            .canceledOnTouchOutside (false)
+                            .cancelable (false)
+                            .positiveText (R.string.dialog_action_yes)
+                            .negativeText (R.string.dialog_action_no)
+                            .onPositive (new MaterialDialog.SingleButtonCallback () {
+                                @Override
+                                public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    updateOfflineFavouriteStatus (true, session_id);
+//                                    updateFavouriteStatus (true, session_id);
+                                }
+                            }).build ();
+                    dialog.show ();
+                }
+            }
+        });
+
+        tvAddFavourite.setOnClickListener (new View.OnClickListener () {
+            @Override
+            public void onClick (View v) {
+                if (sessionDetail.isFavourite ()) {
+                    MaterialDialog dialog = new MaterialDialog.Builder (SessionDetailActivity.this)
+                            .content (R.string.dialog_text_remove_favourite_session)
+                            .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .typeface (SetTypeFace.getTypeface (SessionDetailActivity.this), SetTypeFace.getTypeface (SessionDetailActivity.this))
+                            .canceledOnTouchOutside (false)
+                            .cancelable (false)
+                            .positiveText (R.string.dialog_action_yes)
+                            .negativeText (R.string.dialog_action_no)
+                            .onPositive (new MaterialDialog.SingleButtonCallback () {
+                                @Override
+                                public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    updateOfflineFavouriteStatus (false, session_id);
+//                                    updateFavouriteStatus (false, session_id);
+                                }
+                            }).build ();
+                    dialog.show ();
+                } else {
+                    MaterialDialog dialog = new MaterialDialog.Builder (SessionDetailActivity.this)
+                            .content (R.string.dialog_text_add_favourite_session)
+                            .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
+                            .typeface (SetTypeFace.getTypeface (SessionDetailActivity.this), SetTypeFace.getTypeface (SessionDetailActivity.this))
+                            .canceledOnTouchOutside (false)
+                            .cancelable (false)
+                            .positiveText (R.string.dialog_action_yes)
+                            .negativeText (R.string.dialog_action_no)
+                            .onPositive (new MaterialDialog.SingleButtonCallback () {
+                                @Override
+                                public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    updateOfflineFavouriteStatus (true, session_id);
+//                                    updateFavouriteStatus (true, session_id);
+                                }
+                            }).build ();
+                    dialog.show ();
+                }
+            }
+        });
+    }
+
+    private void initView () {
+        rlMain = (RelativeLayout) findViewById (R.id.rlMain);
+        clMain = (CoordinatorLayout) findViewById (R.id.clMain);
+        ivBack = (ImageView) findViewById (R.id.ivBack);
+        ivFavourite = (ImageView) findViewById (R.id.ivFavourite);
+        llTopics = (LinearLayout) findViewById (R.id.llTopics);
+        tvDate = (TextView) findViewById (R.id.tvDate);
+        tvTime = (TextView) findViewById (R.id.tvTime);
+        tvLocation = (TextView) findViewById (R.id.tvLocation);
+        tvCategory = (TextView) findViewById (R.id.tvCategory);
+        tvAddFavourite = (TextView) findViewById (R.id.tvAddFavourite);
+        ivSpeakerImage = (ImageView) findViewById (R.id.ivSpeakerImage);
+        progressBar = (ProgressBar) findViewById (R.id.progressBar);
+        tvSpeakerName = (TextView) findViewById (R.id.tvSpeakerName);
+        tvSessionTitle = (TextView) findViewById (R.id.tvSessionTitle);
+    }
+
+    private void initData () {
+        db = new DatabaseHandler (getApplicationContext ());
+
+        progressDialog = new ProgressDialog (this);
+        Utils.setTypefaceToAllViews (this, tvSpeakerName);
+    }
+
+    private void getExtras () {
+        Intent intent = getIntent ();
+        session_id = intent.getIntExtra (AppConfigTags.SESSION_ID, 0);
+    }
+
     private void getOfflineSessionDetails (int session_id) {
         sessionDetail = db.getSessionDetail (session_id);
 
@@ -148,132 +277,6 @@ public class SessionDetailActivity extends AppCompatActivity {
 
         rlMain.setVisibility (View.VISIBLE);
     }
-
-    private void initListener () {
-        ivBack.setOnClickListener (new View.OnClickListener () {
-            @Override
-            public void onClick (View v) {
-                finish ();
-                overridePendingTransition (R.anim.slide_in_left, R.anim.slide_out_right);
-            }
-        });
-
-        ivFavourite.setOnClickListener (new View.OnClickListener () {
-            @Override
-            public void onClick (View v) {
-                if (sessionDetail.isFavourite ()) {
-                    MaterialDialog dialog = new MaterialDialog.Builder (SessionDetailActivity.this)
-                            .content (R.string.dialog_text_remove_favourite_session)
-                            .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
-                            .contentColor (getResources ().getColor (R.color.app_text_color_dark))
-                            .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
-                            .typeface (SetTypeFace.getTypeface (SessionDetailActivity.this), SetTypeFace.getTypeface (SessionDetailActivity.this))
-                            .canceledOnTouchOutside (false)
-                            .cancelable (false)
-                            .positiveText (R.string.dialog_action_yes)
-                            .negativeText (R.string.dialog_action_no)
-                            .onPositive (new MaterialDialog.SingleButtonCallback () {
-                                @Override
-                                public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    updateFavouriteStatus (false, session_id);
-                                }
-                            }).build ();
-                    dialog.show ();
-                } else {
-                    MaterialDialog dialog = new MaterialDialog.Builder (SessionDetailActivity.this)
-                            .content (R.string.dialog_text_add_favourite_session)
-                            .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
-                            .contentColor (getResources ().getColor (R.color.app_text_color_dark))
-                            .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
-                            .typeface (SetTypeFace.getTypeface (SessionDetailActivity.this), SetTypeFace.getTypeface (SessionDetailActivity.this))
-                            .canceledOnTouchOutside (false)
-                            .cancelable (false)
-                            .positiveText (R.string.dialog_action_yes)
-                            .negativeText (R.string.dialog_action_no)
-                            .onPositive (new MaterialDialog.SingleButtonCallback () {
-                                @Override
-                                public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    updateFavouriteStatus (true, session_id);
-                                }
-                            }).build ();
-                    dialog.show ();
-                }
-            }
-        });
-
-        tvAddFavourite.setOnClickListener (new View.OnClickListener () {
-            @Override
-            public void onClick (View v) {
-                if (sessionDetail.isFavourite ()) {
-                    MaterialDialog dialog = new MaterialDialog.Builder (SessionDetailActivity.this)
-                            .content (R.string.dialog_text_remove_favourite_session)
-                            .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
-                            .contentColor (getResources ().getColor (R.color.app_text_color_dark))
-                            .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
-                            .typeface (SetTypeFace.getTypeface (SessionDetailActivity.this), SetTypeFace.getTypeface (SessionDetailActivity.this))
-                            .canceledOnTouchOutside (false)
-                            .cancelable (false)
-                            .positiveText (R.string.dialog_action_yes)
-                            .negativeText (R.string.dialog_action_no)
-                            .onPositive (new MaterialDialog.SingleButtonCallback () {
-                                @Override
-                                public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    updateFavouriteStatus (false, session_id);
-                                }
-                            }).build ();
-                    dialog.show ();
-                } else {
-                    MaterialDialog dialog = new MaterialDialog.Builder (SessionDetailActivity.this)
-                            .content (R.string.dialog_text_add_favourite_session)
-                            .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
-                            .contentColor (getResources ().getColor (R.color.app_text_color_dark))
-                            .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
-                            .typeface (SetTypeFace.getTypeface (SessionDetailActivity.this), SetTypeFace.getTypeface (SessionDetailActivity.this))
-                            .canceledOnTouchOutside (false)
-                            .cancelable (false)
-                            .positiveText (R.string.dialog_action_yes)
-                            .negativeText (R.string.dialog_action_no)
-                            .onPositive (new MaterialDialog.SingleButtonCallback () {
-                                @Override
-                                public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    updateFavouriteStatus (true, session_id);
-                                }
-                            }).build ();
-                    dialog.show ();
-                }
-            }
-        });
-    }
-
-    private void initView () {
-        rlMain = (RelativeLayout) findViewById (R.id.rlMain);
-        clMain = (CoordinatorLayout) findViewById (R.id.clMain);
-        ivBack = (ImageView) findViewById (R.id.ivBack);
-        ivFavourite = (ImageView) findViewById (R.id.ivFavourite);
-        llTopics = (LinearLayout) findViewById (R.id.llTopics);
-        tvDate = (TextView) findViewById (R.id.tvDate);
-        tvTime = (TextView) findViewById (R.id.tvTime);
-        tvLocation = (TextView) findViewById (R.id.tvLocation);
-        tvCategory = (TextView) findViewById (R.id.tvCategory);
-        tvAddFavourite = (TextView) findViewById (R.id.tvAddFavourite);
-        ivSpeakerImage = (ImageView) findViewById (R.id.ivSpeakerImage);
-        progressBar = (ProgressBar) findViewById (R.id.progressBar);
-        tvSpeakerName = (TextView) findViewById (R.id.tvSpeakerName);
-        tvSessionTitle = (TextView) findViewById (R.id.tvSessionTitle);
-    }
-
-    private void initData () {
-        db = new DatabaseHandler (getApplicationContext ());
-
-        progressDialog = new ProgressDialog (this);
-        Utils.setTypefaceToAllViews (this, tvSpeakerName);
-    }
-
-    private void getExtras () {
-        Intent intent = getIntent ();
-        session_id = intent.getIntExtra (AppConfigTags.SESSION_ID, 0);
-    }
-
 
     private void getSessionDetailFromServer (int session_id) {
         if (NetworkConnection.isNetworkAvailable (this)) {
@@ -405,6 +408,27 @@ public class SessionDetailActivity extends AppCompatActivity {
             Utils.sendRequest (strRequest, 30);
         } else {
             progressDialog.dismiss ();
+        }
+    }
+
+    private void updateOfflineFavouriteStatus (final boolean add_favourite, final int session_id) {
+        if (add_favourite) {
+            db.addSessionToFavourite (session_id);
+            sessionDetail.setFavourite (true);
+            ivFavourite.setImageResource (R.drawable.ic_star);
+            tvAddFavourite.setVisibility (View.GONE);
+            Utils.showSnackBar (SessionDetailActivity.this, clMain, "Session added to favourites", Snackbar.LENGTH_LONG, null, null);
+        } else {
+            db.removeSessionFromFavourite (session_id);
+            sessionDetail.setFavourite (false);
+            ivFavourite.setImageResource (R.drawable.ic_star_border);
+            tvAddFavourite.setVisibility (View.VISIBLE);
+            Utils.showSnackBar (SessionDetailActivity.this, clMain, "Session removed from favourites", Snackbar.LENGTH_LONG, getResources ().getString (R.string.snackbar_action_undo), new View.OnClickListener () {
+                @Override
+                public void onClick (View v) {
+                    updateOfflineFavouriteStatus (true, session_id);
+                }
+            });
         }
     }
 

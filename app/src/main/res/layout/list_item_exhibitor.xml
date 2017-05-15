@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
+    android:id="@+id/rlMain"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+
     android:layout_height="wrap_content"
     android:background="@color/app_background"
     android:gravity="center_vertical"
@@ -40,12 +42,25 @@
 
         <LinearLayout
             android:id="@+id/llStallDetails"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvExhibitorName"
 
             android:orientation="horizontal"/>
-
+        <TextView
+            android:id="@+id/tvExhibitorDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvExhibitorName"
+            android:layout_marginLeft="@dimen/activity_margin_small"
+            android:layout_marginStart="@dimen/activity_margin_small"
+            android:layout_toEndOf="@+id/llStallDetails"
+            android:layout_toRightOf="@+id/llStallDetails"
+            android:text="offer"
+            android:textColor="@color/app_text_color_dark"
+            android:textSize="@dimen/text_size_small"
+            android:textStyle="bold"
+            android:visibility="gone"/>
 
     </RelativeLayout>
 

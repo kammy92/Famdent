@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.actiknow.famdent.R;
 import com.actiknow.famdent.adapter.EventAdapter;
+import com.actiknow.famdent.helper.DatabaseHandler;
 import com.actiknow.famdent.model.Event;
 import com.actiknow.famdent.utils.AppConfigTags;
 import com.actiknow.famdent.utils.AppConfigURL;
@@ -41,12 +42,13 @@ import java.util.Map;
  * Created by l on 28/04/2017.
  */
 
-public class MyFavouriteProgrammesFragment extends Fragment {
+public class MyFavouriteEventFragment extends Fragment {
     RecyclerView rvProgrammesList;
     SwipeRefreshLayout swipeRefreshLayout;
     List<Event> eventList = new ArrayList<> ();
     EventAdapter eventAdapter;
     TextView tvNoResult;
+    DatabaseHandler db;
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -54,7 +56,8 @@ public class MyFavouriteProgrammesFragment extends Fragment {
         initView (rootView);
         initData ();
         initListener ();
-        getProgramListFromServer ();
+        getOfflineFavouriteEvents ();
+//        getProgramListFromServer ();
         return rootView;
     }
 
@@ -65,6 +68,7 @@ public class MyFavouriteProgrammesFragment extends Fragment {
     }
 
     private void initData() {
+        db = new DatabaseHandler (getActivity ());
         swipeRefreshLayout.setRefreshing (true);
         swipeRefreshLayout.setColorSchemeColors (getResources ().getColor (R.color.colorPrimaryDark));
 
@@ -76,16 +80,32 @@ public class MyFavouriteProgrammesFragment extends Fragment {
         rvProgrammesList.setItemAnimator (new DefaultItemAnimator ());
 
         Utils.setTypefaceToAllViews (getActivity (), tvNoResult);
-
     }
 
     private void initListener() {
         swipeRefreshLayout.setOnRefreshListener (new SwipeRefreshLayout.OnRefreshListener () {
             @Override
             public void onRefresh () {
-                swipeRefreshLayout.setRefreshing (false);
+                getOfflineFavouriteEvents ();
             }
         });
+    }
+
+    private void getOfflineFavouriteEvents () {
+        Utils.showLog (Log.DEBUG, AppConfigTags.TAG, "Getting all the events from local database", true);
+        eventList.clear ();
+        ArrayList<Event> offlineEvents = db.getAllFavouriteEvent ();
+        for (Event event : offlineEvents)
+            eventList.add (event);
+        eventAdapter.notifyDataSetChanged ();
+
+        if (offlineEvents.size () > 0) {
+            swipeRefreshLayout.setRefreshing (false);
+        } else {
+            swipeRefreshLayout.setRefreshing (false);
+            tvNoResult.setVisibility (View.VISIBLE);
+        }
+
     }
 
     private void getProgramListFromServer () {

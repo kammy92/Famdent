@@ -11,13 +11,14 @@ public class ExhibitorDetail {
     boolean favourite;
     ArrayList<String> contactList = new ArrayList<> ();
     ArrayList<StallDetail> stallDetailList = new ArrayList<> ();
-    String exhibitor_logo, exhibitor_name, contact_person, address, email, website, notes;
+    String exhibitor_logo, exhibitor_name, exhibitor_description, contact_person, address, email, website, notes;
 
-    public ExhibitorDetail (int id, boolean favourite, String exhibitor_logo, String exhibitor_name, String contact_person, String address, String email, String website, String notes) {
+    public ExhibitorDetail (int id, boolean favourite, String exhibitor_logo, String exhibitor_name, String exhibitor_description, String contact_person, String address, String email, String website, String notes) {
         this.id = id;
         this.favourite = favourite;
         this.exhibitor_logo = exhibitor_logo;
         this.exhibitor_name = exhibitor_name;
+        this.exhibitor_description = exhibitor_description;
         this.contact_person = contact_person;
         this.address = address;
         this.email = email;
@@ -123,5 +124,13 @@ public class ExhibitorDetail {
 
     public void clearStallDetailList () {
         this.stallDetailList.clear ();
+    }
+
+    public String getExhibitor_description () {
+        return exhibitor_description;
+    }
+
+    public void setExhibitor_description (String exhibitor_description) {
+        this.exhibitor_description = exhibitor_description;
     }
 }

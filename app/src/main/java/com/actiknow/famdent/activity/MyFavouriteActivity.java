@@ -11,8 +11,8 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.actiknow.famdent.R;
+import com.actiknow.famdent.fragment.MyFavouriteEventFragment;
 import com.actiknow.famdent.fragment.MyFavouriteExhibitorFragment;
-import com.actiknow.famdent.fragment.MyFavouriteProgrammesFragment;
 import com.actiknow.famdent.fragment.MyFavouriteSessionFragment;
 import com.actiknow.famdent.utils.Utils;
 
@@ -60,7 +60,7 @@ public class MyFavouriteActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new MyFavouriteExhibitorFragment (), "EXHIBITOR");
-        adapter.addFragment (new MyFavouriteProgrammesFragment (), "PROGRAMMES");
+        adapter.addFragment (new MyFavouriteEventFragment (), "PROGRAMMES");
         adapter.addFragment (new MyFavouriteSessionFragment (), "SESSIONS");
         viewPager.setAdapter(adapter);
     }

@@ -91,7 +91,6 @@
                     android:layout_margin="@dimen/activity_margin"
                     android:animateLayoutChanges="true"
                     android:orientation="vertical">
-
                     <RelativeLayout
                         android:id="@+id/rlAddress"
                         android:layout_width="match_parent"
@@ -130,8 +129,6 @@
                             android:textColor="@color/app_text_color_dark"
                             android:textSize="@dimen/text_size_medium"/>
                     </RelativeLayout>
-
-
                     <RelativeLayout
                         android:id="@+id/rlContactPerson"
                         android:layout_width="match_parent"
@@ -158,8 +155,6 @@
                             android:textColor="@color/app_text_color_dark"
                             android:textSize="@dimen/text_size_medium"/>
                     </RelativeLayout>
-
-
                     <RelativeLayout
                         android:id="@+id/rlPhone"
                         android:layout_width="match_parent"
@@ -189,7 +184,6 @@
 
 
                     </RelativeLayout>
-
                     <RelativeLayout
                         android:id="@+id/rlEmail"
                         android:layout_width="match_parent"
@@ -216,7 +210,6 @@
                             android:textColor="@color/app_text_color_dark"
                             android:textSize="@dimen/text_size_medium"/>
                     </RelativeLayout>
-
                     <RelativeLayout
                         android:id="@+id/rlWebsite"
                         android:layout_width="match_parent"

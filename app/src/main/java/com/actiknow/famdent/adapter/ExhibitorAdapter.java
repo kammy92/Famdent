@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actiknow.famdent.R;
@@ -25,22 +26,22 @@ import java.util.List;
 public class ExhibitorAdapter extends RecyclerView.Adapter<ExhibitorAdapter.ViewHolder> {
     OnItemClickListener mItemClickListener;
     private Activity activity;
-    private List<Exhibitor> exhibitorList = new ArrayList<Exhibitor>();
+    private List<Exhibitor> exhibitorList = new ArrayList<Exhibitor> ();
 
-    public ExhibitorAdapter(Activity activity, List<Exhibitor> exhibitorList) {
+    public ExhibitorAdapter (Activity activity, List<Exhibitor> exhibitorList) {
         this.activity = activity;
         this.exhibitorList = exhibitorList;
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final LayoutInflater mInflater = LayoutInflater.from(parent.getContext());
-        final View sView = mInflater.inflate(R.layout.list_item_exhibitor, parent, false);
-        return new ViewHolder(sView);
+    public ViewHolder onCreateViewHolder (ViewGroup parent, int viewType) {
+        final LayoutInflater mInflater = LayoutInflater.from (parent.getContext ());
+        final View sView = mInflater.inflate (R.layout.list_item_exhibitor, parent, false);
+        return new ViewHolder (sView);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {//        runEnterAnimation (holder.itemView);
+    public void onBindViewHolder (ViewHolder holder, int position) {//        runEnterAnimation (holder.itemView);
         final Exhibitor exhibitor = exhibitorList.get (position);
         List<StallDetail> stallDetails = exhibitor.getStallDetailList ();
 
@@ -56,15 +57,24 @@ public class ExhibitorAdapter extends RecyclerView.Adapter<ExhibitorAdapter.View
         }
 
         holder.tvExhibitorName.setTypeface (SetTypeFace.getTypeface (activity));
+        holder.tvExhibitorDescription.setTypeface (SetTypeFace.getTypeface (activity));
         holder.tvExhibitorName.setText (exhibitor.getExhibitor_name ());
+        if (exhibitor.getExhibitor_description ().length () > 0) {
+            holder.rlMain.setBackgroundColor (activity.getResources ().getColor (R.color.text_color_orange));
+            holder.tvExhibitorDescription.setText (exhibitor.getExhibitor_description ());
+            holder.tvExhibitorDescription.setVisibility (View.VISIBLE);
+        } else {
+            holder.rlMain.setBackgroundColor (activity.getResources ().getColor (R.color.app_background));
+            holder.tvExhibitorDescription.setVisibility (View.GONE);
+        }
     }
 
     @Override
-    public int getItemCount() {
-        return exhibitorList.size();
+    public int getItemCount () {
+        return exhibitorList.size ();
     }
 
-    public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
+    public void SetOnItemClickListener (final OnItemClickListener mItemClickListener) {
         this.mItemClickListener = mItemClickListener;
     }
 
@@ -76,18 +86,22 @@ public class ExhibitorAdapter extends RecyclerView.Adapter<ExhibitorAdapter.View
         TextView tvExhibitorName;
         ImageView ivExhibitorLogo;
         LinearLayout llStallDetails;
+        TextView tvExhibitorDescription;
+        RelativeLayout rlMain;
 
-        public ViewHolder(View view) {
-            super(view);
-            tvExhibitorName = (TextView) view.findViewById(R.id.tvExhibitorName);
+        public ViewHolder (View view) {
+            super (view);
+            tvExhibitorName = (TextView) view.findViewById (R.id.tvExhibitorName);
             ivExhibitorLogo = (ImageView) view.findViewById (R.id.ivExhibitorLogo);
             llStallDetails = (LinearLayout) view.findViewById (R.id.llStallDetails);
-            view.setOnClickListener(this);
+            tvExhibitorDescription = (TextView) view.findViewById (R.id.tvExhibitorDescription);
+            rlMain = (RelativeLayout) view.findViewById (R.id.rlMain);
+            view.setOnClickListener (this);
         }
 
         @Override
-        public void onClick(View v) {
-            Exhibitor exhibitor = exhibitorList.get(getLayoutPosition());
+        public void onClick (View v) {
+            Exhibitor exhibitor = exhibitorList.get (getLayoutPosition ());
 
             Intent intent = new Intent (activity, ExhibitorDetailActivity.class);
             intent.putExtra (AppConfigTags.EXHIBITOR_ID, exhibitor.getId ());

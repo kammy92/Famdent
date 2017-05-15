@@ -5,13 +5,14 @@ import java.util.ArrayList;
 
 public class Exhibitor {
     int id;
-    String exhibitor_logo, exhibitor_name;
+    String exhibitor_logo, exhibitor_name, exhibitor_description;
     ArrayList<StallDetail> stallDetailList = new ArrayList<> ();
 
-    public Exhibitor (int id, String exhibitor_logo, String exhibitor_name) {
+    public Exhibitor (int id, String exhibitor_logo, String exhibitor_name, String exhibitor_description) {
         this.id = id;
         this.exhibitor_logo = exhibitor_logo;
         this.exhibitor_name = exhibitor_name;
+        this.exhibitor_description = exhibitor_description;
     }
 
     public int getId () {
@@ -52,5 +53,13 @@ public class Exhibitor {
 
     public void clearStallDetailList () {
         this.stallDetailList.clear ();
+    }
+
+    public String getExhibitor_description () {
+        return exhibitor_description;
+    }
+
+    public void setExhibitor_description (String exhibitor_description) {
+        this.exhibitor_description = exhibitor_description;
     }
 }

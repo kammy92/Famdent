@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.actiknow.famdent.R;
 import com.actiknow.famdent.adapter.ExhibitorAdapter;
+import com.actiknow.famdent.helper.DatabaseHandler;
 import com.actiknow.famdent.model.Exhibitor;
 import com.actiknow.famdent.model.StallDetail;
 import com.actiknow.famdent.utils.AppConfigTags;
@@ -49,6 +50,7 @@ public class MyFavouriteExhibitorFragment extends Fragment {
     TextView tvNoResult;
     List<StallDetail> stallDetailList = new ArrayList<> ();
 
+    DatabaseHandler db;
 
 
     @Override
@@ -57,10 +59,10 @@ public class MyFavouriteExhibitorFragment extends Fragment {
         initView (rootView);
         initData ();
         initListener ();
-        getExhibitorList ();
+        getOfflineFavouriteExhibitors ();
+//        getExhibitorList ();
         return rootView;
     }
-
 
     private void initView(View rootView) {
         rvExhibitor = (RecyclerView) rootView.findViewById (R.id.rvExhibitorList);
@@ -70,6 +72,7 @@ public class MyFavouriteExhibitorFragment extends Fragment {
     }
 
     private void initData() {
+        db = new DatabaseHandler (getActivity ());
         swipeRefreshLayout.setColorSchemeColors (getResources ().getColor (R.color.colorPrimaryDark));
         swipeRefreshLayout.setRefreshing (true);
         exhibitorAdapter = new ExhibitorAdapter (getActivity (), exhibitorList);
@@ -85,7 +88,7 @@ public class MyFavouriteExhibitorFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener (new SwipeRefreshLayout.OnRefreshListener () {
             @Override
             public void onRefresh () {
-                swipeRefreshLayout.setRefreshing (false);
+                getOfflineFavouriteExhibitors ();
             }
         });
 
@@ -95,6 +98,21 @@ public class MyFavouriteExhibitorFragment extends Fragment {
         rvExhibitor.setLayoutManager (new LinearLayoutManager (getActivity (), LinearLayoutManager.VERTICAL, false));
         rvExhibitor.addItemDecoration (new SimpleDividerItemDecoration (getActivity ()));
         rvExhibitor.setItemAnimator (new DefaultItemAnimator ());
+    }
+
+    private void getOfflineFavouriteExhibitors () {
+        Utils.showLog (Log.DEBUG, AppConfigTags.TAG, "Getting all the exhibitors from local database", true);
+        exhibitorList.clear ();
+        ArrayList<Exhibitor> offlineExhibitor = db.getAllFavouriteExhibitors ();
+        for (Exhibitor exhibitor : offlineExhibitor)
+            exhibitorList.add (exhibitor);
+        exhibitorAdapter.notifyDataSetChanged ();
+        if (offlineExhibitor.size () > 0) {
+            swipeRefreshLayout.setRefreshing (false);
+        } else {
+            swipeRefreshLayout.setRefreshing (false);
+            tvNoResult.setVisibility (View.VISIBLE);
+        }
     }
 
     private void getExhibitorList () {
@@ -119,7 +137,7 @@ public class MyFavouriteExhibitorFragment extends Fragment {
                                             Exhibitor exhibitor = new Exhibitor (
                                                     jsonObjectExhibitor.getInt (AppConfigTags.EXHIBITOR_ID),
                                                     jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_LOGO),
-                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_NAME));
+                                                    jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_NAME), "");
 
                                             JSONArray jsonArrayStallDetails = jsonObjectExhibitor.getJSONArray (AppConfigTags.STALL_DETAILS);
                                             exhibitor.clearStallDetailList ();

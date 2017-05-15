@@ -12,6 +12,8 @@ import com.actiknow.famdent.model.EventDetail;
 import com.actiknow.famdent.model.EventSpeaker;
 import com.actiknow.famdent.model.Exhibitor;
 import com.actiknow.famdent.model.ExhibitorDetail;
+import com.actiknow.famdent.model.Favourite;
+import com.actiknow.famdent.model.Note;
 import com.actiknow.famdent.model.Session;
 import com.actiknow.famdent.model.SessionDetail;
 import com.actiknow.famdent.model.SessionSpeaker;
@@ -26,7 +28,7 @@ import java.util.Locale;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
     // Database Version
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
     // Database Name
     private static final String DATABASE_NAME = "famdent";
 
@@ -119,6 +121,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String FAV_TYPE = "fav_type";
     private static final String FAV_CREATED_AT = "fav_created_at";
 
+    private static final String FAV_TYPE_EXHIBITOR = "EXHIBITOR";
+    private static final String FAV_TYPE_EVENT = "EVENT";
+    private static final String FAV_TYPE_SESSION = "SESSION";
+
+
     // Notes Table - column names
     private static final String NOTS_ID = "nots_id";
     private static final String NOTS_EVNT_ID = "nots_evnt_id";
@@ -129,6 +136,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String NOTS_UPDATED_AT = "nots_updated_at";
     private static final String NOTS_CREATED_AT = "nots_created_at";
 
+    private static final String NOTS_TYPE_EXHIBITOR = "EXHIBITOR";
+    private static final String NOTS_TYPE_EVENT = "EVENT";
+    private static final String NOTS_TYPE_SESSION = "SESSION";
 
 
     // Question table Create Statements
@@ -217,9 +227,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_FAVOURITES = "CREATE TABLE "
             + TABLE_FAVOURITE + "(" +
             FAV_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-            FAV_EVNT_ID + " INTEGER," +
-            FAV_EXHBTR_ID + " INTEGER," +
-            FAV_SSION_ID + " INTEGER," +
+            FAV_EVNT_ID + " INTEGER DEFAULT NULL," +
+            FAV_EXHBTR_ID + " INTEGER DEFAULT NULL," +
+            FAV_SSION_ID + " INTEGER DEFAULT NULL," +
             FAV_TYPE + " TEXT," +
             FAV_CREATED_AT + " DATETIME" + ")";
 
@@ -227,16 +237,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_NOTES = "CREATE TABLE "
             + TABLE_NOTES + "(" +
             NOTS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-            NOTS_EVNT_ID + " INTEGER," +
-            NOTS_EXHBTR_ID + " INTEGER," +
-            NOTS_SSION_ID + " INTEGER," +
+            NOTS_EVNT_ID + " INTEGER DEFAULT NULL," +
+            NOTS_EXHBTR_ID + " INTEGER DEFAULT NULL," +
+            NOTS_SSION_ID + " INTEGER DEFAULT NULL," +
             NOTS_TYPE + " TEXT," +
             NOTS_TEXT + " TEXT," +
             NOTS_UPDATED_AT + " DATETIME," +
             NOTS_CREATED_AT + " DATETIME" + ")";
 
 
-    private boolean LOG_FLAG = false;
+    private boolean LOG_FLAG = true;
 
     public DatabaseHandler (Context context) {
         super (context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -252,6 +262,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL (CREATE_TABLE_SESSIONS);
         db.execSQL (CREATE_TABLE_SESSION_SPEAKERS);
         db.execSQL (CREATE_TABLE_SESSION_TOPICS);
+        db.execSQL (CREATE_TABLE_FAVOURITES);
+        db.execSQL (CREATE_TABLE_NOTES);
     }
 
     @Override
@@ -264,6 +276,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL ("DROP TABLE IF EXISTS " + TABLE_SESSIONS);
         db.execSQL ("DROP TABLE IF EXISTS " + TABLE_SESSION_SPEAKERS);
         db.execSQL ("DROP TABLE IF EXISTS " + TABLE_SESSION_TOPICS);
+//        db.execSQL ("DROP TABLE IF EXISTS " + TABLE_FAVOURITE);
+//        db.execSQL ("DROP TABLE IF EXISTS " + TABLE_NOTES);
         onCreate (db);
     }
 
@@ -278,7 +292,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put (EXHBTR_ADDRESS, exhibitorDetail.getAddress ());
         values.put (EXHBTR_CONTACT_PERSON, exhibitorDetail.getContact_person ());
         values.put (EXHBTR_EMAIL, exhibitorDetail.getEmail ());
-        values.put (EXHBTR_DESCRIPTION, "");
+        values.put (EXHBTR_DESCRIPTION, exhibitorDetail.getExhibitor_description ());
         values.put (EXHBTR_WEBSITE, exhibitorDetail.getWebsite ());
 
         ArrayList<String> contactList = exhibitorDetail.getContactList ();
@@ -332,15 +346,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         ExhibitorDetail exhibitorDetail = new ExhibitorDetail (
                 c.getInt (c.getColumnIndex (EXHBTR_ID)),
-                false,
+                isExhibitorFavourite (c.getInt (c.getColumnIndex (EXHBTR_ID))),
                 "",
                 c.getString (c.getColumnIndex (EXHBTR_NAME)),
+                c.getString (c.getColumnIndex (EXHBTR_DESCRIPTION)),
                 c.getString (c.getColumnIndex (EXHBTR_CONTACT_PERSON)),
                 c.getString (c.getColumnIndex (EXHBTR_ADDRESS)),
                 c.getString (c.getColumnIndex (EXHBTR_EMAIL)),
                 c.getString (c.getColumnIndex (EXHBTR_WEBSITE)),
                 ""
         );
+
         exhibitorDetail.setStallDetailList (getExhibitorStallDetails (exhibitor_id));
         ArrayList<String> contacts = new ArrayList<> ();
         if (c.getString (c.getColumnIndex (EXHBTR_CONTACT1)).length () > 0) {
@@ -381,7 +397,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public ArrayList<Exhibitor> getAllExhibitorList () {
         ArrayList<Exhibitor> exhibitorList = new ArrayList<Exhibitor> ();
-        String selectQuery = "SELECT  * FROM " + TABLE_EXHIBITORS;
+        String selectQuery = "SELECT  * FROM " + TABLE_EXHIBITORS + " ORDER BY " + EXHBTR_DESCRIPTION + " ASC";
         Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Exhibitors", false);
         SQLiteDatabase db = this.getReadableDatabase ();
         Cursor c = db.rawQuery (selectQuery, null);
@@ -391,11 +407,40 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 Exhibitor exhibitor = new Exhibitor (
                         c.getInt ((c.getColumnIndex (EXHBTR_ID))),
                         "",
-                        c.getString ((c.getColumnIndex (EXHBTR_NAME)))
+                        c.getString ((c.getColumnIndex (EXHBTR_NAME))),
+                        c.getString ((c.getColumnIndex (EXHBTR_DESCRIPTION)))
                 );
                 exhibitor.setStallDetailList (getExhibitorStallDetails (exhibitor.getId ()));
                 exhibitorList.add (exhibitor);
             } while (c.moveToNext ());
+        }
+        return exhibitorList;
+    }
+
+    public ArrayList<Exhibitor> getAllFavouriteExhibitors () {
+        ArrayList<Favourite> favouriteList = getAllFavourites ();
+        ArrayList<Exhibitor> exhibitorList = new ArrayList<Exhibitor> ();
+        for (int i = 0; i < favouriteList.size (); i++) {
+            Favourite favourite = favouriteList.get (i);
+            if (favourite.getType ().equalsIgnoreCase (FAV_TYPE_EXHIBITOR)) {
+                String selectQuery = "SELECT  * FROM " + TABLE_EXHIBITORS + " WHERE " + EXHBTR_ID + " = " + favourite.getExhibitor_id ();
+                Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Exhibitors", false);
+                SQLiteDatabase db = this.getReadableDatabase ();
+                Cursor c = db.rawQuery (selectQuery, null);
+                // looping through all rows and adding to list
+                if (c.moveToFirst ()) {
+                    do {
+                        Exhibitor exhibitor = new Exhibitor (
+                                c.getInt ((c.getColumnIndex (EXHBTR_ID))),
+                                "",
+                                c.getString ((c.getColumnIndex (EXHBTR_NAME))),
+                                c.getString ((c.getColumnIndex (EXHBTR_DESCRIPTION)))
+                        );
+                        exhibitor.setStallDetailList (getExhibitorStallDetails (exhibitor.getId ()));
+                        exhibitorList.add (exhibitor);
+                    } while (c.moveToNext ());
+                }
+            }
         }
         return exhibitorList;
     }
@@ -464,7 +509,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         EventDetail eventDetail = new EventDetail (
                 c.getInt (c.getColumnIndex (EVNT_ID)),
-                false,
+                isEventFavourite (c.getInt (c.getColumnIndex (EVNT_ID))),
                 c.getString (c.getColumnIndex (EVNT_NAME)),
                 c.getString (c.getColumnIndex (EVNT_DATE)),
                 c.getString (c.getColumnIndex (EVNT_TIME)),
@@ -546,6 +591,34 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return eventList;
     }
 
+    public ArrayList<Event> getAllFavouriteEvent () {
+        ArrayList<Favourite> favouriteList = getAllFavourites ();
+        ArrayList<Event> eventList = new ArrayList<Event> ();
+        for (int i = 0; i < favouriteList.size (); i++) {
+            Favourite favourite = favouriteList.get (i);
+            if (favourite.getType ().equalsIgnoreCase (FAV_TYPE_EVENT)) {
+                String selectQuery = "SELECT *, (SELECT GROUP_CONCAT(" + EVNT_SPKR_NAME + ") FROM " + TABLE_EVENT_SPEAKERS + " WHERE " + EVNT_SPKR_EVNT_ID + " = " + EVNT_ID + ") as `evnt_speakers`  FROM " + TABLE_EVENTS + " WHERE " + EVNT_ID + " = " + favourite.getEvent_id ();
+                Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Events", false);
+                SQLiteDatabase db = this.getReadableDatabase ();
+                Cursor c = db.rawQuery (selectQuery, null);
+                // looping through all rows and adding to list
+                if (c.moveToFirst ()) {
+                    do {
+                        eventList.add (new Event (
+                                c.getInt ((c.getColumnIndex (EVNT_ID))),
+                                c.getString ((c.getColumnIndex (EVNT_NAME))),
+                                c.getString ((c.getColumnIndex ("evnt_speakers"))),
+                                c.getString ((c.getColumnIndex (EVNT_DATE))),
+                                c.getString ((c.getColumnIndex (EVNT_TIME)))
+                        ));
+
+                    } while (c.moveToNext ());
+                }
+            }
+        }
+        return eventList;
+    }
+
     public void deleteAllEvents () {
         SQLiteDatabase db = this.getWritableDatabase ();
         Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete all events", LOG_FLAG);
@@ -613,7 +686,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         SessionDetail sessionDetail = new SessionDetail (
                 c.getInt (c.getColumnIndex (SSION_ID)),
-                false,
+                isSessionFavourite (c.getInt (c.getColumnIndex (SSION_ID))),
                 c.getString (c.getColumnIndex (SSION_TITLE)),
                 c.getString (c.getColumnIndex (SSION_DATE)),
                 c.getString (c.getColumnIndex (SSION_TIME)),
@@ -693,6 +766,35 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return sessionList;
     }
 
+    public ArrayList<Session> getAllFavouriteSessions () {
+        ArrayList<Favourite> favouriteList = getAllFavourites ();
+        ArrayList<Session> sessionList = new ArrayList<Session> ();
+        for (int i = 0; i < favouriteList.size (); i++) {
+            Favourite favourite = favouriteList.get (i);
+            if (favourite.getType ().equalsIgnoreCase (FAV_TYPE_SESSION)) {
+                String selectQuery = "SELECT *, (SELECT GROUP_CONCAT(" + SSION_SPKR_NAME + ") FROM " + TABLE_SESSION_SPEAKERS + " WHERE " + SSION_SPKR_SSION_ID + " = " + SSION_ID + ") as `ssion_speakers`  FROM " + TABLE_SESSIONS + " WHERE " + SSION_ID + " = " + favourite.getSession_id ();
+                Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Sessions", false);
+                SQLiteDatabase db = this.getReadableDatabase ();
+                Cursor c = db.rawQuery (selectQuery, null);
+                // looping through all rows and adding to list
+                if (c.moveToFirst ()) {
+                    do {
+                        sessionList.add (new Session (
+                                c.getInt ((c.getColumnIndex (SSION_ID))),
+                                c.getString ((c.getColumnIndex (SSION_TITLE))),
+                                c.getString ((c.getColumnIndex ("ssion_speakers"))),
+                                c.getString ((c.getColumnIndex (SSION_DATE))),
+                                c.getString ((c.getColumnIndex (SSION_TIME))),
+                                c.getString ((c.getColumnIndex (SSION_LOCATION))),
+                                c.getString ((c.getColumnIndex (SSION_CATEGORY)))
+                        ));
+                    } while (c.moveToNext ());
+                }
+            }
+        }
+        return sessionList;
+    }
+
     public void deleteAllSessions () {
         SQLiteDatabase db = this.getWritableDatabase ();
         Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete all sessions", LOG_FLAG);
@@ -709,6 +811,197 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase ();
         Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete all session speaker details", LOG_FLAG);
         db.execSQL ("delete from " + TABLE_SESSION_SPEAKERS);
+    }
+
+
+    public long addExhibitorToFavourite (int exhibitor_id) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Adding Exhibitor to favourite", LOG_FLAG);
+        ContentValues values = new ContentValues ();
+        values.put (FAV_EXHBTR_ID, exhibitor_id);
+        values.put (FAV_TYPE, FAV_TYPE_EXHIBITOR);
+        values.put (FAV_CREATED_AT, getDateTime ());
+        long fav_id = db.insert (TABLE_FAVOURITE, null, values);
+        return fav_id;
+    }
+
+    public long addEventToFavourite (int event_id) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Adding Event to favourite", LOG_FLAG);
+        ContentValues values = new ContentValues ();
+        values.put (FAV_EVNT_ID, event_id);
+        values.put (FAV_TYPE, FAV_TYPE_EVENT);
+        values.put (FAV_CREATED_AT, getDateTime ());
+        long fav_id = db.insert (TABLE_FAVOURITE, null, values);
+        return fav_id;
+    }
+
+    public long addSessionToFavourite (int session_id) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Adding Session to favourite", LOG_FLAG);
+        ContentValues values = new ContentValues ();
+        values.put (FAV_SSION_ID, session_id);
+        values.put (FAV_TYPE, FAV_TYPE_SESSION);
+        values.put (FAV_CREATED_AT, getDateTime ());
+        long fav_id = db.insert (TABLE_FAVOURITE, null, values);
+        return fav_id;
+    }
+
+    public void removeExhibitorFromFavourite (int exhibitor_id) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete exhibitor from Favorite where Exhibitor ID = " + exhibitor_id, LOG_FLAG);
+        db.delete (TABLE_FAVOURITE, FAV_EXHBTR_ID + " = ? AND " + FAV_TYPE + " = ?", new String[] {String.valueOf (exhibitor_id), FAV_TYPE_EXHIBITOR});
+    }
+
+    public void removeEventFromFavourite (long event_id) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete event from Favorite where Event ID = " + event_id, LOG_FLAG);
+        db.delete (TABLE_FAVOURITE, FAV_EVNT_ID + " = ? AND " + FAV_TYPE + " = ?", new String[] {String.valueOf (event_id), FAV_TYPE_EVENT});
+    }
+
+    public void removeSessionFromFavourite (long session_id) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete session from Favorite where Session ID = " + session_id, LOG_FLAG);
+        db.delete (TABLE_FAVOURITE, FAV_SSION_ID + " = ? AND " + FAV_TYPE + " = ?", new String[] {String.valueOf (session_id), FAV_TYPE_SESSION});
+    }
+
+    public boolean isExhibitorFavourite (int exhibitor_id) {
+        String countQuery = "SELECT  * FROM " + TABLE_FAVOURITE + " WHERE " + FAV_EXHBTR_ID + " = " + exhibitor_id + " AND " + FAV_TYPE + " = '" + FAV_TYPE_EXHIBITOR + "'";
+        SQLiteDatabase db = this.getReadableDatabase ();
+        Cursor cursor = db.rawQuery (countQuery, null);
+        int count = cursor.getCount ();
+        cursor.close ();
+        if (count > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isEventFavourite (int event_id) {
+        String countQuery = "SELECT  * FROM " + TABLE_FAVOURITE + " WHERE " + FAV_EVNT_ID + " = " + event_id + " AND " + FAV_TYPE + " = '" + FAV_TYPE_EVENT + "'";
+        SQLiteDatabase db = this.getReadableDatabase ();
+        Cursor cursor = db.rawQuery (countQuery, null);
+        int count = cursor.getCount ();
+        cursor.close ();
+        if (count > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isSessionFavourite (int session_id) {
+        String countQuery = "SELECT  * FROM " + TABLE_FAVOURITE + " WHERE " + FAV_SSION_ID + " = " + session_id + " AND " + FAV_TYPE + " = '" + FAV_TYPE_SESSION + "'";
+        SQLiteDatabase db = this.getReadableDatabase ();
+        Cursor cursor = db.rawQuery (countQuery, null);
+        int count = cursor.getCount ();
+        cursor.close ();
+        if (count > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public ArrayList<Favourite> getAllFavourites () {
+        ArrayList<Favourite> favouriteList = new ArrayList<Favourite> ();
+        String selectQuery = "SELECT * FROM " + TABLE_FAVOURITE;
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get favourite List", LOG_FLAG);
+        SQLiteDatabase db = this.getReadableDatabase ();
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c.moveToFirst ()) {
+            do {
+                try {
+                    favouriteList.add (new Favourite (
+                            c.getInt (c.getColumnIndex (FAV_ID)),
+                            c.getInt (c.getColumnIndex (FAV_SSION_ID)),
+                            c.getInt (c.getColumnIndex (FAV_EVNT_ID)),
+                            c.getInt (c.getColumnIndex (FAV_EXHBTR_ID)),
+                            c.getString (c.getColumnIndex (FAV_TYPE))
+                    ));
+                } catch (Exception e) {
+                    e.printStackTrace ();
+                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), true);
+                }
+            } while (c.moveToNext ());
+        }
+        return favouriteList;
+    }
+
+
+    public long addNoteToExhibitor (int exhibitor_id) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Adding Note to exhibitor", LOG_FLAG);
+        ContentValues values = new ContentValues ();
+        values.put (NOTS_EXHBTR_ID, exhibitor_id);
+        values.put (NOTS_TYPE, NOTS_TYPE_EXHIBITOR);
+        values.put (NOTS_CREATED_AT, getDateTime ());
+        long nots_id = db.insert (TABLE_NOTES, null, values);
+        return nots_id;
+    }
+
+    public void removeNoteFromExhibitor (int exhibitor_id) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete note from exhibitor where Exhibitor ID = " + exhibitor_id, LOG_FLAG);
+        db.delete (TABLE_NOTES, NOTS_EXHBTR_ID + " = ? AND " + NOTS_TYPE + " = ?", new String[] {String.valueOf (exhibitor_id), NOTS_TYPE_EXHIBITOR});
+    }
+
+    public boolean isNoteInExhibitor (int exhibitor_id) {
+        String countQuery = "SELECT  * FROM " + TABLE_NOTES + " WHERE " + NOTS_EXHBTR_ID + " = " + exhibitor_id + " AND " + NOTS_TYPE + " = '" + NOTS_TYPE_EXHIBITOR + "'";
+        SQLiteDatabase db = this.getReadableDatabase ();
+        Cursor cursor = db.rawQuery (countQuery, null);
+        int count = cursor.getCount ();
+        cursor.close ();
+        if (count > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public int updateNoteInExhibitor (String text, int exhibitor_id) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Update not in exhibitor", false);
+        ContentValues values = new ContentValues ();
+        values.put (NOTS_TEXT, text);
+        return db.update (TABLE_NOTES, values, NOTS_EXHBTR_ID + " = ? AND " + NOTS_TYPE + " = ?", new String[] {String.valueOf (exhibitor_id), NOTS_TYPE_EXHIBITOR});
+    }
+
+    public String getExhibitorNote (int exhibitor_id) {
+        SQLiteDatabase db = this.getReadableDatabase ();
+        String selectQuery = "SELECT * FROM " + TABLE_NOTES + " WHERE " + NOTS_EXHBTR_ID + " = " + exhibitor_id + " AND " + NOTS_TYPE + " = " + NOTS_TYPE_EXHIBITOR;
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get note where exhibitor ID = " + exhibitor_id, LOG_FLAG);
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c != null)
+            c.moveToFirst ();
+
+        return c.getString (c.getColumnIndex (NOTS_TEXT));
+    }
+
+    public ArrayList<Note> getAllNotes () {
+        ArrayList<Note> noteList = new ArrayList<Note> ();
+        String selectQuery = "SELECT * FROM " + TABLE_NOTES;
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get Notes List", LOG_FLAG);
+        SQLiteDatabase db = this.getReadableDatabase ();
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c.moveToFirst ()) {
+            do {
+                try {
+                    noteList.add (new Note (
+                            c.getInt (c.getColumnIndex (NOTS_ID)),
+                            c.getInt (c.getColumnIndex (NOTS_SSION_ID)),
+                            c.getInt (c.getColumnIndex (NOTS_EVNT_ID)),
+                            c.getInt (c.getColumnIndex (NOTS_EXHBTR_ID)),
+                            c.getString (c.getColumnIndex (NOTS_TYPE))
+                    ));
+                } catch (Exception e) {
+                    e.printStackTrace ();
+                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), true);
+                }
+            } while (c.moveToNext ());
+        }
+        return noteList;
     }
 
 

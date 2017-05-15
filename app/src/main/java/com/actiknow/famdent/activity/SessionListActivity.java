@@ -59,7 +59,7 @@ public class SessionListActivity extends AppCompatActivity {
     TextView tvTitle;
     SearchView searchView;
 
-    String category;
+    String category = "";
 
     DatabaseHandler db;
 
@@ -70,16 +70,24 @@ public class SessionListActivity extends AppCompatActivity {
         initView ();
         initData ();
         initListener ();
-        getOfflineSessionList ();
-//        selectSessionCategoryDialog ();
+//        getOfflineSessionList ();
+        selectSessionCategoryDialog ();
     }
 
     private void getOfflineSessionList () {
         Utils.showLog (Log.DEBUG, AppConfigTags.TAG, "Getting all the sessions from local database", true);
         sessionList.clear ();
         ArrayList<Session> offlineSessions = db.getAllSessionList ();
-        for (Session session : offlineSessions)
-            sessionList.add (session);
+
+        for (Session session : offlineSessions) {
+            if (category.length () > 0) {
+                if (session.getCategory ().equalsIgnoreCase (category)) {
+                    sessionList.add (session);
+                }
+            } else {
+                sessionList.add (session);
+            }
+        }
         sessionAdapter.notifyDataSetChanged ();
         swipeRefreshLayout.setRefreshing (false);
     }
@@ -315,7 +323,8 @@ public class SessionListActivity extends AppCompatActivity {
                     public void onSelection (MaterialDialog dialog, View view, int which, CharSequence text) {
 //                        Utils.showToast (SessionListActivity.this, "tt" + text.toString (), false);
                         category = text.toString ();
-                        getSessionListFromServer ();
+//                        getSessionListFromServer ();
+                        getOfflineSessionList ();
                     }
                 })
 //                .onPositive (new MaterialDialog.SingleButtonCallback () {
@@ -329,7 +338,8 @@ public class SessionListActivity extends AppCompatActivity {
                     @Override
                     public void onCancel (DialogInterface dialog) {
                         category = "";
-                        getSessionListFromServer ();
+                        getOfflineSessionList ();
+//                        getSessionListFromServer ();
                     }
                 })
                 .show ();

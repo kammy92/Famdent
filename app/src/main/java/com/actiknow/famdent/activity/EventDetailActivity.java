@@ -145,7 +145,8 @@ public class EventDetailActivity extends AppCompatActivity {
                             .onPositive (new MaterialDialog.SingleButtonCallback () {
                                 @Override
                                 public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    updateFavouriteStatus (false, event_id);
+                                    updateOfflineFavouriteStatus (false, event_id);
+//                                    updateFavouriteStatus (false, event_id);
                                 }
                             }).build ();
                     dialog.show ();
@@ -163,7 +164,8 @@ public class EventDetailActivity extends AppCompatActivity {
                             .onPositive (new MaterialDialog.SingleButtonCallback () {
                                 @Override
                                 public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    updateFavouriteStatus (true, event_id);
+                                    updateOfflineFavouriteStatus (true, event_id);
+//                                    updateFavouriteStatus (true, event_id);
                                 }
                             }).build ();
                     dialog.show ();
@@ -188,7 +190,8 @@ public class EventDetailActivity extends AppCompatActivity {
                             .onPositive (new MaterialDialog.SingleButtonCallback () {
                                 @Override
                                 public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    updateFavouriteStatus (false, event_id);
+                                    updateOfflineFavouriteStatus (false, event_id);
+//                                    updateFavouriteStatus (false, event_id);
                                 }
                             }).build ();
                     dialog.show ();
@@ -206,7 +209,8 @@ public class EventDetailActivity extends AppCompatActivity {
                             .onPositive (new MaterialDialog.SingleButtonCallback () {
                                 @Override
                                 public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    updateFavouriteStatus (true, event_id);
+                                    updateOfflineFavouriteStatus (true, event_id);
+//                                    updateFavouriteStatus (true, event_id);
                                 }
                             }).build ();
                     dialog.show ();
@@ -465,6 +469,27 @@ public class EventDetailActivity extends AppCompatActivity {
             Utils.sendRequest (strRequest, 30);
         } else {
             progressDialog.dismiss ();
+        }
+    }
+
+    private void updateOfflineFavouriteStatus (final boolean add_favourite, final int event_id) {
+        if (add_favourite) {
+            db.addEventToFavourite (event_id);
+            eventDetail.setFavourite (true);
+            ivFavourite.setImageResource (R.drawable.ic_star);
+            tvAddFavourite.setVisibility (View.GONE);
+            Utils.showSnackBar (EventDetailActivity.this, clMain, "Event added to favourites", Snackbar.LENGTH_LONG, null, null);
+        } else {
+            db.removeEventFromFavourite (event_id);
+            eventDetail.setFavourite (false);
+            ivFavourite.setImageResource (R.drawable.ic_star_border);
+            tvAddFavourite.setVisibility (View.VISIBLE);
+            Utils.showSnackBar (EventDetailActivity.this, clMain, "Event removed from favourites", Snackbar.LENGTH_LONG, getResources ().getString (R.string.snackbar_action_undo), new View.OnClickListener () {
+                @Override
+                public void onClick (View v) {
+                    updateOfflineFavouriteStatus (true, event_id);
+                }
+            });
         }
     }
 

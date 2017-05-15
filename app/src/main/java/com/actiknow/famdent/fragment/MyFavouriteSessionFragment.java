@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.actiknow.famdent.R;
 import com.actiknow.famdent.adapter.SessionAdapter;
+import com.actiknow.famdent.helper.DatabaseHandler;
 import com.actiknow.famdent.model.Session;
 import com.actiknow.famdent.utils.AppConfigTags;
 import com.actiknow.famdent.utils.AppConfigURL;
@@ -49,7 +50,8 @@ public class MyFavouriteSessionFragment extends Fragment {
 
     TextView tvNoResult;
 
-    //karman
+    DatabaseHandler db;
+
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -57,7 +59,8 @@ public class MyFavouriteSessionFragment extends Fragment {
         initView (rootView);
         initData ();
         initListener ();
-        getSessionListFromServer ();
+        getOfflineFavouriteSessions ();
+//        getSessionListFromServer ();
         return rootView;
     }
 
@@ -70,6 +73,7 @@ public class MyFavouriteSessionFragment extends Fragment {
     }
 
     private void initData () {
+        db = new DatabaseHandler (getActivity ());
         swipeRefreshLayout.setColorSchemeColors (getResources ().getColor (R.color.colorPrimaryDark));
         swipeRefreshLayout.setRefreshing (true);
         sessionAdapter = new SessionAdapter (getActivity (), sessionList);
@@ -82,11 +86,28 @@ public class MyFavouriteSessionFragment extends Fragment {
         Utils.setTypefaceToAllViews (getActivity (), tvNoResult);
     }
 
+    private void getOfflineFavouriteSessions () {
+        Utils.showLog (Log.DEBUG, AppConfigTags.TAG, "Getting all the sessions from local database", true);
+        sessionList.clear ();
+        ArrayList<Session> offlineSessions = db.getAllFavouriteSessions ();
+
+        for (Session session : offlineSessions) {
+            sessionList.add (session);
+        }
+        sessionAdapter.notifyDataSetChanged ();
+        if (offlineSessions.size () > 0) {
+            swipeRefreshLayout.setRefreshing (false);
+        } else {
+            swipeRefreshLayout.setRefreshing (false);
+            tvNoResult.setVisibility (View.VISIBLE);
+        }
+    }
+
     private void initListener () {
         swipeRefreshLayout.setOnRefreshListener (new SwipeRefreshLayout.OnRefreshListener () {
             @Override
             public void onRefresh () {
-                swipeRefreshLayout.setRefreshing (false);
+                getOfflineFavouriteSessions ();
             }
         });
     }

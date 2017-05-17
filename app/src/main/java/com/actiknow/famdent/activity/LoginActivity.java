@@ -589,11 +589,12 @@ public class LoginActivity extends AppCompatActivity {
                     checkSelfPermission (Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission (Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission (Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED ||
+                    checkSelfPermission (Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission (Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
 
                 requestPermissions (new String[] {Manifest.permission.RECEIVE_SMS, Manifest.permission.VIBRATE,
                                 Manifest.permission.READ_SMS, Manifest.permission.GET_ACCOUNTS, Manifest.permission.READ_CONTACTS,
-                                Manifest.permission.CALL_PHONE, Manifest.permission.READ_PHONE_STATE},
+                                Manifest.permission.CALL_PHONE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE},
                         PERMISSION_REQUEST_CODE);
             }
 /*
@@ -654,6 +655,7 @@ public class LoginActivity extends AppCompatActivity {
                     } else if (Manifest.permission.GET_ACCOUNTS.equals (permission)) {
                     } else if (Manifest.permission.READ_CONTACTS.equals (permission)) {
                     } else if (Manifest.permission.CALL_PHONE.equals (permission)) {
+                    } else if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equals (permission)) {
                     } else if (Manifest.permission.READ_PHONE_STATE.equals (permission)) {
                     }
                 }

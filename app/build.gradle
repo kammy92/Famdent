@@ -7,7 +7,7 @@ android {
         applicationId "com.actiknow.famdent"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 5
+        versionCode 6
         versionName "1.2.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -17,6 +17,9 @@ android {
         javaMaxHeapSize "4g"
     }
 
+    repositories {
+        mavenCentral()
+    }
 
     buildTypes {
         release {
@@ -50,7 +53,13 @@ dependencies {
 
     compile 'com.bugsnag:bugsnag-android:3.+'
     compile 'com.github.bumptech.glide:glide:3.7.0'
-}
 
+    compile 'com.daimajia.slider:library:1.1.5@aar'
+    compile 'com.squareup.picasso:picasso:2.3.2'
+    compile 'com.nineoldandroids:library:2.4.0'
+
+    compile 'com.facebook.android:facebook-android-sdk:4.+'
+
+}
 // apply the Google Services Plugin
 apply plugin: 'com.google.gms.google-services'

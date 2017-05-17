@@ -9,6 +9,8 @@
     <dimen name="blood_group_button">50dp</dimen>
 
 
+    <dimen name="slider_height">170dp</dimen>
+
     <dimen name="logo_height">150dp</dimen>
     <dimen name="qr_code_height">150dp</dimen>
     <dimen name="button_radius">2dp</dimen>

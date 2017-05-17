@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.actiknow.famdent.model.Banner;
 import com.actiknow.famdent.model.Event;
 import com.actiknow.famdent.model.EventDetail;
 import com.actiknow.famdent.model.EventSpeaker;
@@ -20,6 +21,7 @@ import com.actiknow.famdent.model.SessionSpeaker;
 import com.actiknow.famdent.model.StallDetail;
 import com.actiknow.famdent.utils.AppConfigTags;
 import com.actiknow.famdent.utils.Utils;
+import com.actiknow.famdent.utils.VisitorDetailsPref;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ import java.util.Locale;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
     // Database Version
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 8;
     // Database Name
     private static final String DATABASE_NAME = "famdent";
 
@@ -47,6 +49,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String TABLE_FAVOURITE = "tbl_favourites";
 
     private static final String TABLE_NOTES = "tbl_notes";
+
+    private static final String TABLE_BANNERS = "tbl_banners";
 
 
     // Exhibitors Table - column names
@@ -141,6 +145,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String NOTS_TYPE_SESSION = "SESSION";
 
 
+    // Banners Table - column names
+    private static final String BNNR_ID = "bnnr_id";
+    private static final String BNNR_TITLE = "bnnr_title";
+    private static final String BNNR_IMAGE = "bnnr_image";
+    private static final String BNNR_URL = "bnnr_url";
+    private static final String BNNR_TYPE = "bnnr_type";
+
+    private static final String BNNR_TYPE_LARGE = "LARGE";
+    private static final String BNNR_TYPE_SMALL = "SMALL";
+    private static final String BNNR_TYPE_EXHIBITOR = "EXHIBITOR";
+
+
     // Question table Create Statements
     private static final String CREATE_TABLE_EXHIBITORS = "CREATE TABLE "
             + TABLE_EXHIBITORS + "(" +
@@ -224,7 +240,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
     // Favourites table Create Statements
-    private static final String CREATE_TABLE_FAVOURITES = "CREATE TABLE "
+    private static final String CREATE_TABLE_FAVOURITES = "CREATE TABLE IF NOT EXISTS "
             + TABLE_FAVOURITE + "(" +
             FAV_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             FAV_EVNT_ID + " INTEGER DEFAULT NULL," +
@@ -234,7 +250,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             FAV_CREATED_AT + " DATETIME" + ")";
 
     // Notes table Create Statements
-    private static final String CREATE_TABLE_NOTES = "CREATE TABLE "
+    private static final String CREATE_TABLE_NOTES = "CREATE TABLE IF NOT EXISTS "
             + TABLE_NOTES + "(" +
             NOTS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             NOTS_EVNT_ID + " INTEGER DEFAULT NULL," +
@@ -245,11 +261,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             NOTS_UPDATED_AT + " DATETIME," +
             NOTS_CREATED_AT + " DATETIME" + ")";
 
-
-    private boolean LOG_FLAG = true;
+    // Notes table Create Statements
+    private static final String CREATE_TABLE_BANNERS = "CREATE TABLE "
+            + TABLE_BANNERS + "(" +
+            BNNR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            BNNR_TITLE + " TEXT," +
+            BNNR_IMAGE + " TEXT," +
+            BNNR_URL + " TEXT," +
+            BNNR_TYPE + " TEXT" + ")";
+    Context mContext;
+    private boolean LOG_FLAG = false;
 
     public DatabaseHandler (Context context) {
         super (context, DATABASE_NAME, null, DATABASE_VERSION);
+        mContext = context;
     }
 
     @Override
@@ -264,10 +289,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL (CREATE_TABLE_SESSION_TOPICS);
         db.execSQL (CREATE_TABLE_FAVOURITES);
         db.execSQL (CREATE_TABLE_NOTES);
+        db.execSQL (CREATE_TABLE_BANNERS);
     }
 
     @Override
     public void onUpgrade (SQLiteDatabase db, int oldVersion, int newVersion) {
+        VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
+        visitorDetailsPref.putIntPref (mContext, VisitorDetailsPref.DATABASE_VERSION, 0);
         db.execSQL ("DROP TABLE IF EXISTS " + TABLE_EXHIBITORS);
         db.execSQL ("DROP TABLE IF EXISTS " + TABLE_EXHIBITION_PLAN);
         db.execSQL ("DROP TABLE IF EXISTS " + TABLE_EVENTS);
@@ -278,6 +306,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL ("DROP TABLE IF EXISTS " + TABLE_SESSION_TOPICS);
 //        db.execSQL ("DROP TABLE IF EXISTS " + TABLE_FAVOURITE);
 //        db.execSQL ("DROP TABLE IF EXISTS " + TABLE_NOTES);
+        db.execSQL ("DROP TABLE IF EXISTS " + TABLE_BANNERS);
         onCreate (db);
     }
 
@@ -357,6 +386,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 ""
         );
 
+        if (isNoteInExhibitor (c.getInt (c.getColumnIndex (EXHBTR_ID)))) {
+            exhibitorDetail.setNotes (getExhibitorNote (c.getInt (c.getColumnIndex (EXHBTR_ID))));
+        }
+
         exhibitorDetail.setStallDetailList (getExhibitorStallDetails (exhibitor_id));
         ArrayList<String> contacts = new ArrayList<> ();
         if (c.getString (c.getColumnIndex (EXHBTR_CONTACT1)).length () > 0) {
@@ -397,7 +430,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public ArrayList<Exhibitor> getAllExhibitorList () {
         ArrayList<Exhibitor> exhibitorList = new ArrayList<Exhibitor> ();
-        String selectQuery = "SELECT  * FROM " + TABLE_EXHIBITORS + " ORDER BY " + EXHBTR_DESCRIPTION + " ASC";
+        String selectQuery = "SELECT  * FROM " + TABLE_EXHIBITORS + " ORDER BY " + EXHBTR_DESCRIPTION + " DESC, " + EXHBTR_NAME + " ASC";
         Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Exhibitors", false);
         SQLiteDatabase db = this.getReadableDatabase ();
         Cursor c = db.rawQuery (selectQuery, null);
@@ -930,11 +963,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    public long addNoteToExhibitor (int exhibitor_id) {
+    public long addNoteToExhibitor (String notes, int exhibitor_id) {
         SQLiteDatabase db = this.getWritableDatabase ();
         Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Adding Note to exhibitor", LOG_FLAG);
         ContentValues values = new ContentValues ();
         values.put (NOTS_EXHBTR_ID, exhibitor_id);
+        values.put (NOTS_TEXT, notes);
         values.put (NOTS_TYPE, NOTS_TYPE_EXHIBITOR);
         values.put (NOTS_CREATED_AT, getDateTime ());
         long nots_id = db.insert (TABLE_NOTES, null, values);
@@ -970,7 +1004,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public String getExhibitorNote (int exhibitor_id) {
         SQLiteDatabase db = this.getReadableDatabase ();
-        String selectQuery = "SELECT * FROM " + TABLE_NOTES + " WHERE " + NOTS_EXHBTR_ID + " = " + exhibitor_id + " AND " + NOTS_TYPE + " = " + NOTS_TYPE_EXHIBITOR;
+        String selectQuery = "SELECT * FROM " + TABLE_NOTES + " WHERE " + NOTS_EXHBTR_ID + " = " + exhibitor_id + " AND " + NOTS_TYPE + " = '" + NOTS_TYPE_EXHIBITOR + "'";
         Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get note where exhibitor ID = " + exhibitor_id, LOG_FLAG);
         Cursor c = db.rawQuery (selectQuery, null);
         if (c != null)
@@ -1002,6 +1036,107 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             } while (c.moveToNext ());
         }
         return noteList;
+    }
+
+
+    //BANNERS
+
+    public long createBanner (Banner banner) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Creating Banner", LOG_FLAG);
+        ContentValues values = new ContentValues ();
+        values.put (BNNR_TITLE, banner.getTitle ());
+        values.put (BNNR_IMAGE, banner.getImage ());
+        values.put (BNNR_URL, banner.getUrl ());
+        values.put (BNNR_TYPE, banner.getType ());
+        long banner_id = db.insert (TABLE_BANNERS, null, values);
+        return banner_id;
+    }
+
+    public ArrayList<Banner> getAllLargeBanners () {
+        ArrayList<Banner> bannerList = new ArrayList<Banner> ();
+        SQLiteDatabase db = this.getReadableDatabase ();
+        String selectQuery = "SELECT  * FROM " + TABLE_BANNERS + " WHERE " + BNNR_TYPE + " = '" + BNNR_TYPE_LARGE + "'";
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get banner where banner type = " + BNNR_TYPE_LARGE, LOG_FLAG);
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c.moveToFirst ()) {
+            do {
+                Banner banner = new Banner (
+                        c.getInt ((c.getColumnIndex (BNNR_ID))),
+                        c.getString ((c.getColumnIndex (BNNR_TITLE))),
+                        c.getString ((c.getColumnIndex (BNNR_IMAGE))),
+                        c.getString ((c.getColumnIndex (BNNR_URL))),
+                        c.getString ((c.getColumnIndex (BNNR_TYPE)))
+                );
+                bannerList.add (banner);
+            } while (c.moveToNext ());
+        }
+        return bannerList;
+    }
+
+    public Banner getRandomLargeBanner () {
+        SQLiteDatabase db = this.getReadableDatabase ();
+        String selectQuery = "SELECT * FROM " + TABLE_BANNERS + " WHERE " + BNNR_TYPE + " = '" + BNNR_TYPE_LARGE + "' ORDER BY RANDOM() LIMIT 1";
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get random banner where banner type = " + BNNR_TYPE_LARGE, LOG_FLAG);
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c != null)
+            c.moveToFirst ();
+        Banner banner = new Banner (
+                c.getInt ((c.getColumnIndex (BNNR_ID))),
+                c.getString ((c.getColumnIndex (BNNR_TITLE))),
+                c.getString ((c.getColumnIndex (BNNR_IMAGE))),
+                c.getString ((c.getColumnIndex (BNNR_URL))),
+                c.getString ((c.getColumnIndex (BNNR_TYPE)))
+        );
+        return banner;
+    }
+
+    public ArrayList<Banner> getAllSmallBanners () {
+        ArrayList<Banner> bannerList = new ArrayList<Banner> ();
+        SQLiteDatabase db = this.getReadableDatabase ();
+        String selectQuery = "SELECT  * FROM " + TABLE_BANNERS + " WHERE " + BNNR_TYPE + " = '" + BNNR_TYPE_SMALL + "'";
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get banner where banner type = " + BNNR_TYPE_SMALL, LOG_FLAG);
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c.moveToFirst ()) {
+            do {
+                Banner banner = new Banner (
+                        c.getInt ((c.getColumnIndex (BNNR_ID))),
+                        c.getString ((c.getColumnIndex (BNNR_TITLE))),
+                        c.getString ((c.getColumnIndex (BNNR_IMAGE))),
+                        c.getString ((c.getColumnIndex (BNNR_URL))),
+                        c.getString ((c.getColumnIndex (BNNR_TYPE)))
+                );
+                bannerList.add (banner);
+            } while (c.moveToNext ());
+        }
+        return bannerList;
+    }
+
+    public ArrayList<Banner> getAllExhibitorBanners () {
+        ArrayList<Banner> bannerList = new ArrayList<Banner> ();
+        SQLiteDatabase db = this.getReadableDatabase ();
+        String selectQuery = "SELECT  * FROM " + TABLE_BANNERS + " WHERE " + BNNR_TYPE + " = '" + BNNR_TYPE_EXHIBITOR + "'";
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get banner where banner type = " + BNNR_TYPE_EXHIBITOR, LOG_FLAG);
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c.moveToFirst ()) {
+            do {
+                Banner banner = new Banner (
+                        c.getInt ((c.getColumnIndex (BNNR_ID))),
+                        c.getString ((c.getColumnIndex (BNNR_TITLE))),
+                        c.getString ((c.getColumnIndex (BNNR_IMAGE))),
+                        c.getString ((c.getColumnIndex (BNNR_URL))),
+                        c.getString ((c.getColumnIndex (BNNR_TYPE)))
+                );
+                bannerList.add (banner);
+            } while (c.moveToNext ());
+        }
+        return bannerList;
+    }
+
+    public void deleteAllBanners () {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete all banners", LOG_FLAG);
+        db.execSQL ("delete from " + TABLE_BANNERS);
     }
 
 

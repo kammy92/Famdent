@@ -138,6 +138,14 @@ public class AppConfigTags {
     public static final String SESSION_DETAILS_SPEAKER_NAME = "speaker_name";
 
 
+    public static final String BANNERS = "banners";
+    public static final String BANNER_ID = "banner_id";
+    public static final String BANNER_TITLE = "banner_title";
+    public static final String BANNER_IMAGE = "banner_image";
+    public static final String BANNER_URL = "banner_url";
+    public static final String BANNER_TYPE = "banner_type";
+
+
     public static final String DEVICE_DETAILS = "device_details";
 
     public static final String DATABASE_VERSION = "database_version";

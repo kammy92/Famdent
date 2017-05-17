@@ -314,7 +314,8 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
                 mBuilder.onPositive (new MaterialDialog.SingleButtonCallback () {
                     @Override
                     public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        updateNoteStatus (exhibitor_id, dialog.getInputEditText ().getText ().toString ());
+                        updateOfflineNoteStatus (dialog.getInputEditText ().getText ().toString (), exhibitor_id);
+                        updateNoteStatus2 (exhibitor_id, dialog.getInputEditText ().getText ().toString ());
 //                        exhibitorDetail.setNotes (dialog.getInputEditText ().getText ().toString ());
 //                        tvNotes.setText (exhibitorDetail.getNotes ());
 //                        if (exhibitorDetail.getNotes ().length () > 0) {
@@ -357,7 +358,8 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
                 mBuilder.onPositive (new MaterialDialog.SingleButtonCallback () {
                     @Override
                     public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        updateNoteStatus (exhibitor_id, dialog.getInputEditText ().getText ().toString ());
+                        updateOfflineNoteStatus (dialog.getInputEditText ().getText ().toString (), exhibitor_id);
+                        updateNoteStatus2 (exhibitor_id, dialog.getInputEditText ().getText ().toString ());
 //                        exhibitorDetail.setNotes (dialog.getInputEditText ().getText ().toString ());
 //                        tvNotes.setText (exhibitorDetail.getNotes ());
 //                        if (exhibitorDetail.getNotes ().length () > 0) {
@@ -697,6 +699,28 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
         }
     }
 
+    private void updateOfflineNoteStatus (final String notes, final int exhibitor_id) {
+        exhibitorDetail.setNotes (notes);
+        if (db.isNoteInExhibitor (exhibitor_id)) {
+            if (notes.length () > 0) {
+                db.updateNoteInExhibitor (notes, exhibitor_id);
+            } else {
+                db.removeNoteFromExhibitor (exhibitor_id);
+            }
+        } else {
+            db.addNoteToExhibitor (notes, exhibitor_id);
+        }
+
+        if (exhibitorDetail.getNotes ().length () > 0) {
+            rlNotes.setVisibility (View.VISIBLE);
+            tvAddNotes.setText ("EDIT NOTES");
+        } else {
+            rlNotes.setVisibility (View.GONE);
+            tvAddNotes.setText ("ADD NOTES");
+        }
+        tvNotes.setText (db.getExhibitorNote (exhibitor_id));
+    }
+
     private void updateNoteStatus (final int exhibitors_id, final String notes) {
         if (NetworkConnection.isNetworkAvailable (this)) {
             Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_please_wait), false);
@@ -765,6 +789,59 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
             Utils.sendRequest (strRequest, 30);
         } else {
             progressDialog.dismiss ();
+        }
+    }
+
+    private void updateNoteStatus2 (final int exhibitors_id, final String notes) {
+        if (NetworkConnection.isNetworkAvailable (this)) {
+            Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_EXHIBITOR_NOTE, true);
+            StringRequest strRequest = new StringRequest (Request.Method.POST, AppConfigURL.URL_EXHIBITOR_NOTE,
+                    new Response.Listener<String> () {
+                        @Override
+                        public void onResponse (String response) {
+                            Utils.showLog (Log.INFO, AppConfigTags.SERVER_RESPONSE, response, true);
+                            if (response != null) {
+                                try {
+                                    JSONObject jsonObj = new JSONObject (response);
+                                    boolean error = jsonObj.getBoolean (AppConfigTags.ERROR);
+                                    String message = jsonObj.getString (AppConfigTags.MESSAGE);
+                                } catch (Exception e) {
+                                    e.printStackTrace ();
+                                }
+                            } else {
+                                Utils.showLog (Log.WARN, AppConfigTags.SERVER_RESPONSE, AppConfigTags.DIDNT_RECEIVE_ANY_DATA_FROM_SERVER, true);
+                            }
+                        }
+                    },
+                    new Response.ErrorListener () {
+                        @Override
+                        public void onErrorResponse (VolleyError error) {
+                            Utils.showLog (Log.ERROR, AppConfigTags.VOLLEY_ERROR, error.toString (), true);
+                        }
+                    }) {
+
+                @Override
+                protected Map<String, String> getParams () throws AuthFailureError {
+                    Map<String, String> params = new Hashtable<String, String> ();
+                    params.put (AppConfigTags.EXHIBITOR_ID, String.valueOf (exhibitors_id));
+                    params.put (AppConfigTags.EXHIBITOR_NOTES, notes);
+                    Utils.showLog (Log.INFO, AppConfigTags.PARAMETERS_SENT_TO_THE_SERVER, "" + params, true);
+                    return params;
+                }
+
+                @Override
+                public Map<String, String> getHeaders () throws AuthFailureError {
+                    VisitorDetailsPref visitorDetailsPref = VisitorDetailsPref.getInstance ();
+                    Map<String, String> params = new HashMap<> ();
+                    params.put (AppConfigTags.HEADER_API_KEY, Constants.api_key);
+                    params.put (AppConfigTags.HEADER_VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (ExhibitorDetailActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
+                    Utils.showLog (Log.INFO, AppConfigTags.HEADERS_SENT_TO_THE_SERVER, "" + params, false);
+                    return params;
+                }
+            };
+            strRequest.setRetryPolicy (new DefaultRetryPolicy (DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            Utils.sendRequest (strRequest, 30);
+        } else {
         }
     }
 

@@ -24,6 +24,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
@@ -36,6 +38,7 @@ import android.widget.TextView;
 import com.actiknow.famdent.R;
 import com.actiknow.famdent.adapter.HomeServiceAdapter;
 import com.actiknow.famdent.helper.DatabaseHandler;
+import com.actiknow.famdent.model.Banner;
 import com.actiknow.famdent.model.EventDetail;
 import com.actiknow.famdent.model.EventSpeaker;
 import com.actiknow.famdent.model.ExhibitorDetail;
@@ -50,6 +53,7 @@ import com.actiknow.famdent.utils.Constants;
 import com.actiknow.famdent.utils.NetworkConnection;
 import com.actiknow.famdent.utils.SetTypeFace;
 import com.actiknow.famdent.utils.SimpleDividerItemDecoration;
+import com.actiknow.famdent.utils.TypefaceSpan;
 import com.actiknow.famdent.utils.Utils;
 import com.actiknow.famdent.utils.VisitorDetailsPref;
 import com.actiknow.famdent.utils.qr_code.QRContents;
@@ -63,6 +67,14 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.bugsnag.android.Bugsnag;
+import com.daimajia.slider.library.Animations.DescriptionAnimation;
+import com.daimajia.slider.library.Indicators.PagerIndicator;
+import com.daimajia.slider.library.SliderLayout;
+import com.daimajia.slider.library.SliderTypes.BaseSliderView;
+import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
+import com.daimajia.slider.library.Tricks.ViewPagerEx;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import com.google.zxing.WriterException;
 
 import org.json.JSONArray;
@@ -77,7 +89,7 @@ import java.util.Map;
 
 import static com.actiknow.famdent.activity.LoginActivity.PERMISSION_REQUEST_CODE;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPageChangeListener, BaseSliderView.OnSliderClickListener {
     VisitorDetailsPref visitorDetailsPref;
     int version_code;
     CoordinatorLayout clMain;
@@ -92,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
     List<HomeService> homeServices = new ArrayList<> ();
     HomeServiceAdapter homeServiceAdapter;
 
+    private SliderLayout slider;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -114,11 +127,16 @@ public class MainActivity extends AppCompatActivity {
         rvHomeServiceList = (RecyclerView) findViewById (R.id.rvHomeServiceList);
         ivVisitorCard = (ImageView) findViewById (R.id.ivVisitorCard);
         ivIndiaSupplyLogo = (ImageView) findViewById (R.id.ivIndiaSupplyLogo);
-
+        slider = (SliderLayout) findViewById (R.id.slider);
     }
 
     private void initData () {
         Bugsnag.init (this);
+
+        FacebookSdk.sdkInitialize (getApplicationContext ());
+        AppEventsLogger.activateApp (this);
+
+
         visitorDetailsPref = VisitorDetailsPref.getInstance ();
         db = new DatabaseHandler (getApplicationContext ());
 
@@ -221,6 +239,34 @@ public class MainActivity extends AppCompatActivity {
                 dialog.show ();
             }
         });
+    }
+
+    private void initSlider () {
+        for (int i = 0; i < db.getAllSmallBanners ().size (); i++) {
+            Banner banner = db.getAllSmallBanners ().get (i);
+            SpannableString s = new SpannableString (banner.getTitle ());
+            s.setSpan (new TypefaceSpan (this, Constants.font_name), 0, s.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            DefaultSliderView defaultSliderView = new DefaultSliderView (this);
+            defaultSliderView
+                    .image (banner.getImage ())
+                    .setScaleType (BaseSliderView.ScaleType.Fit)
+                    .setOnSliderClickListener (this);
+
+            Log.e ("karman", banner.getImage ());
+
+            defaultSliderView.bundle (new Bundle ());
+            defaultSliderView.getBundle ().putString ("url", banner.getUrl ());
+            slider.addSlider (defaultSliderView);
+        }
+
+        slider.setIndicatorVisibility (PagerIndicator.IndicatorVisibility.Visible);
+        slider.setPresetTransformer (SliderLayout.Transformer.Default);
+        slider.setCustomAnimation (new DescriptionAnimation ());
+        slider.setDuration (5000);
+        slider.addOnPageChangeListener (this);
+        slider.setCustomIndicator ((PagerIndicator) findViewById (R.id.custom_indicator));
+        slider.setPresetIndicator (SliderLayout.PresetIndicators.Center_Bottom);
     }
 
     private void checkVersionUpdate () {
@@ -488,6 +534,23 @@ public class MainActivity extends AppCompatActivity {
                                     int status = jsonObj.getInt (AppConfigTags.STATUS);
                                     int db_version = jsonObj.getInt (AppConfigTags.DATABASE_VERSION);
                                     visitorDetailsPref.putIntPref (MainActivity.this, VisitorDetailsPref.DATABASE_VERSION, db_version);
+
+                                    db.deleteAllBanners ();
+                                    JSONArray jsonArrayBanner = jsonObj.getJSONArray (AppConfigTags.BANNERS);
+                                    for (int i = 0; i < jsonArrayBanner.length (); i++) {
+                                        JSONObject jsonObjectBanner = jsonArrayBanner.getJSONObject (i);
+                                        Banner banner = new Banner (
+                                                jsonObjectBanner.getInt (AppConfigTags.BANNER_ID),
+                                                jsonObjectBanner.getString (AppConfigTags.BANNER_TITLE),
+                                                jsonObjectBanner.getString (AppConfigTags.BANNER_IMAGE),
+                                                jsonObjectBanner.getString (AppConfigTags.BANNER_URL),
+                                                jsonObjectBanner.getString (AppConfigTags.BANNER_TYPE)
+                                        );
+                                        db.createBanner (banner);
+                                    }
+
+                                    initSlider ();
+
                                     if (! error) {
                                         switch (status) {
                                             case 1:
@@ -715,11 +778,12 @@ public class MainActivity extends AppCompatActivity {
                     checkSelfPermission (Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission (Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission (Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED ||
+                    checkSelfPermission (Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission (Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
 
                 requestPermissions (new String[] {Manifest.permission.RECEIVE_SMS, Manifest.permission.VIBRATE,
                                 Manifest.permission.READ_SMS, Manifest.permission.GET_ACCOUNTS, Manifest.permission.READ_CONTACTS,
-                                Manifest.permission.CALL_PHONE, Manifest.permission.READ_PHONE_STATE},
+                                Manifest.permission.CALL_PHONE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE},
                         PERMISSION_REQUEST_CODE);
             }
 /*
@@ -780,6 +844,7 @@ public class MainActivity extends AppCompatActivity {
                     } else if (Manifest.permission.GET_ACCOUNTS.equals (permission)) {
                     } else if (Manifest.permission.READ_CONTACTS.equals (permission)) {
                     } else if (Manifest.permission.CALL_PHONE.equals (permission)) {
+                    } else if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equals (permission)) {
                     } else if (Manifest.permission.READ_PHONE_STATE.equals (permission)) {
                     }
                 }
@@ -788,4 +853,24 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    public void onSliderClick (BaseSliderView slider) {
+        Uri uri = Uri.parse ("http://" + slider.getBundle ().get ("url"));
+        Intent intent = new Intent (Intent.ACTION_VIEW, uri);
+        startActivity (intent);
+    }
+
+    @Override
+    public void onPageScrolled (int position, float positionOffset, int positionOffsetPixels) {
+    }
+
+    @Override
+    public void onPageSelected (int position) {
+    }
+
+    @Override
+    public void onPageScrollStateChanged (int state) {
+    }
+
 }

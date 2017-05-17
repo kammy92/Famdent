@@ -63,6 +63,8 @@ public class SessionListActivity extends AppCompatActivity {
 
     DatabaseHandler db;
 
+//    Dialog dialog;
+
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
@@ -70,8 +72,8 @@ public class SessionListActivity extends AppCompatActivity {
         initView ();
         initData ();
         initListener ();
-//        getOfflineSessionList ();
         selectSessionCategoryDialog ();
+//        getOfflineSessionList ();
     }
 
     private void getOfflineSessionList () {
@@ -106,13 +108,14 @@ public class SessionListActivity extends AppCompatActivity {
 
     private void initData () {
         db = new DatabaseHandler (getApplicationContext ());
-
+//        dialog = Utils.showBigBannerDialog (this);
         sessionCategories.add ("International Speakers");
         sessionCategories.add ("Live Dentistry Arena");
         sessionCategories.add ("Famdent Awards Exceptional Speakers");
         sessionCategories.add ("Power Of 10");
         sessionCategories.add ("How To Series");
         sessionCategories.add ("Most Challenging Cases");
+        sessionCategories.add ("2 Ways To Get There!!");
 
         swipeRefreshLayout.setColorSchemeColors (getResources ().getColor (R.color.colorPrimaryDark));
 
@@ -194,6 +197,13 @@ public class SessionListActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+//        dialog.setOnCancelListener (new DialogInterface.OnCancelListener () {
+//            @Override
+//            public void onCancel (DialogInterface dialog) {
+//                selectSessionCategoryDialog ();
+//            }
+//        });
     }
 
     private void getSessionListFromServer () {

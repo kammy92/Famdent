@@ -2,11 +2,11 @@
 <android.support.design.widget.CoordinatorLayout
     android:id="@+id/clMain"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:background="@color/app_background"
->
+    android:background="@color/app_background">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -35,12 +35,30 @@
             android:layout_below="@+id/appBar"
             android:layout_centerInParent="true"
             android:animateLayoutChanges="true">
+            <com.daimajia.slider.library.SliderLayout
+                android:id="@+id/slider"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/home_slider_height"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                app:auto_cycle="true"
+                app:pager_animation="Accordion"
+                app:pager_animation_span="500"/>
+
+            <com.daimajia.slider.library.Indicators.PagerIndicator
+                android:id="@+id/custom_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/slider"
+                android:gravity="center"/>
             <ImageView
                 android:id="@+id/ivLogo"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/logo_height"
                 android:layout_margin="@dimen/activity_margin"
-                android:src="@drawable/famdent_logo"/>
+                android:src="@drawable/famdent_logo"
+                android:visibility="gone"/>
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -61,18 +79,25 @@
                 android:id="@+id/view"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_below="@+id/ivLogo"
+                android:layout_below="@+id/custom_indicator"
                 android:background="@color/divider_color">
             </View>
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rvHomeServiceList"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_above="@+id/rlFooter"
+                android:layout_above="@+id/view2"
                 android:layout_below="@+id/view"
                 android:fillViewport="true"
                 android:overScrollMode="never" android:scrollbarStyle="insideOverlay"/>
 
+            <View
+                android:id="@+id/view2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_above="@+id/rlFooter"
+                android:background="@color/divider_color">
+            </View>
             <RelativeLayout
                 android:id="@+id/rlFooter"
                 android:layout_width="match_parent"

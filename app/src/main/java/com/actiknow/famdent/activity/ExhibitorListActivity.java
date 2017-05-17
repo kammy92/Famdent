@@ -1,13 +1,17 @@
 package com.actiknow.famdent.activity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -18,6 +22,7 @@ import android.widget.TextView;
 import com.actiknow.famdent.R;
 import com.actiknow.famdent.adapter.ExhibitorAdapter;
 import com.actiknow.famdent.helper.DatabaseHandler;
+import com.actiknow.famdent.model.Banner;
 import com.actiknow.famdent.model.Exhibitor;
 import com.actiknow.famdent.model.StallDetail;
 import com.actiknow.famdent.utils.AppConfigTags;
@@ -26,6 +31,7 @@ import com.actiknow.famdent.utils.Constants;
 import com.actiknow.famdent.utils.NetworkConnection;
 import com.actiknow.famdent.utils.SetTypeFace;
 import com.actiknow.famdent.utils.SimpleDividerItemDecoration;
+import com.actiknow.famdent.utils.TypefaceSpan;
 import com.actiknow.famdent.utils.Utils;
 import com.actiknow.famdent.utils.VisitorDetailsPref;
 import com.afollestad.materialdialogs.DialogAction;
@@ -36,6 +42,12 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.daimajia.slider.library.Animations.DescriptionAnimation;
+import com.daimajia.slider.library.Indicators.PagerIndicator;
+import com.daimajia.slider.library.SliderLayout;
+import com.daimajia.slider.library.SliderTypes.BaseSliderView;
+import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
+import com.daimajia.slider.library.Tricks.ViewPagerEx;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,10 +59,11 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-public class ExhibitorListActivity extends AppCompatActivity {
+
+public class ExhibitorListActivity extends AppCompatActivity implements ViewPagerEx.OnPageChangeListener, BaseSliderView.OnSliderClickListener {
     RecyclerView rvExhibitor;
     ImageView ivBack;
-    SwipeRefreshLayout swipeRefreshLayout;
+    //    SwipeRefreshLayout swipeRefreshLayout;
     List<Exhibitor> exhibitorList = new ArrayList<> ();
     List<Exhibitor> tempExhibitorList = new ArrayList<> ();
     ExhibitorAdapter exhibitorAdapter;
@@ -67,6 +80,11 @@ public class ExhibitorListActivity extends AppCompatActivity {
 
     DatabaseHandler db;
 
+//    Dialog dialog;
+
+    private Toolbar toolbar;
+    private SliderLayout slider;
+
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -75,8 +93,9 @@ public class ExhibitorListActivity extends AppCompatActivity {
         initView ();
         initData ();
         initListener ();
-
 //        getExhibitorList ();
+        initSlider ();
+//        setUpNavigationDrawer ();
         getOfflineExhibitorList ();
     }
 
@@ -87,7 +106,7 @@ public class ExhibitorListActivity extends AppCompatActivity {
         for (Exhibitor exhibitor : offlineExhibitor)
             exhibitorList.add (exhibitor);
         exhibitorAdapter.notifyDataSetChanged ();
-        swipeRefreshLayout.setRefreshing (false);
+//        swipeRefreshLayout.setRefreshing (false);
     }
 
     private void initView () {
@@ -99,16 +118,19 @@ public class ExhibitorListActivity extends AppCompatActivity {
         ivSort = (ImageView) findViewById (R.id.ivSort);
         tvTitle = (TextView) findViewById (R.id.tvTitle);
         searchView = (SearchView) findViewById (R.id.searchView);
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById (R.id.swipeRefreshLayout);
+//        swipeRefreshLayout = (SwipeRefreshLayout) findViewById (swipeRefreshLayout);
         Utils.setTypefaceToAllViews (this, rvExhibitor);
+
+        toolbar = (Toolbar) findViewById (R.id.toolbar1);
+        slider = (SliderLayout) findViewById (R.id.slider);
+
     }
 
     private void initData () {
         db = new DatabaseHandler (getApplicationContext ());
-
+//        dialog = Utils.showBigBannerDialog (this);
         category = new String[] {"Air Abrasion", "Curing Lights", "Disposable Needles"};
-
-        swipeRefreshLayout.setRefreshing (true);
+//        swipeRefreshLayout.setRefreshing (true);
 
 //        exhibitorList.add (new Exhibitor (1, "http://seeklogo.com/images/1/3M-logo-079FB52BC8-seeklogo.com.png", "3M ESPE", "Hall 1", "Stall 28"));
 //        exhibitorList.add (new Exhibitor (2, "http://mudrsoc.com/wp-content/uploads/2017/01/Dentsply-Logo-Black.jpg", "DENTSPLY SIRONA", "Hall 1", "Stall 31"));
@@ -118,7 +140,7 @@ public class ExhibitorListActivity extends AppCompatActivity {
 //        exhibitorList.add (new Exhibitor (6, "", "ACETON INDIA", "Hall 1", "Stall 17"));
 //        exhibitorList.add (new Exhibitor (7, "", "SKANRAY TECHNOLOGY", "Hall 1", "Stall 32"));
 
-        swipeRefreshLayout.setColorSchemeColors (getResources ().getColor (R.color.colorPrimaryDark));
+//        swipeRefreshLayout.setColorSchemeColors (getResources ().getColor (R.color.colorPrimaryDark));
         exhibitorAdapter = new ExhibitorAdapter (this, exhibitorList);
         rvExhibitor.setAdapter (exhibitorAdapter);
         rvExhibitor.setHasFixedSize (true);
@@ -128,14 +150,14 @@ public class ExhibitorListActivity extends AppCompatActivity {
     }
 
     private void initListener () {
-        swipeRefreshLayout.setOnRefreshListener (new SwipeRefreshLayout.OnRefreshListener () {
-            @Override
-            public void onRefresh () {
-                swipeRefreshLayout.setRefreshing (true);
-                getOfflineExhibitorList ();
+//        swipeRefreshLayout.setOnRefreshListener (new SwipeRefreshLayout.OnRefreshListener () {
+//            @Override
+//            public void onRefresh () {
+//                swipeRefreshLayout.setRefreshing (true);
+//                getOfflineExhibitorList ();
 //                getExhibitorList ();
-            }
-        });
+//            }
+//        });
         ivBack.setOnClickListener (new View.OnClickListener () {
             @Override
             public void onClick (View v) {
@@ -241,6 +263,32 @@ public class ExhibitorListActivity extends AppCompatActivity {
         });
     }
 
+    private void initSlider () {
+        for (int i = 0; i < db.getAllExhibitorBanners ().size (); i++) {
+            Banner banner = db.getAllExhibitorBanners ().get (i);
+            SpannableString s = new SpannableString (banner.getTitle ());
+            s.setSpan (new TypefaceSpan (this, Constants.font_name), 0, s.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            DefaultSliderView defaultSliderView = new DefaultSliderView (this);
+            defaultSliderView
+                    .image (banner.getImage ())
+                    .setScaleType (BaseSliderView.ScaleType.Fit)
+                    .setOnSliderClickListener (this);
+
+            defaultSliderView.bundle (new Bundle ());
+            defaultSliderView.getBundle ().putString ("url", banner.getUrl ());
+            slider.addSlider (defaultSliderView);
+        }
+
+        slider.setIndicatorVisibility (PagerIndicator.IndicatorVisibility.Visible);
+        slider.setPresetTransformer (SliderLayout.Transformer.Default);
+        slider.setCustomAnimation (new DescriptionAnimation ());
+        slider.setDuration (5000);
+        slider.addOnPageChangeListener (this);
+        slider.setCustomIndicator ((PagerIndicator) findViewById (R.id.custom_indicator));
+        slider.setPresetIndicator (SliderLayout.PresetIndicators.Center_Bottom);
+    }
+
     private void getExhibitorList () {
         if (NetworkConnection.isNetworkAvailable (this)) {
             tvNoResult.setVisibility (View.GONE);
@@ -280,22 +328,22 @@ public class ExhibitorListActivity extends AppCompatActivity {
                                             exhibitorAdapter.notifyDataSetChanged ();
                                             }
                                         if (jsonArrayExhibitor.length () > 0) {
-                                            swipeRefreshLayout.setRefreshing (false);
+//                                            swipeRefreshLayout.setRefreshing (false);
                                         } else {
-                                            swipeRefreshLayout.setRefreshing (false);
+//                                            swipeRefreshLayout.setRefreshing (false);
                                             tvNoResult.setVisibility (View.VISIBLE);
                                         }
                                     } else {
-                                        swipeRefreshLayout.setRefreshing (false);
+//                                        swipeRefreshLayout.setRefreshing (false);
                                         tvNoResult.setVisibility (View.VISIBLE);
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace ();
-                                    swipeRefreshLayout.setRefreshing (false);
+//                                    swipeRefreshLayout.setRefreshing (false);
                                     tvNoResult.setVisibility (View.VISIBLE);
                                 }
                             } else {
-                                swipeRefreshLayout.setRefreshing (false);
+//                                swipeRefreshLayout.setRefreshing (false);
                                 tvNoResult.setVisibility (View.VISIBLE);
                                 Utils.showLog (Log.WARN, AppConfigTags.SERVER_RESPONSE, AppConfigTags.DIDNT_RECEIVE_ANY_DATA_FROM_SERVER, true);
                             }
@@ -310,7 +358,7 @@ public class ExhibitorListActivity extends AppCompatActivity {
                                 Utils.showLog (Log.ERROR, AppConfigTags.ERROR, new String (response.data), true);
 
                             }
-                            swipeRefreshLayout.setRefreshing (false);
+//                            swipeRefreshLayout.setRefreshing (false);
                             tvNoResult.setVisibility (View.VISIBLE);
                         }
                     }) {
@@ -334,7 +382,7 @@ public class ExhibitorListActivity extends AppCompatActivity {
             };
             Utils.sendRequest (strRequest, 5);
         } else {
-            swipeRefreshLayout.setRefreshing (false);
+//            swipeRefreshLayout.setRefreshing (false);
             tvNoResult.setVisibility (View.VISIBLE);
         }
     }
@@ -421,4 +469,26 @@ public class ExhibitorListActivity extends AppCompatActivity {
         finish ();
         overridePendingTransition (R.anim.slide_in_left, R.anim.slide_out_right);
     }
+
+    @Override
+    public void onSliderClick (BaseSliderView slider) {
+        Uri uri = Uri.parse ("http://" + slider.getBundle ().get ("url"));
+        Intent intent = new Intent (Intent.ACTION_VIEW, uri);
+        startActivity (intent);
+    }
+
+    @Override
+    public void onPageScrolled (int position, float positionOffset, int positionOffsetPixels) {
+    }
+
+    @Override
+    public void onPageSelected (int position) {
+    }
+
+    @Override
+    public void onPageScrollStateChanged (int state) {
+    }
+
+
+
 }

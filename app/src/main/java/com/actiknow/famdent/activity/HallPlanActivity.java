@@ -1,23 +1,32 @@
 package com.actiknow.famdent.activity;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.AssetManager;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 
 import com.actiknow.famdent.R;
+import com.actiknow.famdent.utils.TouchImageView;
 import com.actiknow.famdent.utils.Utils;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 
 public class HallPlanActivity extends AppCompatActivity {
     ImageView ivBack;
-    //TouchImageView ivHallPlan;
-    WebView webView;
+    TouchImageView ivHallPlan;
+    //    WebView webView;
     ProgressDialog progressDialog;
 
     @Override
@@ -33,12 +42,14 @@ public class HallPlanActivity extends AppCompatActivity {
 
     private void initView () {
         ivBack = (ImageView) findViewById (R.id.ivBack);
-        // ivHallPlan = (TouchImageView) findViewById (ivHallPlan);
-        webView = (WebView) findViewById (R.id.webView);
+        ivHallPlan = (TouchImageView) findViewById (R.id.ivHallPlan);
+//        webView = (WebView) findViewById (webView);
         Utils.setTypefaceToAllViews (this, ivBack);
     }
 
     private void initData () {
+
+/*
         progressDialog = new ProgressDialog (this);
         Utils.showProgressDialog (progressDialog, "Loading...", false);
 
@@ -68,6 +79,8 @@ public class HallPlanActivity extends AppCompatActivity {
         String pdfURL = "http://35.165.111.86/api/extras/hallplan.pdf";
         webView.loadUrl (
                 "http://docs.google.com/gview?embedded=true&url=" + pdfURL);
+
+        */
     }
 
     private void initListener () {
@@ -79,6 +92,43 @@ public class HallPlanActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void CopyReadAssets () {
+        AssetManager assetManager = getAssets ();
+
+        InputStream in = null;
+        OutputStream out = null;
+        File file = new File (getFilesDir (), "hall_plan.pdf");
+        try {
+            in = assetManager.open ("hall_plan.pdf");
+            out = openFileOutput (file.getName (), Context.MODE_WORLD_READABLE);
+
+            copyFile (in, out);
+            in.close ();
+            in = null;
+            out.flush ();
+            out.close ();
+            out = null;
+        } catch (Exception e) {
+            Log.e ("tag", e.getMessage ());
+        }
+
+        Intent intent = new Intent (Intent.ACTION_VIEW);
+        intent.setDataAndType (
+                Uri.parse ("file://" + getFilesDir () + "/hall_plan.pdf"),
+                "application/pdf");
+
+        startActivity (intent);
+    }
+
+    private void copyFile (InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[1024];
+        int read;
+        while ((read = in.read (buffer)) != - 1) {
+            out.write (buffer, 0, read);
+        }
+    }
+
 
     @Override
     public void onBackPressed () {
@@ -93,47 +143,4 @@ public class HallPlanActivity extends AppCompatActivity {
             return (false);
         }
     }
-
-    /*private void CopyReadAssets()
-    {
-        AssetManager assetManager = getAssets();
-
-        InputStream in = null;
-        OutputStream out = null;
-        File file = new File(getFilesDir(), "salary.pdf");
-        try
-        {
-            in = assetManager.open("salary.pdf");
-            out = openFileOutput(file.getName(), Context.MODE_WORLD_READABLE);
-
-            copyFile(in, out);
-            in.close();
-            in = null;
-            out.flush();
-            out.close();
-            out = null;
-        } catch (Exception e)
-        {
-            Log.e("tag", e.getMessage());
-        }
-
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(
-                Uri.parse("file://" + getFilesDir() + "/salary.pdf"),
-                "application/pdf");
-
-        startActivity(intent);
-    }
-
-    private void copyFile(InputStream in, OutputStream out) throws IOException
-    {
-        byte[] buffer = new byte[1024];
-        int read;
-        while ((read = in.read(buffer)) != -1)
-        {
-            out.write(buffer, 0, read);
-        }
-    }
-*/
-
 }

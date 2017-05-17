@@ -53,6 +53,8 @@ public class EventListActivity extends AppCompatActivity {
     SearchView searchView;
     DatabaseHandler db;
 
+//    Dialog dialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +82,7 @@ public class EventListActivity extends AppCompatActivity {
     private void initData() {
         db = new DatabaseHandler (getApplicationContext ());
         swipeRefreshLayout.setRefreshing (true);
+//        dialog = Utils.showBigBannerDialog (this);
 
 //        eventList.add (new Event (1, "Orthodontics Workshop", "Dr Nikita Jain", "27/04/2017", "15:22"));
 //        eventList.add (new Event (2, "Esthetic Implants", "Dr Rahul Jain", "27/05/2017", "15:22"));
@@ -168,6 +171,12 @@ public class EventListActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+//        dialog.setOnCancelListener (new DialogInterface.OnCancelListener () {
+//            @Override
+//            public void onCancel (DialogInterface dialog) {
+//            }
+//        });
     }
 
     private void getOfflineEventList () {

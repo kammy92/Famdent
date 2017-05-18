@@ -45,6 +45,8 @@
 
     <string name="activity_session_detail_title">SESSION DETAIL</string>
 
+    <string name="activity_session_list_title">SESSION LIST</string>
+
 
     <string name="activity_information_title">INFORMATION</string>
     <string name="activity_information_text_1">The House of FAMDENT swears by its mission of
@@ -120,7 +122,9 @@
     <string name="progress_dialog_text_please_wait">Please wait&#8230;</string>
     <string name="progress_dialog_text_sending_request">Sending Request&#8230;</string>
     <string name="progress_dialog_text_submitting_responses">Submitting Responses&#8230;</string>
-    <string name="progress_dialog_text_initializing">Initializing Application&#8230;</string>
+    <string name="progress_dialog_text_initializing">Initializing Application&#8230;\nThis may take
+        some time
+    </string>
 
     <string name="snackbar_text_no_internet_connection_available">No Internet Connection available
     </string>

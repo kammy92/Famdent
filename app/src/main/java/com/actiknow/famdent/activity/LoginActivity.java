@@ -141,7 +141,7 @@ public class LoginActivity extends AppCompatActivity {
                 s2.setSpan (new TypefaceSpan (LoginActivity.this, Constants.font_name), 0, s2.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 SpannableString s3 = new SpannableString (getResources ().getString (R.string.please_enter_mobile));
                 s3.setSpan (new TypefaceSpan (LoginActivity.this, Constants.font_name), 0, s3.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                SpannableString s4 = new SpannableString (getResources ().getString (R.string.please_enter_valid_email));
+                SpannableString s4 = new SpannableString (getResources ().getString (R.string.please_enter_valid_mobile));
                 s4.setSpan (new TypefaceSpan (LoginActivity.this, Constants.font_name), 0, s4.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 SpannableString s5 = new SpannableString (getResources ().getString (R.string.please_enter_valid_mobile));
                 s5.setSpan (new TypefaceSpan (LoginActivity.this, Constants.font_name), 0, s5.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -170,21 +170,25 @@ public class LoginActivity extends AppCompatActivity {
                 } else if (! cbTermAndCondition.isChecked ()) {
                     Toast.makeText (LoginActivity.this, s8, Toast.LENGTH_LONG).show ();
                 } else {
-                    switch (Utils.isValidMobile (etMobile.getText ().toString ())) {
-                        case 1:
-                            etMobile.setError (s4);
-                            break;
-                        case 2:
-                            etMobile.setError (s4);
-                            break;
-                        case 3:
-                            getOTP (etMobile.getText ().toString ());
-                            break;
-                        case 4:
-                            etMobile.setError (s3);
-                            break;
+                    try {
+                        switch (Utils.isValidMobile (etMobile.getText ().toString ())) {
+                            case 1:
+                                etMobile.setError (s4);
+                                break;
+                            case 2:
+                                etMobile.setError (s4);
+                                break;
+                            case 3:
+                                getOTP (etMobile.getText ().toString ());
+                                break;
+                            case 4:
+                                etMobile.setError (s3);
+                                break;
+                        }
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace ();
+                        etMobile.setError (s4);
                     }
-
                 }
             }
 
@@ -288,6 +292,7 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                             }
                             TelephonyManager tm = (TelephonyManager) getSystemService (TELEPHONY_SERVICE);
+
                             etMobile.setText (tm.getLine1Number ());
                         } catch (Exception e) {
                             e.printStackTrace ();
@@ -580,7 +585,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-
     public void checkPermissions () {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission (Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED ||
@@ -589,12 +593,19 @@ public class LoginActivity extends AppCompatActivity {
                     checkSelfPermission (Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission (Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission (Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED ||
-                    checkSelfPermission (Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+//                    checkSelfPermission (Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission (Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-
-                requestPermissions (new String[] {Manifest.permission.RECEIVE_SMS, Manifest.permission.VIBRATE,
-                                Manifest.permission.READ_SMS, Manifest.permission.GET_ACCOUNTS, Manifest.permission.READ_CONTACTS,
-                                Manifest.permission.CALL_PHONE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE},
+    
+                requestPermissions (new String[] {
+                                Manifest.permission.RECEIVE_SMS,
+                                Manifest.permission.VIBRATE,
+                                Manifest.permission.READ_SMS,
+                                Manifest.permission.GET_ACCOUNTS,
+                                Manifest.permission.READ_CONTACTS,
+                                Manifest.permission.CALL_PHONE,
+//                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.READ_PHONE_STATE
+                        },
                         PERMISSION_REQUEST_CODE);
             }
 /*
@@ -655,7 +666,7 @@ public class LoginActivity extends AppCompatActivity {
                     } else if (Manifest.permission.GET_ACCOUNTS.equals (permission)) {
                     } else if (Manifest.permission.READ_CONTACTS.equals (permission)) {
                     } else if (Manifest.permission.CALL_PHONE.equals (permission)) {
-                    } else if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equals (permission)) {
+//                    } else if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equals (permission)) {
                     } else if (Manifest.permission.READ_PHONE_STATE.equals (permission)) {
                     }
                 }
@@ -745,8 +756,6 @@ public class LoginActivity extends AppCompatActivity {
         }
 
     }
-
-
 }
 
 

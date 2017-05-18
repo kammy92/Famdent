@@ -149,6 +149,15 @@ public class AppConfigTags {
     public static final String DEVICE_DETAILS = "device_details";
 
     public static final String DATABASE_VERSION = "database_version";
-
-
+    
+    public static final String CATEGORIES = "categories";
+    public static final String CATEGORY_ID = "category_id";
+    public static final String CATEGORY_NAME = "category_name";
+    public static final String CATEGORY_LEVEL2 = "category_level2";
+    public static final String CATEGORY_LEVEL3 = "category_level3";
+    
+    public static final String CATEGORY_MAPPINGS = "category_mappings";
+    public static final String CATEGORY_MAPPING_EXHIBITOR_ID = "category_mapping_exhibitor_id";
+    public static final String CATEGORY_MAPPING_CATEGORY_ID = "category_mapping_category_id";
+    public static final String CATEGORY_MAPPING_EXHIBITOR_NAME = "category_mapping_exhibitor_name";
 }

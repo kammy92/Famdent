@@ -1,10 +1,9 @@
 package com.actiknow.famdent.utils;
 
 public class AppConfigURL {
-    public static String version = "v1.2.1";
-    //    public static String BASE_URL = "https://project-famdent-cammy92.c9users.io/api/" + version + "/";
-//    public static String BASE_URL = "http://35.165.111.86/api/" + version + "/";
-    public static String BASE_URL = "http://famdent.indiasupply.com/api/" + version + "/";
+    public static String version = "v1.2.2";
+    public static String BASE_URL = "https://project-famdent-cammy92.c9users.io/api/" + version + "/";
+//    public static String BASE_URL = "http://famdent.indiasupply.com/api/" + version + "/";
 
 
     public static String URL_GETOTP = BASE_URL + "visitor/otp";

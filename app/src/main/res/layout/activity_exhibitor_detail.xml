@@ -84,7 +84,7 @@
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_above="@+id/llButtons">
+                android:layout_above="@+id/tvDealsIn">
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -282,10 +282,21 @@
                             android:textColor="@color/app_text_color_dark"
                             android:textSize="@dimen/text_size_medium"/>
                     </RelativeLayout>
-
                 </RelativeLayout>
             </ScrollView>
-
+            <TextView
+                android:id="@+id/tvDealsIn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/llButtons"
+                android:layout_marginEnd="@dimen/activity_margin_small"
+                android:layout_marginLeft="@dimen/activity_margin_small"
+                android:layout_marginRight="@dimen/activity_margin_small"
+                android:layout_marginStart="@dimen/activity_margin_small"
+                android:textColor="@color/app_text_color_light"
+                android:textSize="@dimen/text_size_small"
+                android:textStyle="bold"
+                android:visibility="gone"/>
             <LinearLayout
                 android:id="@+id/llButtons"
                 android:layout_width="match_parent"

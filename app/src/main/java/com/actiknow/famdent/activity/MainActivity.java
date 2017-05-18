@@ -39,6 +39,8 @@ import com.actiknow.famdent.R;
 import com.actiknow.famdent.adapter.HomeServiceAdapter;
 import com.actiknow.famdent.helper.DatabaseHandler;
 import com.actiknow.famdent.model.Banner;
+import com.actiknow.famdent.model.Category;
+import com.actiknow.famdent.model.CategoryMapping;
 import com.actiknow.famdent.model.EventDetail;
 import com.actiknow.famdent.model.EventSpeaker;
 import com.actiknow.famdent.model.ExhibitorDetail;
@@ -103,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
     RecyclerView rvHomeServiceList;
     List<HomeService> homeServices = new ArrayList<> ();
     HomeServiceAdapter homeServiceAdapter;
-
+    TextView tvRefreshData;
     private SliderLayout slider;
 
     @Override
@@ -128,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
         ivVisitorCard = (ImageView) findViewById (R.id.ivVisitorCard);
         ivIndiaSupplyLogo = (ImageView) findViewById (R.id.ivIndiaSupplyLogo);
         slider = (SliderLayout) findViewById (R.id.slider);
+        tvRefreshData = (TextView) findViewById (R.id.tvRefreshData);
     }
 
     private void initData () {
@@ -216,12 +219,11 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                     jsonObject.put (VisitorDetailsPref.VISITOR_NAME, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_NAME));
                     jsonObject.put (VisitorDetailsPref.VISITOR_MOBILE, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_MOBILE));
                     jsonObject.put (VisitorDetailsPref.VISITOR_EMAIL, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_EMAIL));
+                    jsonObject.put (VisitorDetailsPref.VISITOR_TYPE, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_TYPE));
                 } catch (JSONException e) {
                     e.printStackTrace ();
                 }
-
-                Log.e ("karman", jsonObject.toString ());
-
+    
                 QREncoder qrgEncoder = new QREncoder (jsonObject.toString (), null, QRContents.Type.TEXT, smallerDimension);
                 try {
                     // Getting QR-Code as Bitmap
@@ -237,6 +239,13 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
 //                tvEmail.setTypeface (SetTypeFace.getTypeface (activity, "OCRA.otf"));
 //                tvMobile.setTypeface (SetTypeFace.getTypeface (activity, "OCRA.otf"));
                 dialog.show ();
+            }
+        });
+    
+        tvRefreshData.setOnClickListener (new View.OnClickListener () {
+            @Override
+            public void onClick (View v) {
+                initApplication (0);
             }
         });
     }
@@ -484,13 +493,13 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
             Intent myIntent = new Intent (this, LoginActivity.class);
             startActivity (myIntent);
         } else {
-            initApplication ();
+            initApplication (visitorDetailsPref.getIntPref (MainActivity.this, VisitorDetailsPref.DATABASE_VERSION));
         }
         if (visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY) == "")// || userDetailPref.getStringPref (MainActivity.this, VisitorDetailsPref.HOSPITAL_DEFAULT_PATIENT_ID) == "")
             finish ();
     }
-
-    private void initApplication () {
+    
+    private void initApplication (final int db_version) {
         final JSONArray jsonArrayFavourites = new JSONArray ();
         try {
             ArrayList<Favourite> favouriteList = db.getAllFavourites ();
@@ -515,8 +524,6 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
             e.printStackTrace ();
         }
 
-        Log.e ("karman", jsonArrayFavourites.toString ());
-
         Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_initializing), false);
         if (NetworkConnection.isNetworkAvailable (this)) {
             Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_INIT, true);
@@ -532,8 +539,6 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                                     boolean error = jsonObj.getBoolean (AppConfigTags.ERROR);
                                     String message = jsonObj.getString (AppConfigTags.MESSAGE);
                                     int status = jsonObj.getInt (AppConfigTags.STATUS);
-                                    int db_version = jsonObj.getInt (AppConfigTags.DATABASE_VERSION);
-                                    visitorDetailsPref.putIntPref (MainActivity.this, VisitorDetailsPref.DATABASE_VERSION, db_version);
 
                                     db.deleteAllBanners ();
                                     JSONArray jsonArrayBanner = jsonObj.getJSONArray (AppConfigTags.BANNERS);
@@ -566,7 +571,32 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                                                 db.deleteAllSessions ();
                                                 db.deleteAllSessionSpeakers ();
                                                 db.deleteAllSessionTopics ();
-
+    
+                                                db.deleteAllCategories ();
+                                                db.deleteAllCategoryMappings ();
+    
+                                                JSONArray jsonArrayCategories = jsonObj.getJSONArray (AppConfigTags.CATEGORIES);
+                                                for (int i = 0; i < jsonArrayCategories.length (); i++) {
+                                                    JSONObject jsonObjectExhibitor = jsonArrayCategories.getJSONObject (i);
+                                                    Category category = new Category (
+                                                            jsonObjectExhibitor.getInt (AppConfigTags.CATEGORY_ID),
+                                                            jsonObjectExhibitor.getString (AppConfigTags.CATEGORY_NAME),
+                                                            jsonObjectExhibitor.getString (AppConfigTags.CATEGORY_LEVEL2),
+                                                            jsonObjectExhibitor.getString (AppConfigTags.CATEGORY_LEVEL3)
+                                                    );
+                                                    db.createCategory (category);
+                                                }
+    
+                                                JSONArray jsonArrayCategoryMappings = jsonObj.getJSONArray (AppConfigTags.CATEGORY_MAPPINGS);
+                                                for (int i = 0; i < jsonArrayCategoryMappings.length (); i++) {
+                                                    JSONObject jsonObjectExhibitor = jsonArrayCategoryMappings.getJSONObject (i);
+                                                    CategoryMapping categoryMapping = new CategoryMapping (
+                                                            jsonObjectExhibitor.getInt (AppConfigTags.CATEGORY_MAPPING_EXHIBITOR_ID),
+                                                            jsonObjectExhibitor.getInt (AppConfigTags.CATEGORY_MAPPING_CATEGORY_ID),
+                                                            jsonObjectExhibitor.getString (AppConfigTags.CATEGORY_MAPPING_EXHIBITOR_NAME)
+                                                    );
+                                                    db.createCategoryMapping (categoryMapping);
+                                                }
 
                                                 JSONArray jsonArrayExhibitor = jsonObj.getJSONArray (AppConfigTags.EXHIBITOR);
                                                 for (int i = 0; i < jsonArrayExhibitor.length (); i++) {
@@ -581,7 +611,8 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                                                             jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_ADDRESS),
                                                             jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_EMAIL),
                                                             jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_WEBSITE),
-                                                            "");
+                                                            ""
+                                                    );
 
                                                     ArrayList<String> contactList = new ArrayList<> ();
                                                     JSONArray jsonArrayContacts = jsonObjectExhibitor.getJSONArray (AppConfigTags.EXHIBITOR_CONTACTS);
@@ -619,7 +650,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                                                             jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_DURATION),
                                                             jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_LOCATION),
                                                             jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_FEES),
-                                                            "");
+                                                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_NOTES));
                                                     db.createEvent (eventDetail);
 
                                                     JSONArray jsonArraySpeakers = jsonObjectEvent.getJSONArray (AppConfigTags.EVENT_DETAIL_SPEAKERS);
@@ -677,6 +708,8 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                                                 break;
                                         }
                                         progressDialog.dismiss ();
+                                        int db_version = jsonObj.getInt (AppConfigTags.DATABASE_VERSION);
+                                        visitorDetailsPref.putIntPref (MainActivity.this, VisitorDetailsPref.DATABASE_VERSION, db_version);
                                     }
                                 } catch (Exception e) {
                                     progressDialog.dismiss ();
@@ -699,7 +732,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                 @Override
                 protected Map<String, String> getParams () throws AuthFailureError {
                     Map<String, String> params = new Hashtable<String, String> ();
-                    params.put ("db_version", String.valueOf (visitorDetailsPref.getIntPref (MainActivity.this, VisitorDetailsPref.DATABASE_VERSION)));
+                    params.put ("db_version", String.valueOf (db_version));
                     params.put ("favourites_json", jsonArrayFavourites.toString ());
                     Utils.showLog (Log.INFO, AppConfigTags.PARAMETERS_SENT_TO_THE_SERVER, "" + params, true);
                     return params;
@@ -778,12 +811,19 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                     checkSelfPermission (Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission (Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission (Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED ||
-                    checkSelfPermission (Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+//                    checkSelfPermission (Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission (Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-
-                requestPermissions (new String[] {Manifest.permission.RECEIVE_SMS, Manifest.permission.VIBRATE,
-                                Manifest.permission.READ_SMS, Manifest.permission.GET_ACCOUNTS, Manifest.permission.READ_CONTACTS,
-                                Manifest.permission.CALL_PHONE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE},
+    
+                requestPermissions (new String[] {
+                                Manifest.permission.RECEIVE_SMS,
+                                Manifest.permission.VIBRATE,
+                                Manifest.permission.READ_SMS,
+                                Manifest.permission.GET_ACCOUNTS,
+                                Manifest.permission.READ_CONTACTS,
+                                Manifest.permission.CALL_PHONE,
+//                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.READ_PHONE_STATE
+                        },
                         PERMISSION_REQUEST_CODE);
             }
 /*
@@ -844,7 +884,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                     } else if (Manifest.permission.GET_ACCOUNTS.equals (permission)) {
                     } else if (Manifest.permission.READ_CONTACTS.equals (permission)) {
                     } else if (Manifest.permission.CALL_PHONE.equals (permission)) {
-                    } else if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equals (permission)) {
+//                    } else if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equals (permission)) {
                     } else if (Manifest.permission.READ_PHONE_STATE.equals (permission)) {
                     }
                 }

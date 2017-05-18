@@ -1,6 +1,8 @@
 package com.actiknow.famdent.activity;
 
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +10,9 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,6 +21,7 @@ import android.widget.TextView;
 import com.actiknow.famdent.R;
 import com.actiknow.famdent.adapter.SessionAdapter;
 import com.actiknow.famdent.helper.DatabaseHandler;
+import com.actiknow.famdent.model.Banner;
 import com.actiknow.famdent.model.Session;
 import com.actiknow.famdent.utils.AppConfigTags;
 import com.actiknow.famdent.utils.AppConfigURL;
@@ -23,6 +29,7 @@ import com.actiknow.famdent.utils.Constants;
 import com.actiknow.famdent.utils.NetworkConnection;
 import com.actiknow.famdent.utils.SetTypeFace;
 import com.actiknow.famdent.utils.SimpleDividerItemDecoration;
+import com.actiknow.famdent.utils.TypefaceSpan;
 import com.actiknow.famdent.utils.Utils;
 import com.actiknow.famdent.utils.VisitorDetailsPref;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -32,6 +39,12 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.daimajia.slider.library.Animations.DescriptionAnimation;
+import com.daimajia.slider.library.Indicators.PagerIndicator;
+import com.daimajia.slider.library.SliderLayout;
+import com.daimajia.slider.library.SliderTypes.BaseSliderView;
+import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
+import com.daimajia.slider.library.Tricks.ViewPagerEx;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,7 +54,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SessionListActivity extends AppCompatActivity {
+public class SessionListActivity extends AppCompatActivity implements ViewPagerEx.OnPageChangeListener, BaseSliderView.OnSliderClickListener {
     ImageView ivBack;
     RecyclerView rvSession;
     SwipeRefreshLayout swipeRefreshLayout;
@@ -62,6 +75,7 @@ public class SessionListActivity extends AppCompatActivity {
     String category = "";
 
     DatabaseHandler db;
+    private SliderLayout slider;
 
 //    Dialog dialog;
 
@@ -72,6 +86,7 @@ public class SessionListActivity extends AppCompatActivity {
         initView ();
         initData ();
         initListener ();
+        initSlider ();
         selectSessionCategoryDialog ();
 //        getOfflineSessionList ();
     }
@@ -104,6 +119,7 @@ public class SessionListActivity extends AppCompatActivity {
         ivSort = (ImageView) findViewById (R.id.ivSort);
         tvTitle = (TextView) findViewById (R.id.tvTitle);
         searchView = (SearchView) findViewById (R.id.searchView);
+        slider = (SliderLayout) findViewById (R.id.slider);
     }
 
     private void initData () {
@@ -125,7 +141,8 @@ public class SessionListActivity extends AppCompatActivity {
         rvSession.setLayoutManager (new LinearLayoutManager (SessionListActivity.this, LinearLayoutManager.VERTICAL, false));
         rvSession.addItemDecoration (new SimpleDividerItemDecoration (SessionListActivity.this));
         rvSession.setItemAnimator (new DefaultItemAnimator ());
-
+    
+        searchView.setQueryHint (Html.fromHtml ("<font color = #aaffffff>" + "Search" + "</font>"));
         Utils.setTypefaceToAllViews (this, ivBack);
     }
 
@@ -360,6 +377,52 @@ public class SessionListActivity extends AppCompatActivity {
         finish ();
         overridePendingTransition (R.anim.slide_in_left, R.anim.slide_out_right);
     }
-
+    
+    private void initSlider () {
+        for (int i = 0; i < db.getAllSessionBanners ().size (); i++) {
+            Banner banner = db.getAllSessionBanners ().get (i);
+            SpannableString s = new SpannableString (banner.getTitle ());
+            s.setSpan (new TypefaceSpan (this, Constants.font_name), 0, s.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            
+            DefaultSliderView defaultSliderView = new DefaultSliderView (this);
+            defaultSliderView
+                    .image (banner.getImage ())
+                    .setScaleType (BaseSliderView.ScaleType.Fit)
+                    .setOnSliderClickListener (this);
+            
+            defaultSliderView.bundle (new Bundle ());
+            defaultSliderView.getBundle ().putString ("url", banner.getUrl ());
+            slider.addSlider (defaultSliderView);
+        }
+        
+        slider.setIndicatorVisibility (PagerIndicator.IndicatorVisibility.Visible);
+        slider.setPresetTransformer (SliderLayout.Transformer.Default);
+        slider.setCustomAnimation (new DescriptionAnimation ());
+        slider.setDuration (5000);
+        slider.addOnPageChangeListener (this);
+        slider.setCustomIndicator ((PagerIndicator) findViewById (R.id.custom_indicator));
+        slider.setPresetIndicator (SliderLayout.PresetIndicators.Center_Bottom);
+    }
+    
+    
+    @Override
+    public void onSliderClick (BaseSliderView slider) {
+        Uri uri = Uri.parse ("http://" + slider.getBundle ().get ("url"));
+        Intent intent = new Intent (Intent.ACTION_VIEW, uri);
+        startActivity (intent);
+    }
+    
+    @Override
+    public void onPageScrolled (int position, float positionOffset, int positionOffsetPixels) {
+    }
+    
+    @Override
+    public void onPageSelected (int position) {
+    }
+    
+    @Override
+    public void onPageScrollStateChanged (int state) {
+    }
+    
 }
 

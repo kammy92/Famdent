@@ -69,6 +69,7 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
 
     RelativeLayout rlMain;
     RelativeLayout rlWebsite;
+    TextView tvDealsIn;
     LinearLayout llButtons;
 
     ProgressDialog progressDialog;
@@ -100,6 +101,7 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
         rlMain = (RelativeLayout) findViewById (R.id.rlMain);
         rlWebsite = (RelativeLayout) findViewById (R.id.rlWebsite);
         llButtons = (LinearLayout) findViewById (R.id.llButtons);
+        tvDealsIn = (TextView) findViewById (R.id.tvDealsIn);
 
         llPhone = (LinearLayout) findViewById (R.id.llPhone);
         rlNotes = (RelativeLayout) findViewById (R.id.rlNotes);
@@ -400,7 +402,7 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
             final ArrayList<String> contactList2 = exhibitorDetail.getContactList ();
             TextView tv = new TextView (ExhibitorDetailActivity.this);
             tv.setText (Html.fromHtml ("<u><font color='blue'>" + contactList2.get (i) + "</font></u>"), TextView.BufferType.SPANNABLE);
-            tv.setTextSize (14);
+            tv.setTextSize (16);
             tv.setPadding (0, 5, 0, 5);
             tv.setTypeface (SetTypeFace.getTypeface (ExhibitorDetailActivity.this, Constants.font_name));
             tv.setTextColor (getResources ().getColor (R.color.app_text_color_dark));
@@ -440,6 +442,13 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
             rlWebsite.setVisibility (View.VISIBLE);
         } else {
             rlWebsite.setVisibility (View.GONE);
+        }
+    
+        if (db.isCategoryMappingInExhibitor (exhibitor_id)) {
+            tvDealsIn.setVisibility (View.VISIBLE);
+            tvDealsIn.setText ("Deals In : " + db.getAllCategoryMappingsForExhibitor (exhibitor_id));
+        } else {
+            tvDealsIn.setVisibility (View.GONE);
         }
 
         rlMain.setVisibility (View.VISIBLE);
@@ -713,12 +722,13 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
 
         if (exhibitorDetail.getNotes ().length () > 0) {
             rlNotes.setVisibility (View.VISIBLE);
+            tvNotes.setVisibility (View.VISIBLE);
+            tvNotes.setText (exhibitorDetail.getNotes ());
             tvAddNotes.setText ("EDIT NOTES");
         } else {
             rlNotes.setVisibility (View.GONE);
             tvAddNotes.setText ("ADD NOTES");
         }
-        tvNotes.setText (db.getExhibitorNote (exhibitor_id));
     }
 
     private void updateNoteStatus (final int exhibitors_id, final String notes) {
@@ -844,7 +854,8 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
         } else {
         }
     }
-
+    
+    
     @Override
     public void onBackPressed () {
         finish ();

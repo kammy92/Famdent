@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.actiknow.famdent.model.Banner;
+import com.actiknow.famdent.model.Category;
+import com.actiknow.famdent.model.CategoryMapping;
 import com.actiknow.famdent.model.Event;
 import com.actiknow.famdent.model.EventDetail;
 import com.actiknow.famdent.model.EventSpeaker;
@@ -30,7 +32,7 @@ import java.util.Locale;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
     // Database Version
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
     // Database Name
     private static final String DATABASE_NAME = "famdent";
 
@@ -51,6 +53,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String TABLE_NOTES = "tbl_notes";
 
     private static final String TABLE_BANNERS = "tbl_banners";
+    
+    private static final String TABLE_CATEGORIES = "tbl_categories";
+    
+    private static final String TABLE_CATEGORY_MAPPINGS = "tbl_category_mappings";
 
 
     // Exhibitors Table - column names
@@ -155,6 +161,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String BNNR_TYPE_LARGE = "LARGE";
     private static final String BNNR_TYPE_SMALL = "SMALL";
     private static final String BNNR_TYPE_EXHIBITOR = "EXHIBITOR";
+    private static final String BNNR_TYPE_EVENT = "EVENT";
+    private static final String BNNR_TYPE_SESSION = "SESSION";
+    
+    
+    // Categories Table - column names
+    private static final String CTGRY_ID = "ctgry_id";
+    private static final String CTGRY_NAME = "ctgry_name";
+    private static final String CTGRY_LEVEL2 = "ctgry_level2";
+    private static final String CTGRY_LEVEL3 = "ctgry_level3";
+    
+    // Category Mappings Table - column names
+    private static final String CTGRY_MAP_ID = "ctgry_map_id";
+    private static final String CTGRY_MAP_EXHBTR_ID = "ctgry_map_exhbtr_id";
+    private static final String CTGRY_MAP_CTGRY_ID = "ctgry_map_ctgry_id";
+    private static final String CTGRY_MAP_EXHBTR_NAME = "ctgry_map_exhbtr_name";
 
 
     // Question table Create Statements
@@ -269,6 +290,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             BNNR_IMAGE + " TEXT," +
             BNNR_URL + " TEXT," +
             BNNR_TYPE + " TEXT" + ")";
+    
+    // Categories table Create Statements
+    private static final String CREATE_TABLE_CATEGORIES = "CREATE TABLE "
+            + TABLE_CATEGORIES + "(" +
+            CTGRY_ID + " INTEGER PRIMARY KEY ," +
+            CTGRY_NAME + " TEXT," +
+            CTGRY_LEVEL2 + " TEXT," +
+            CTGRY_LEVEL3 + " TEXT" + ")";
+    
+    // Category mappings table Create Statements
+    private static final String CREATE_TABLE_CATEGORY_MAPPINGS = "CREATE TABLE "
+            + TABLE_CATEGORY_MAPPINGS + "(" +
+            CTGRY_MAP_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            CTGRY_MAP_EXHBTR_ID + " INTEGER," +
+            CTGRY_MAP_CTGRY_ID + " INTEGER," +
+            CTGRY_MAP_EXHBTR_NAME + " TEXT" + ")";
+
+
     Context mContext;
     private boolean LOG_FLAG = false;
 
@@ -290,6 +329,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL (CREATE_TABLE_FAVOURITES);
         db.execSQL (CREATE_TABLE_NOTES);
         db.execSQL (CREATE_TABLE_BANNERS);
+    
+        db.execSQL (CREATE_TABLE_CATEGORIES);
+        db.execSQL (CREATE_TABLE_CATEGORY_MAPPINGS);
     }
 
     @Override
@@ -307,6 +349,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //        db.execSQL ("DROP TABLE IF EXISTS " + TABLE_FAVOURITE);
 //        db.execSQL ("DROP TABLE IF EXISTS " + TABLE_NOTES);
         db.execSQL ("DROP TABLE IF EXISTS " + TABLE_BANNERS);
+        db.execSQL ("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
+        db.execSQL ("DROP TABLE IF EXISTS " + TABLE_CATEGORY_MAPPINGS);
         onCreate (db);
     }
 
@@ -1111,7 +1155,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         return bannerList;
     }
-
+    
     public ArrayList<Banner> getAllExhibitorBanners () {
         ArrayList<Banner> bannerList = new ArrayList<Banner> ();
         SQLiteDatabase db = this.getReadableDatabase ();
@@ -1132,12 +1176,188 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         return bannerList;
     }
-
+    
+    public ArrayList<Banner> getAllEventBanners () {
+        ArrayList<Banner> bannerList = new ArrayList<Banner> ();
+        SQLiteDatabase db = this.getReadableDatabase ();
+        String selectQuery = "SELECT  * FROM " + TABLE_BANNERS + " WHERE " + BNNR_TYPE + " = '" + BNNR_TYPE_EVENT + "'";
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get banner where banner type = " + BNNR_TYPE_EVENT, LOG_FLAG);
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c.moveToFirst ()) {
+            do {
+                Banner banner = new Banner (
+                        c.getInt ((c.getColumnIndex (BNNR_ID))),
+                        c.getString ((c.getColumnIndex (BNNR_TITLE))),
+                        c.getString ((c.getColumnIndex (BNNR_IMAGE))),
+                        c.getString ((c.getColumnIndex (BNNR_URL))),
+                        c.getString ((c.getColumnIndex (BNNR_TYPE)))
+                );
+                bannerList.add (banner);
+            } while (c.moveToNext ());
+        }
+        return bannerList;
+    }
+    
+    public ArrayList<Banner> getAllSessionBanners () {
+        ArrayList<Banner> bannerList = new ArrayList<Banner> ();
+        SQLiteDatabase db = this.getReadableDatabase ();
+        String selectQuery = "SELECT  * FROM " + TABLE_BANNERS + " WHERE " + BNNR_TYPE + " = '" + BNNR_TYPE_SESSION + "'";
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get banner where banner type = " + BNNR_TYPE_SESSION, LOG_FLAG);
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c.moveToFirst ()) {
+            do {
+                Banner banner = new Banner (
+                        c.getInt ((c.getColumnIndex (BNNR_ID))),
+                        c.getString ((c.getColumnIndex (BNNR_TITLE))),
+                        c.getString ((c.getColumnIndex (BNNR_IMAGE))),
+                        c.getString ((c.getColumnIndex (BNNR_URL))),
+                        c.getString ((c.getColumnIndex (BNNR_TYPE)))
+                );
+                bannerList.add (banner);
+            } while (c.moveToNext ());
+        }
+        return bannerList;
+    }
+    
     public void deleteAllBanners () {
         SQLiteDatabase db = this.getWritableDatabase ();
         Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete all banners", LOG_FLAG);
         db.execSQL ("delete from " + TABLE_BANNERS);
     }
+    
+    //Categories
+    
+    public long createCategory (Category category) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Creating category", LOG_FLAG);
+        ContentValues values = new ContentValues ();
+        values.put (CTGRY_ID, category.getId ());
+        values.put (CTGRY_NAME, category.getName ());
+        values.put (CTGRY_LEVEL2, category.getLevel2 ());
+        values.put (CTGRY_LEVEL3, category.getLevel3 ());
+        long category_id = db.insert (TABLE_CATEGORIES, null, values);
+        return category_id;
+    }
+    
+    public ArrayList<Category> getAllCategories () {
+        ArrayList<Category> categoryList = new ArrayList<Category> ();
+        SQLiteDatabase db = this.getReadableDatabase ();
+        String selectQuery = "SELECT  * FROM " + TABLE_CATEGORIES;
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all categories", LOG_FLAG);
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c.moveToFirst ()) {
+            do {
+                Category category = new Category (
+                        c.getInt ((c.getColumnIndex (CTGRY_ID))),
+                        c.getString ((c.getColumnIndex (CTGRY_NAME))),
+                        c.getString ((c.getColumnIndex (CTGRY_LEVEL2))),
+                        c.getString ((c.getColumnIndex (CTGRY_LEVEL3)))
+                );
+                categoryList.add (category);
+            } while (c.moveToNext ());
+        }
+        return categoryList;
+    }
+    
+    public ArrayList<String> getAllCategoryName () {
+        ArrayList<String> categoryNameList = new ArrayList<String> ();
+        SQLiteDatabase db = this.getReadableDatabase ();
+        String selectQuery = "SELECT DISTINCT(" + CTGRY_NAME + ") FROM " + TABLE_CATEGORIES;
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all distinct category names", LOG_FLAG);
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c.moveToFirst ()) {
+            do {
+                categoryNameList.add (c.getString ((c.getColumnIndex (CTGRY_NAME))));
+            } while (c.moveToNext ());
+        }
+        return categoryNameList;
+    }
+    
+    public ArrayList<String> getAllCategoryLevel2 (String category_name) {
+        ArrayList<String> categoryLevel2List = new ArrayList<String> ();
+        SQLiteDatabase db = this.getReadableDatabase ();
+        String selectQuery = "SELECT DISTINCT(" + CTGRY_LEVEL2 + ") FROM " + TABLE_CATEGORIES + " WHERE " + CTGRY_NAME + " = '" + category_name + "'";
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all distinct category level 2 where category name = " + category_name, LOG_FLAG);
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c.moveToFirst ()) {
+            do {
+                categoryLevel2List.add (c.getString ((c.getColumnIndex (CTGRY_LEVEL2))));
+            } while (c.moveToNext ());
+        }
+        return categoryLevel2List;
+    }
+    
+    public void deleteAllCategories () {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete all categories", LOG_FLAG);
+        db.execSQL ("delete from " + TABLE_CATEGORIES);
+    }
+    
+    
+    //Category mappings
+    
+    public long createCategoryMapping (CategoryMapping categoryMapping) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Creating category mapping", LOG_FLAG);
+        ContentValues values = new ContentValues ();
+        values.put (CTGRY_MAP_EXHBTR_ID, categoryMapping.getExhibitor_id ());
+        values.put (CTGRY_MAP_CTGRY_ID, categoryMapping.getCategory_id ());
+        values.put (CTGRY_MAP_EXHBTR_NAME, categoryMapping.getExhibitor_name ());
+        long category_id = db.insert (TABLE_CATEGORY_MAPPINGS, null, values);
+        return category_id;
+    }
+    
+    public ArrayList<Category> getAllCategoryMapping () {
+        ArrayList<Category> categoryList = new ArrayList<Category> ();
+        SQLiteDatabase db = this.getReadableDatabase ();
+        String selectQuery = "SELECT  * FROM " + TABLE_CATEGORIES;
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all categories", LOG_FLAG);
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c.moveToFirst ()) {
+            do {
+                Category category = new Category (
+                        c.getInt ((c.getColumnIndex (CTGRY_ID))),
+                        c.getString ((c.getColumnIndex (CTGRY_NAME))),
+                        c.getString ((c.getColumnIndex (CTGRY_LEVEL2))),
+                        c.getString ((c.getColumnIndex (CTGRY_LEVEL3)))
+                );
+                categoryList.add (category);
+            } while (c.moveToNext ());
+        }
+        return categoryList;
+    }
+    
+    public String getAllCategoryMappingsForExhibitor (int exhibitor_id) {
+        ArrayList<Category> categoryList = new ArrayList<Category> ();
+        SQLiteDatabase db = this.getReadableDatabase ();
+        String selectQuery = "SELECT GROUP_CONCAT(" + CTGRY_LEVEL3 + ") AS categories FROM " + TABLE_CATEGORY_MAPPINGS + " INNER JOIN " + TABLE_CATEGORIES + " ON " + CTGRY_MAP_CTGRY_ID + " = " + CTGRY_ID + " WHERE " + CTGRY_MAP_EXHBTR_ID + " = " + exhibitor_id;
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all category mapping for exhibitor = " + exhibitor_id, LOG_FLAG);
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c != null)
+            c.moveToFirst ();
+        
+        return c.getString (c.getColumnIndex ("categories"));
+    }
+    
+    public boolean isCategoryMappingInExhibitor (int exhibitor_id) {
+        String countQuery = "SELECT * FROM " + TABLE_CATEGORY_MAPPINGS + " WHERE " + CTGRY_MAP_EXHBTR_ID + " = " + exhibitor_id;
+        SQLiteDatabase db = this.getReadableDatabase ();
+        Cursor cursor = db.rawQuery (countQuery, null);
+        int count = cursor.getCount ();
+        cursor.close ();
+        if (count > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public void deleteAllCategoryMappings () {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete all category mappings", LOG_FLAG);
+        db.execSQL ("delete from " + TABLE_CATEGORY_MAPPINGS);
+    }
+
 
 
     public void closeDB () {

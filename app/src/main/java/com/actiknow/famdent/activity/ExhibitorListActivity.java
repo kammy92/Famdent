@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.util.Log;
@@ -147,6 +148,8 @@ public class ExhibitorListActivity extends AppCompatActivity implements ViewPage
         rvExhibitor.setLayoutManager (new LinearLayoutManager (this, LinearLayoutManager.VERTICAL, false));
         rvExhibitor.addItemDecoration (new SimpleDividerItemDecoration (this));
         rvExhibitor.setItemAnimator (new DefaultItemAnimator ());
+    
+        searchView.setQueryHint (Html.fromHtml ("<font color = #aaffffff>" + "Search" + "</font>"));
     }
 
     private void initListener () {

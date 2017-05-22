@@ -44,8 +44,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 
@@ -218,6 +220,7 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
                             .onPositive (new MaterialDialog.SingleButtonCallback () {
                                 @Override
                                 public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+    
                                     updateOfflineFavouriteStatus (false, exhibitor_id);
 //                                    updateFavouriteStatus (false, exhibitor_id);
                                 }
@@ -378,6 +381,30 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
                 dialog.show ();
             }
         });
+    
+        tvDealsIn.setOnClickListener (new View.OnClickListener () {
+            @Override
+            public void onClick (View v) {
+                List<String> items = Arrays.asList (db.getAllCategoryMappingsForExhibitor (exhibitor_id).split (","));
+                String dealsIn = "";
+            
+                for (int i = 0; i < items.size (); i++) {
+                    dealsIn = dealsIn + items.get (i) + "\n";
+                }
+                MaterialDialog dialog = new MaterialDialog.Builder (ExhibitorDetailActivity.this)
+                        .title ("Deals in")
+//                        .items (items)
+                        .content (dealsIn)
+                        .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                        .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                        .typeface (SetTypeFace.getTypeface (ExhibitorDetailActivity.this), SetTypeFace.getTypeface (ExhibitorDetailActivity.this))
+                        .canceledOnTouchOutside (false)
+                        .cancelable (false)
+                        .positiveText (R.string.dialog_action_ok)
+                        .build ();
+                dialog.show ();
+            }
+        });
     }
 
     private void getExtras () {
@@ -395,7 +422,7 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
         tvFullAddress.setText ("Stall :" + exhibitorDetail.getAddress ());
         tvContactPerson.setText (exhibitorDetail.getContact_person ());
         tvEmail.setText (Html.fromHtml ("<u><font color='blue'>" + exhibitorDetail.getEmail () + "</font></u>"), TextView.BufferType.SPANNABLE);
-        tvWebsite.setText (Html.fromHtml ("<u><font color='blue'>" + exhibitorDetail.getWebsite () + "</font></u>"), TextView.BufferType.SPANNABLE);
+        tvWebsite.setText (Html.fromHtml ("<u><font color='blue'>" + "Click here" + "</font></u>"), TextView.BufferType.SPANNABLE);
         tvNotes.setText (exhibitorDetail.getNotes ());
 
         for (int i = 0; i < exhibitorDetail.getContactList ().size (); i++) {

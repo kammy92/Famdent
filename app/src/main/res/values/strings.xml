@@ -35,6 +35,10 @@
     <string name="activity_event_list_title">EVENT LIST</string>
     <string name="activity_event_list_text_no_programme_found">No Event Found</string>
 
+
+    <string name="activity_session_list_text_no_session_found">No Session Found</string>
+
+
     <string name="activity_hall_plan_title">HALL PLAN</string>
 
     <string name="activity_my_favourites_title">MY FAVOURITES</string>

@@ -60,7 +60,7 @@ public class MyFavouriteActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new MyFavouriteExhibitorFragment (), "EXHIBITOR");
-        adapter.addFragment (new MyFavouriteEventFragment (), "PROGRAMMES");
+        adapter.addFragment (new MyFavouriteEventFragment (), "EVENTS");
         adapter.addFragment (new MyFavouriteSessionFragment (), "SESSIONS");
         viewPager.setAdapter(adapter);
     }

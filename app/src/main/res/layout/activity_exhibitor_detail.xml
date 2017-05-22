@@ -79,7 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/appBar"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <ScrollView
                 android:layout_width="match_parent"
@@ -87,7 +87,7 @@
                 android:layout_above="@+id/tvDealsIn">
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_margin="@dimen/activity_margin"
                     android:animateLayoutChanges="true"
                     android:orientation="vertical">
@@ -95,15 +95,12 @@
                         android:id="@+id/rlAddress"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
-
-
                         <ImageView
                             android:id="@+id/ivLocation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="@dimen/activity_margin_small"
                             android:src="@drawable/ic_location"/>
-
                         <TextView
                             android:id="@+id/tvExhibitorName"
                             android:layout_width="match_parent"
@@ -117,7 +114,6 @@
                             android:textColor="@color/app_text_color_dark"
                             android:textSize="@dimen/text_size_large"
                             android:textStyle="bold"/>
-
                         <TextView
                             android:id="@+id/tvFullAddress"
                             android:layout_width="wrap_content"
@@ -189,8 +185,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/rlPhone"
-                        android:layout_marginTop="@dimen/activity_margin"
-                    >
+                        android:layout_marginTop="@dimen/activity_margin">
                         <ImageView
                             android:id="@+id/ivEmail"
                             android:layout_width="wrap_content"
@@ -293,10 +288,13 @@
                 android:layout_marginLeft="@dimen/activity_margin_small"
                 android:layout_marginRight="@dimen/activity_margin_small"
                 android:layout_marginStart="@dimen/activity_margin_small"
+                android:ellipsize="end"
+                android:lines="2"
+                android:text="alskdm lkamsd lk lk lkasmd lkamsdlka slkma sddlkmas dlk ds lkamsd lkmasd lkm lkamsd lkmadsalk asd kd lkm glmd kasmd"
                 android:textColor="@color/app_text_color_light"
                 android:textSize="@dimen/text_size_small"
                 android:textStyle="bold"
-                android:visibility="gone"/>
+                android:visibility="visible"/>
             <LinearLayout
                 android:id="@+id/llButtons"
                 android:layout_width="match_parent"

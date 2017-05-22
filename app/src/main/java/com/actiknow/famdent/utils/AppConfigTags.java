@@ -44,6 +44,7 @@ public class AppConfigTags {
     public static final String VERSION_CODE = "version_code";
     public static final String VERSION_NAME = "version_name";
     public static final String VERSION_UPDATED_ON = "version_updated_on";
+    public static final String VERSION_UPDATE = "version_update";
     public static final String VERSION_UPDATE_CRITICAL = "version_update_critical";
 
 

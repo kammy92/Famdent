@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 import com.actiknow.famdent.model.Banner;
@@ -32,7 +33,7 @@ import java.util.Locale;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
     // Database Version
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 10;
     // Database Name
     private static final String DATABASE_NAME = "famdent";
 
@@ -396,7 +397,107 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         long exhibitor_id = db.insert (TABLE_EXHIBITORS, null, values);
         return exhibitor_id;
     }
+    
+    public void insertAllExhibitors (ArrayList<ExhibitorDetail> exhibitorDetailList) {
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Inserting all exhibitors", LOG_FLAG);
+        SQLiteDatabase db = this.getWritableDatabase ();
+        String sql = "INSERT INTO " + TABLE_EXHIBITORS + " VALUES (?,?,?,?,?,?,?,?,?,?,?);";
+        SQLiteStatement statement = db.compileStatement (sql);
+        db.beginTransaction ();
+        try {
+            for (ExhibitorDetail exhibitorDetail : exhibitorDetailList) {
+                statement.clearBindings ();
+                statement.bindLong (1, exhibitorDetail.getId ());
+                statement.bindString (2, exhibitorDetail.getExhibitor_name ());
+                statement.bindString (3, exhibitorDetail.getAddress ());
+                statement.bindString (4, exhibitorDetail.getContact_person ());
+                statement.bindString (5, exhibitorDetail.getEmail ());
+                statement.bindString (6, exhibitorDetail.getExhibitor_description ());
+                statement.bindString (7, exhibitorDetail.getWebsite ());
+                
+                ArrayList<String> contactList = exhibitorDetail.getContactList ();
+                switch (exhibitorDetail.getContactList ().size ()) {
+                    case 0:
+                        statement.bindString (8, "");
+                        statement.bindString (9, "");
+                        statement.bindString (10, "");
+                        break;
+                    case 1:
+                        statement.bindString (8, contactList.get (0));
+                        statement.bindString (9, "");
+                        statement.bindString (10, "");
+                        break;
+                    case 2:
+                        statement.bindString (8, contactList.get (0));
+                        statement.bindString (9, contactList.get (1));
+                        statement.bindString (10, "");
+                        break;
+                    case 3:
+                        statement.bindString (8, contactList.get (0));
+                        statement.bindString (9, contactList.get (1));
+                        statement.bindString (10, contactList.get (2));
+                        break;
+                }
+                statement.bindString (11, getDateTime ());
+                statement.execute ();
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+        
+        
+        
+        /*
+        
+        db.beginTransaction ();
+        try {
+            ContentValues values = new ContentValues ();
+            for (ExhibitorDetail exhibitorDetail : exhibitorDetailList) {
+                values.put (EXHBTR_ID, exhibitorDetail.getId ());
+                values.put (EXHBTR_NAME, exhibitorDetail.getExhibitor_name ());
+                values.put (EXHBTR_ADDRESS, exhibitorDetail.getAddress ());
+                values.put (EXHBTR_CONTACT_PERSON, exhibitorDetail.getContact_person ());
+                values.put (EXHBTR_EMAIL, exhibitorDetail.getEmail ());
+                values.put (EXHBTR_DESCRIPTION, exhibitorDetail.getExhibitor_description ());
+                values.put (EXHBTR_WEBSITE, exhibitorDetail.getWebsite ());
+    
+                ArrayList<String> contactList = exhibitorDetail.getContactList ();
+                switch (exhibitorDetail.getContactList ().size ()) {
+                    case 0:
+                        values.put (EXHBTR_CONTACT1, "");
+                        values.put (EXHBTR_CONTACT2, "");
+                        values.put (EXHBTR_CONTACT3, "");
+                        break;
+                    case 1:
+                        values.put (EXHBTR_CONTACT1, contactList.get (0));
+                        values.put (EXHBTR_CONTACT2, "");
+                        values.put (EXHBTR_CONTACT3, "");
+                        break;
+                    case 2:
+                        values.put (EXHBTR_CONTACT1, contactList.get (0));
+                        values.put (EXHBTR_CONTACT2, contactList.get (1));
+                        values.put (EXHBTR_CONTACT3, "");
+                        break;
+                    case 3:
+                        values.put (EXHBTR_CONTACT1, contactList.get (0));
+                        values.put (EXHBTR_CONTACT2, contactList.get (1));
+                        values.put (EXHBTR_CONTACT3, contactList.get (2));
+                        break;
+                }
+    
+                values.put (EXHBTR_CREATED_AT, getDateTime ());
 
+                db.insert (TABLE_EXHIBITORS, null, values);
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+        
+        */
+    }
+    
     public long createExhibitorStallDetail (StallDetail stallDetail, long exhibitor_id) {
         SQLiteDatabase db = this.getWritableDatabase ();
         Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Creating Stall Detail", LOG_FLAG);
@@ -408,7 +509,48 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         long exhibition_plan_id = db.insert (TABLE_EXHIBITION_PLAN, null, values);
         return exhibition_plan_id;
     }
-
+    
+    public void insertAllStallDetails (ArrayList<StallDetail> stallDetailArrayList, long exhibitor_id) {
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Inserting all Stall details where exhibitor id = " + exhibitor_id, LOG_FLAG);
+        SQLiteDatabase db = this.getWritableDatabase ();
+        String sql = "INSERT INTO " + TABLE_EXHIBITION_PLAN + "(" + EXHBTN_PLN_EXHBTR_ID + ", " + EXHBTN_PLN_HALL_NUMBER + ", " + EXHBTN_PLN_STALL_NUMBER + ", " + EXHBTN_PLN_STALL_NAME + ") VALUES (?,?,?,?);";
+        SQLiteStatement statement = db.compileStatement (sql);
+        db.beginTransaction ();
+        try {
+            for (StallDetail stallDetail : stallDetailArrayList) {
+                statement.clearBindings ();
+                statement.bindLong (1, exhibitor_id);
+                statement.bindString (2, stallDetail.getHall_number ());
+                statement.bindString (3, stallDetail.getStall_number ());
+                statement.bindString (4, stallDetail.getStall_name ());
+                
+                statement.execute ();
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+    
+    /*
+        SQLiteDatabase db = this.getWritableDatabase ();
+        db.beginTransaction ();
+        try {
+            ContentValues values = new ContentValues ();
+            for (StallDetail stallDetail : stallDetailArrayList) {
+                values.put (EXHBTN_PLN_EXHBTR_ID, exhibitor_id);
+                values.put (EXHBTN_PLN_HALL_NUMBER, stallDetail.getHall_number ());
+                values.put (EXHBTN_PLN_STALL_NUMBER, stallDetail.getStall_number ());
+                values.put (EXHBTN_PLN_STALL_NAME, stallDetail.getStall_name ());
+                db.insert (TABLE_EXHIBITION_PLAN, null, values);
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+        
+        */
+    }
+    
     public ExhibitorDetail getExhibitorDetail (long exhibitor_id) {
         SQLiteDatabase db = this.getReadableDatabase ();
         String selectQuery = "SELECT  * FROM " + TABLE_EXHIBITORS + " WHERE " + EXHBTR_ID + " = " + exhibitor_id;
@@ -452,7 +594,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public ArrayList<StallDetail> getExhibitorStallDetails (long exhibitor_id) {
         ArrayList<StallDetail> stallDetailList = new ArrayList<StallDetail> ();
         String selectQuery = "SELECT * FROM " + TABLE_EXHIBITION_PLAN + " WHERE " + EXHBTN_PLN_EXHBTR_ID + " = " + exhibitor_id;
-        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get exhibitorList", LOG_FLAG);
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get stall detail for exhibitor id = " + exhibitor_id, LOG_FLAG);
         SQLiteDatabase db = this.getReadableDatabase ();
         Cursor c = db.rawQuery (selectQuery, null);
         if (c.moveToFirst ()) {
@@ -465,7 +607,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     ));
                 } catch (Exception e) {
                     e.printStackTrace ();
-                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), true);
+                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), LOG_FLAG);
                 }
             } while (c.moveToNext ());
         }
@@ -475,7 +617,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public ArrayList<Exhibitor> getAllExhibitorList () {
         ArrayList<Exhibitor> exhibitorList = new ArrayList<Exhibitor> ();
         String selectQuery = "SELECT  * FROM " + TABLE_EXHIBITORS + " ORDER BY " + EXHBTR_DESCRIPTION + " DESC, " + EXHBTR_NAME + " ASC";
-        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Exhibitors", false);
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Exhibitors", LOG_FLAG);
         SQLiteDatabase db = this.getReadableDatabase ();
         Cursor c = db.rawQuery (selectQuery, null);
         // looping through all rows and adding to list
@@ -501,7 +643,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             Favourite favourite = favouriteList.get (i);
             if (favourite.getType ().equalsIgnoreCase (FAV_TYPE_EXHIBITOR)) {
                 String selectQuery = "SELECT  * FROM " + TABLE_EXHIBITORS + " WHERE " + EXHBTR_ID + " = " + favourite.getExhibitor_id ();
-                Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Exhibitors", false);
+                Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Exhibitors", LOG_FLAG);
                 SQLiteDatabase db = this.getReadableDatabase ();
                 Cursor c = db.rawQuery (selectQuery, null);
                 // looping through all rows and adding to list
@@ -552,7 +694,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         long exhibitor_id = db.insert (TABLE_EVENTS, null, values);
         return exhibitor_id;
     }
-
+    
+    public void insertAllEvents (ArrayList<EventDetail> eventDetailList) {
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Inserting all Events", LOG_FLAG);
+        SQLiteDatabase db = this.getWritableDatabase ();
+        db.beginTransaction ();
+        try {
+            ContentValues values = new ContentValues ();
+            for (EventDetail eventDetail : eventDetailList) {
+                values.put (EVNT_ID, eventDetail.getId ());
+                values.put (EVNT_NAME, eventDetail.getName ());
+                values.put (EVNT_DATE, eventDetail.getDate ());
+                values.put (EVNT_TIME, eventDetail.getTime ());
+                values.put (EVNT_DURATION, eventDetail.getDuration ());
+                values.put (EVNT_LOCATION, eventDetail.getLocation ());
+                values.put (EVNT_FEES, eventDetail.getFees ());
+                values.put (EVNT_NOTES, eventDetail.getNotes ());
+                values.put (EVNT_CREATED_AT, getDateTime ());
+                db.insert (TABLE_EVENTS, null, values);
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+    }
+    
     public long createEventSpeaker (EventSpeaker eventSpeaker, long event_id) {
         SQLiteDatabase db = this.getWritableDatabase ();
         Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Creating event speaker", LOG_FLAG);
@@ -565,7 +731,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         long event_speaker_id = db.insert (TABLE_EVENT_SPEAKERS, null, values);
         return event_speaker_id;
     }
-
+    
+    public void insertAllEventSpeakers (ArrayList<EventSpeaker> eventSpeakerList, long event_id) {
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Inserting all event speakers where event id = " + event_id, LOG_FLAG);
+        SQLiteDatabase db = this.getWritableDatabase ();
+        db.beginTransaction ();
+        try {
+            ContentValues values = new ContentValues ();
+            for (EventSpeaker eventSpeaker : eventSpeakerList) {
+                values.put (EVNT_SPKR_EVNT_ID, event_id);
+                values.put (EVNT_SPKR_IMAGE, eventSpeaker.getImage ());
+                values.put (EVNT_SPKR_NAME, eventSpeaker.getName ());
+                values.put (EVNT_SPKR_QUALIFICATION, eventSpeaker.getQualification ());
+                values.put (EVNT_SPKR_EXPERIENCE, eventSpeaker.getExperience ());
+                db.insert (TABLE_EVENT_SPEAKERS, null, values);
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+    }
+    
     public long createEventTopic (String topic, long event_id) {
         SQLiteDatabase db = this.getWritableDatabase ();
         Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Creating event topic", LOG_FLAG);
@@ -575,7 +761,42 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         long event_topic_id = db.insert (TABLE_EVENT_TOPICS, null, values);
         return event_topic_id;
     }
-
+    
+    public void insertAllEventTopics (ArrayList<String> eventTopicList, long event_id) {
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Inserting all Event topics where event id = " + event_id, LOG_FLAG);
+        SQLiteDatabase db = this.getWritableDatabase ();
+        String sql = "INSERT INTO " + TABLE_EVENT_TOPICS + "(" + EVNT_TOPC_EVNT_ID + ", " + EVNT_TOPC_TEXT + ") VALUES (?,?);";
+        SQLiteStatement statement = db.compileStatement (sql);
+        db.beginTransaction ();
+        try {
+            for (String topic : eventTopicList) {
+                statement.clearBindings ();
+                statement.bindLong (1, event_id);
+                statement.bindString (2, topic);
+                statement.execute ();
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+    
+    /*
+        SQLiteDatabase db = this.getWritableDatabase ();
+        db.beginTransaction ();
+        try {
+            ContentValues values = new ContentValues ();
+            for (String topic : eventTopicList) {
+                values.put (EVNT_TOPC_EVNT_ID, event_id);
+                values.put (EVNT_TOPC_TEXT, topic);
+                db.insert (TABLE_EVENT_TOPICS, null, values);
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+        */
+    }
+    
     public EventDetail getEventDetail (long event_id) {
         SQLiteDatabase db = this.getReadableDatabase ();
         String selectQuery = "SELECT  * FROM " + TABLE_EVENTS + " WHERE " + EVNT_ID + " = " + event_id;
@@ -620,7 +841,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     ));
                 } catch (Exception e) {
                     e.printStackTrace ();
-                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), true);
+                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), LOG_FLAG);
                 }
             } while (c.moveToNext ());
         }
@@ -639,7 +860,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     eventTopicList.add (c.getString (c.getColumnIndex (EVNT_TOPC_TEXT)));
                 } catch (Exception e) {
                     e.printStackTrace ();
-                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), true);
+                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), LOG_FLAG);
                 }
             } while (c.moveToNext ());
         }
@@ -649,7 +870,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public ArrayList<Event> getAllEventList () {
         ArrayList<Event> eventList = new ArrayList<Event> ();
         String selectQuery = "SELECT *, (SELECT GROUP_CONCAT(" + EVNT_SPKR_NAME + ") FROM " + TABLE_EVENT_SPEAKERS + " WHERE " + EVNT_SPKR_EVNT_ID + " = " + EVNT_ID + ") as `evnt_speakers`  FROM " + TABLE_EVENTS;
-        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Events", false);
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Events", LOG_FLAG);
         SQLiteDatabase db = this.getReadableDatabase ();
         Cursor c = db.rawQuery (selectQuery, null);
         // looping through all rows and adding to list
@@ -675,7 +896,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             Favourite favourite = favouriteList.get (i);
             if (favourite.getType ().equalsIgnoreCase (FAV_TYPE_EVENT)) {
                 String selectQuery = "SELECT *, (SELECT GROUP_CONCAT(" + EVNT_SPKR_NAME + ") FROM " + TABLE_EVENT_SPEAKERS + " WHERE " + EVNT_SPKR_EVNT_ID + " = " + EVNT_ID + ") as `evnt_speakers`  FROM " + TABLE_EVENTS + " WHERE " + EVNT_ID + " = " + favourite.getEvent_id ();
-                Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Events", false);
+                Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Events", LOG_FLAG);
                 SQLiteDatabase db = this.getReadableDatabase ();
                 Cursor c = db.rawQuery (selectQuery, null);
                 // looping through all rows and adding to list
@@ -731,7 +952,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         long session_id = db.insert (TABLE_SESSIONS, null, values);
         return session_id;
     }
-
+    
+    public void insertAllSessions (ArrayList<SessionDetail> sessionDetailList) {
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Inserting all Sessions", LOG_FLAG);
+        SQLiteDatabase db = this.getWritableDatabase ();
+        db.beginTransaction ();
+        try {
+            ContentValues values = new ContentValues ();
+            for (SessionDetail sessionDetail : sessionDetailList) {
+                values.put (SSION_ID, sessionDetail.getId ());
+                values.put (SSION_TITLE, sessionDetail.getTitle ());
+                values.put (SSION_DATE, sessionDetail.getDate ());
+                values.put (SSION_TIME, sessionDetail.getTime ());
+                values.put (SSION_LOCATION, sessionDetail.getLocation ());
+                values.put (SSION_CATEGORY, sessionDetail.getCategory ());
+                values.put (SSION_CREATED_AT, getDateTime ());
+                db.insert (TABLE_SESSIONS, null, values);
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+    }
+    
     public long createSessionSpeaker (SessionSpeaker sessionSpeaker, long session_id) {
         SQLiteDatabase db = this.getWritableDatabase ();
         Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Creating session speaker", LOG_FLAG);
@@ -742,7 +985,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         long session_speaker_id = db.insert (TABLE_SESSION_SPEAKERS, null, values);
         return session_speaker_id;
     }
-
+    
+    public void insertAllSessionSpeakers (ArrayList<SessionSpeaker> sessionSpeakerList, long session_id) {
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Inserting all session speakers where session id = " + session_id, LOG_FLAG);
+        SQLiteDatabase db = this.getWritableDatabase ();
+        db.beginTransaction ();
+        try {
+            ContentValues values = new ContentValues ();
+            for (SessionSpeaker sessionSpeaker : sessionSpeakerList) {
+                values.put (SSION_SPKR_SSION_ID, session_id);
+                values.put (SSION_SPKR_NAME, sessionSpeaker.getName ());
+                values.put (SSION_SPKR_IMAGE, sessionSpeaker.getImage ());
+                db.insert (TABLE_SESSION_SPEAKERS, null, values);
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+    }
+    
     public long createSessionTopic (String topic, long session_id) {
         SQLiteDatabase db = this.getWritableDatabase ();
         Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Creating session topic", LOG_FLAG);
@@ -752,7 +1013,42 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         long session_topic_id = db.insert (TABLE_SESSION_TOPICS, null, values);
         return session_topic_id;
     }
-
+    
+    public void insertAllSessionTopics (ArrayList<String> sessionTopicList, long session_id) {
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Inserting all Session topics where session id = " + session_id, LOG_FLAG);
+        SQLiteDatabase db = this.getWritableDatabase ();
+        String sql = "INSERT INTO " + TABLE_SESSION_TOPICS + "(" + SSION_TOPC_SSION_ID + ", " + SSION_TOPC_TEXT + ") VALUES (?,?);";
+        SQLiteStatement statement = db.compileStatement (sql);
+        db.beginTransaction ();
+        try {
+            for (String topic : sessionTopicList) {
+                statement.clearBindings ();
+                statement.bindLong (1, session_id);
+                statement.bindString (2, topic);
+                statement.execute ();
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+    
+    /*
+        SQLiteDatabase db = this.getWritableDatabase ();
+        db.beginTransaction ();
+        try {
+            ContentValues values = new ContentValues ();
+            for (String topic : sessionTopicList) {
+                values.put (SSION_TOPC_SSION_ID, session_id);
+                values.put (SSION_TOPC_TEXT, topic);
+                db.insert (TABLE_SESSION_TOPICS, null, values);
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+        */
+    }
+    
     public SessionDetail getSessionDetail (long session_id) {
         SQLiteDatabase db = this.getReadableDatabase ();
         String selectQuery = "SELECT  * FROM " + TABLE_SESSIONS + " WHERE " + SSION_ID + " = " + session_id;
@@ -793,7 +1089,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     ));
                 } catch (Exception e) {
                     e.printStackTrace ();
-                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), true);
+                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), LOG_FLAG);
                 }
             } while (c.moveToNext ());
         }
@@ -812,7 +1108,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     sessionTopicList.add (c.getString (c.getColumnIndex (SSION_TOPC_TEXT)));
                 } catch (Exception e) {
                     e.printStackTrace ();
-                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), true);
+                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), LOG_FLAG);
                 }
             } while (c.moveToNext ());
         }
@@ -822,7 +1118,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public ArrayList<Session> getAllSessionList () {
         ArrayList<Session> sessionList = new ArrayList<Session> ();
         String selectQuery = "SELECT *, (SELECT GROUP_CONCAT(" + SSION_SPKR_NAME + ") FROM " + TABLE_SESSION_SPEAKERS + " WHERE " + SSION_SPKR_SSION_ID + " = " + SSION_ID + ") as `ssion_speakers`  FROM " + TABLE_SESSIONS;
-        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Sessions", false);
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Sessions", LOG_FLAG);
         SQLiteDatabase db = this.getReadableDatabase ();
         Cursor c = db.rawQuery (selectQuery, null);
         // looping through all rows and adding to list
@@ -850,7 +1146,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             Favourite favourite = favouriteList.get (i);
             if (favourite.getType ().equalsIgnoreCase (FAV_TYPE_SESSION)) {
                 String selectQuery = "SELECT *, (SELECT GROUP_CONCAT(" + SSION_SPKR_NAME + ") FROM " + TABLE_SESSION_SPEAKERS + " WHERE " + SSION_SPKR_SSION_ID + " = " + SSION_ID + ") as `ssion_speakers`  FROM " + TABLE_SESSIONS + " WHERE " + SSION_ID + " = " + favourite.getSession_id ();
-                Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Sessions", false);
+                Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Sessions", LOG_FLAG);
                 SQLiteDatabase db = this.getReadableDatabase ();
                 Cursor c = db.rawQuery (selectQuery, null);
                 // looping through all rows and adding to list
@@ -999,7 +1295,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     ));
                 } catch (Exception e) {
                     e.printStackTrace ();
-                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), true);
+                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), LOG_FLAG);
                 }
             } while (c.moveToNext ());
         }
@@ -1040,7 +1336,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public int updateNoteInExhibitor (String text, int exhibitor_id) {
         SQLiteDatabase db = this.getWritableDatabase ();
-        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Update not in exhibitor", false);
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Update not in exhibitor", LOG_FLAG);
         ContentValues values = new ContentValues ();
         values.put (NOTS_TEXT, text);
         return db.update (TABLE_NOTES, values, NOTS_EXHBTR_ID + " = ? AND " + NOTS_TYPE + " = ?", new String[] {String.valueOf (exhibitor_id), NOTS_TYPE_EXHIBITOR});
@@ -1075,7 +1371,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     ));
                 } catch (Exception e) {
                     e.printStackTrace ();
-                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), true);
+                    Utils.showLog (Log.DEBUG, "EXCEPTION", e.getMessage (), LOG_FLAG);
                 }
             } while (c.moveToNext ());
         }
@@ -1096,7 +1392,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         long banner_id = db.insert (TABLE_BANNERS, null, values);
         return banner_id;
     }
-
+    
+    public void insertAllBanners (ArrayList<Banner> bannerList) {
+        SQLiteDatabase db = this.getWritableDatabase ();
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Inserting all banners", LOG_FLAG);
+        db.beginTransaction ();
+        try {
+            ContentValues values = new ContentValues ();
+            for (Banner banner : bannerList) {
+                values.put (BNNR_TITLE, banner.getTitle ());
+                values.put (BNNR_IMAGE, banner.getImage ());
+                values.put (BNNR_URL, banner.getUrl ());
+                values.put (BNNR_TYPE, banner.getType ());
+                db.insert (TABLE_BANNERS, null, values);
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+    }
+    
     public ArrayList<Banner> getAllLargeBanners () {
         ArrayList<Banner> bannerList = new ArrayList<Banner> ();
         SQLiteDatabase db = this.getReadableDatabase ();
@@ -1239,6 +1554,47 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return category_id;
     }
     
+    public void insertAllCategories (ArrayList<Category> categoryList) {
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Inserting all Categories", LOG_FLAG);
+        SQLiteDatabase db = this.getWritableDatabase ();
+        String sql = "INSERT INTO " + TABLE_CATEGORIES + " VALUES (?,?,?,?);";
+        SQLiteStatement statement = db.compileStatement (sql);
+        db.beginTransaction ();
+        try {
+            for (Category category : categoryList) {
+                statement.clearBindings ();
+                statement.bindLong (1, category.getId ());
+                statement.bindString (2, category.getName ());
+                statement.bindString (3, category.getLevel2 ());
+                statement.bindString (4, category.getLevel3 ());
+                
+                statement.execute ();
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+    
+    /*
+        SQLiteDatabase db = this.getWritableDatabase ();
+        db.beginTransaction ();
+        try {
+            ContentValues values = new ContentValues ();
+            for (Category category : categoryList) {
+                values.put (CTGRY_ID, category.getId ());
+                values.put (CTGRY_NAME, category.getName ());
+                values.put (CTGRY_LEVEL2, category.getLevel2 ());
+                values.put (CTGRY_LEVEL3, category.getLevel3 ());
+                db.insert (TABLE_CATEGORIES, null, values);
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+        
+        */
+    }
+    
     public ArrayList<Category> getAllCategories () {
         ArrayList<Category> categoryList = new ArrayList<Category> ();
         SQLiteDatabase db = this.getReadableDatabase ();
@@ -1287,6 +1643,64 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return categoryLevel2List;
     }
     
+    
+    public String getAllFilteredExhibitorIds (String category_name, String category_level2) {
+        SQLiteDatabase db = this.getReadableDatabase ();
+        Log.e ("karman category", category_name);
+        Log.e ("karman sub category", category_level2);
+        String selectQuery = "SELECT GROUP_CONCAT (DISTINCT (ctgry_map_exhbtr_id)) AS ctgrys FROM `tbl_category_mappings` WHERE ctgry_map_ctgry_id IN (" + getAllFilteredCategoryIds (category_name, category_level2) + ")";
+//        String selectQuery = "SELECT GROUP_CONCAT (DISTINCT (ctgry_map_exhbtr_id)) AS ctgrys FROM `tbl_category_mappings` WHERE ctgry_map_ctgry_id IN (SELECT GROUP_CONCAT (ctgry_id) FROM `tbl_categories`where ctgry_name = '" + category_name + "' AND ctgry_level2 = '" + category_level2 + "')";
+//        String selectQuery = "SELECT GROUP_CONCAT (ctgry_id) AS ctgrys FROM `tbl_categories`where ctgry_name = '" + category_name + "' AND ctgry_level2 = '" + category_level2 + "'";
+//        String selectQuery = "SELECT DISTINCT(" + CTGRY_LEVEL2 + ") FROM " + TABLE_CATEGORIES + " WHERE " + CTGRY_NAME + " = '" + category_name + "'";
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all distinct category level 2 where category name = " + category_name, LOG_FLAG);
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c != null)
+            c.moveToFirst ();
+        
+        return c.getString ((c.getColumnIndex ("ctgrys")));
+
+//        Cursor c = db.rawQuery (selectQuery, null);
+//        if (c.moveToFirst ()) {
+//            do {
+//                categoryLevel2List.add (c.getString ((c.getColumnIndex (CTGRY_LEVEL2))));
+//            } while (c.moveToNext ());
+//        }
+    }
+    
+    public String getAllFilteredCategoryIds (String category_name, String category_level2) {
+        SQLiteDatabase db = this.getReadableDatabase ();
+        String selectQuery = "SELECT GROUP_CONCAT (ctgry_id) AS ctgrys FROM `tbl_categories`where ctgry_name = '" + category_name + "' AND ctgry_level2 = '" + category_level2 + "'";
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all distinct category level 2 where category name = " + category_name, LOG_FLAG);
+        Cursor c = db.rawQuery (selectQuery, null);
+        if (c != null)
+            c.moveToFirst ();
+        
+        return c.getString ((c.getColumnIndex ("ctgrys")));
+    }
+    
+    public ArrayList<Exhibitor> getAllFilteredExhibitorList (String category_name, String category_level2) {
+        ArrayList<Exhibitor> exhibitorList = new ArrayList<Exhibitor> ();
+        String selectQuery = "SELECT  * FROM " + TABLE_EXHIBITORS + " WHERE " + EXHBTR_ID + " IN (" + getAllFilteredExhibitorIds (category_name, category_level2) + ") ORDER BY " + EXHBTR_DESCRIPTION + " DESC, " + EXHBTR_NAME + " ASC";
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Get all Exhibitors", LOG_FLAG);
+        SQLiteDatabase db = this.getReadableDatabase ();
+        Cursor c = db.rawQuery (selectQuery, null);
+        // looping through all rows and adding to list
+        if (c.moveToFirst ()) {
+            do {
+                Exhibitor exhibitor = new Exhibitor (
+                        c.getInt ((c.getColumnIndex (EXHBTR_ID))),
+                        "",
+                        c.getString ((c.getColumnIndex (EXHBTR_NAME))),
+                        c.getString ((c.getColumnIndex (EXHBTR_DESCRIPTION)))
+                );
+                exhibitor.setStallDetailList (getExhibitorStallDetails (exhibitor.getId ()));
+                exhibitorList.add (exhibitor);
+            } while (c.moveToNext ());
+        }
+        return exhibitorList;
+    }
+    
+    
     public void deleteAllCategories () {
         SQLiteDatabase db = this.getWritableDatabase ();
         Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Delete all categories", LOG_FLAG);
@@ -1305,6 +1719,44 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put (CTGRY_MAP_EXHBTR_NAME, categoryMapping.getExhibitor_name ());
         long category_id = db.insert (TABLE_CATEGORY_MAPPINGS, null, values);
         return category_id;
+    }
+    
+    public void insertAllCategoryMapping (ArrayList<CategoryMapping> categoryMappingList) {
+        Utils.showLog (Log.DEBUG, AppConfigTags.DATABASE_LOG, "Inserting all Category mapping", LOG_FLAG);
+        SQLiteDatabase db = this.getWritableDatabase ();
+        String sql = "INSERT INTO " + TABLE_CATEGORY_MAPPINGS + "(" + CTGRY_MAP_CTGRY_ID + ", " + CTGRY_MAP_EXHBTR_ID + ", " + CTGRY_MAP_EXHBTR_NAME + ") VALUES (?,?,?);";
+        SQLiteStatement statement = db.compileStatement (sql);
+        db.beginTransaction ();
+        try {
+            for (CategoryMapping categoryMapping : categoryMappingList) {
+                statement.clearBindings ();
+                statement.bindLong (1, categoryMapping.getCategory_id ());
+                statement.bindLong (2, categoryMapping.getExhibitor_id ());
+                statement.bindString (3, categoryMapping.getExhibitor_name ());
+                statement.execute ();
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+    
+        
+        /*
+        SQLiteDatabase db = this.getWritableDatabase ();
+        db.beginTransaction ();
+        try {
+            ContentValues values = new ContentValues ();
+            for (CategoryMapping categoryMapping : categoryMappingList) {
+                values.put (CTGRY_MAP_EXHBTR_ID, categoryMapping.getExhibitor_id ());
+                values.put (CTGRY_MAP_CTGRY_ID, categoryMapping.getCategory_id ());
+                values.put (CTGRY_MAP_EXHBTR_NAME, categoryMapping.getExhibitor_name ());
+                db.insert (TABLE_CATEGORY_MAPPINGS, null, values);
+            }
+            db.setTransactionSuccessful ();
+        } finally {
+            db.endTransaction ();
+        }
+        */
     }
     
     public ArrayList<Category> getAllCategoryMapping () {

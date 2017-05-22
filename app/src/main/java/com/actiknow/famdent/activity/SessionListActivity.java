@@ -142,7 +142,7 @@ public class SessionListActivity extends AppCompatActivity implements ViewPagerE
         rvSession.addItemDecoration (new SimpleDividerItemDecoration (SessionListActivity.this));
         rvSession.setItemAnimator (new DefaultItemAnimator ());
     
-        searchView.setQueryHint (Html.fromHtml ("<font color = #aaffffff>" + "Search" + "</font>"));
+        searchView.setQueryHint (Html.fromHtml ("<font color = #ffffff>" + "Search" + "</font>"));
         Utils.setTypefaceToAllViews (this, ivBack);
     }
 

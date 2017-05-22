@@ -15,9 +15,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.util.Log;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.actiknow.famdent.R;
@@ -69,24 +67,27 @@ public class ExhibitorListActivity extends AppCompatActivity implements ViewPage
     List<Exhibitor> tempExhibitorList = new ArrayList<> ();
     ExhibitorAdapter exhibitorAdapter;
     String[] category;
-
+    
     ImageView ivFilter;
     ImageView ivSort;
     TextView tvTitle;
     SearchView searchView;
-
+    
     TextView tvNoResult;
-
+    
     List<StallDetail> stallDetailList = new ArrayList<> ();
-
+    
     DatabaseHandler db;
+    
+    String filterCategory = "";
+    String filterSubCategory = "";
 
 //    Dialog dialog;
-
+    
     private Toolbar toolbar;
     private SliderLayout slider;
-
-
+    
+    
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
@@ -99,7 +100,7 @@ public class ExhibitorListActivity extends AppCompatActivity implements ViewPage
 //        setUpNavigationDrawer ();
         getOfflineExhibitorList ();
     }
-
+    
     private void getOfflineExhibitorList () {
         Utils.showLog (Log.DEBUG, AppConfigTags.TAG, "Getting all the exhibitors from local database", true);
         exhibitorList.clear ();
@@ -109,24 +110,24 @@ public class ExhibitorListActivity extends AppCompatActivity implements ViewPage
         exhibitorAdapter.notifyDataSetChanged ();
 //        swipeRefreshLayout.setRefreshing (false);
     }
-
+    
     private void initView () {
         rvExhibitor = (RecyclerView) findViewById (R.id.rvExhibitorList);
         ivBack = (ImageView) findViewById (R.id.ivBack);
         ivFilter = (ImageView) findViewById (R.id.ivFilter);
         tvNoResult = (TextView) findViewById (R.id.tvNoResult);
-
+        
         ivSort = (ImageView) findViewById (R.id.ivSort);
         tvTitle = (TextView) findViewById (R.id.tvTitle);
         searchView = (SearchView) findViewById (R.id.searchView);
 //        swipeRefreshLayout = (SwipeRefreshLayout) findViewById (swipeRefreshLayout);
         Utils.setTypefaceToAllViews (this, rvExhibitor);
-
+        
         toolbar = (Toolbar) findViewById (R.id.toolbar1);
         slider = (SliderLayout) findViewById (R.id.slider);
-
+        
     }
-
+    
     private void initData () {
         db = new DatabaseHandler (getApplicationContext ());
 //        dialog = Utils.showBigBannerDialog (this);
@@ -148,10 +149,10 @@ public class ExhibitorListActivity extends AppCompatActivity implements ViewPage
         rvExhibitor.setLayoutManager (new LinearLayoutManager (this, LinearLayoutManager.VERTICAL, false));
         rvExhibitor.addItemDecoration (new SimpleDividerItemDecoration (this));
         rvExhibitor.setItemAnimator (new DefaultItemAnimator ());
-    
-        searchView.setQueryHint (Html.fromHtml ("<font color = #aaffffff>" + "Search" + "</font>"));
+        
+        searchView.setQueryHint (Html.fromHtml ("<font color = #ffffff>" + "Search" + "</font>"));
     }
-
+    
     private void initListener () {
 //        swipeRefreshLayout.setOnRefreshListener (new SwipeRefreshLayout.OnRefreshListener () {
 //            @Override
@@ -168,12 +169,82 @@ public class ExhibitorListActivity extends AppCompatActivity implements ViewPage
                 overridePendingTransition (R.anim.slide_in_left, R.anim.slide_out_right);
             }
         });
-
+        
         ivFilter.setOnClickListener (new View.OnClickListener () {
-
-
             @Override
             public void onClick (View view) {
+                new MaterialDialog.Builder (ExhibitorListActivity.this)
+                        .title ("Select Category")
+                        .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                        .items (db.getAllCategoryName ())
+                        .typeface (SetTypeFace.getTypeface (ExhibitorListActivity.this), SetTypeFace.getTypeface (ExhibitorListActivity.this))
+                        .canceledOnTouchOutside (true)
+                        .cancelable (true)
+                        .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                        .positiveText ("RESET FILTER")
+                        .onPositive (new MaterialDialog.SingleButtonCallback () {
+                            @Override
+                            public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                filterCategory = "";
+                                filterSubCategory = "";
+                                exhibitorList.clear ();
+                                ArrayList<Exhibitor> offlineExhibitor = db.getAllExhibitorList ();
+                                for (Exhibitor exhibitor : offlineExhibitor)
+                                    exhibitorList.add (exhibitor);
+                    
+                                exhibitorAdapter = new ExhibitorAdapter (ExhibitorListActivity.this, exhibitorList);
+                                rvExhibitor.setAdapter (exhibitorAdapter);
+                    
+                                exhibitorAdapter.notifyDataSetChanged ();
+                                ivFilter.setImageDrawable (getResources ().getDrawable (R.drawable.ic_filter));
+                            }
+                        })
+                        .itemsCallback (new MaterialDialog.ListCallback () {
+                            @Override
+                            public void onSelection (MaterialDialog dialog, View view, int which, CharSequence text) {
+                                filterCategory = text.toString ();
+                                ArrayList<String> level2CategoryList = db.getAllCategoryLevel2 (text.toString ());
+                                if (level2CategoryList.size () > 1) {
+                                    new MaterialDialog.Builder (ExhibitorListActivity.this)
+                                            .title ("Select Sub Category")
+                                            .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                                            .items (db.getAllCategoryLevel2 (text.toString ()))
+                                            .typeface (SetTypeFace.getTypeface (ExhibitorListActivity.this), SetTypeFace.getTypeface (ExhibitorListActivity.this))
+                                            .canceledOnTouchOutside (true)
+                                            .cancelable (true)
+                                            .itemsCallback (new MaterialDialog.ListCallback () {
+                                                @Override
+                                                public void onSelection (MaterialDialog dialog, View view, int which, CharSequence text) {
+                                                    filterSubCategory = text.toString ();
+//                                                    Utils.showToast (ExhibitorListActivity.this, "Filter\n Category : " + filterCategory + "\nSub Category : " + filterSubCategory, true);
+//                                                    Utils.showToast (ExhibitorListActivity.this, "Category Ids : " + db.getAllFilteredCategoryIds (filterCategory, filterSubCategory) + "\nExhibitor Ids : " + db.getAllFilteredExhibitorIds (filterCategory, filterSubCategory), true);
+                                        
+                                                    exhibitorList.clear ();
+                                                    ArrayList<Exhibitor> offlineExhibitor = db.getAllFilteredExhibitorList (filterCategory, filterSubCategory);
+                                                    for (Exhibitor exhibitor : offlineExhibitor)
+                                                        exhibitorList.add (exhibitor);
+                                                    exhibitorAdapter.notifyDataSetChanged ();
+                                                    ivFilter.setImageDrawable (getResources ().getDrawable (R.drawable.ic_filter_checked));
+                                                }
+                                            })
+                                            .show ();
+                                } else {
+                                    filterSubCategory = level2CategoryList.get (0);
+//                                    Utils.showToast (ExhibitorListActivity.this, "Filter\n Category : " + filterCategory + "\nSub Category : " + filterSubCategory, true);
+//                                    Utils.showToast (ExhibitorListActivity.this, "Category Ids : " + db.getAllFilteredCategoryIds (filterCategory, filterSubCategory) + "\nExhibitor Ids : " + db.getAllFilteredExhibitorIds (filterCategory, filterSubCategory), true);
+                                    exhibitorList.clear ();
+                                    ArrayList<Exhibitor> offlineExhibitor = db.getAllFilteredExhibitorList (filterCategory, filterSubCategory);
+                                    for (Exhibitor exhibitor : offlineExhibitor)
+                                        exhibitorList.add (exhibitor);
+                                    exhibitorAdapter.notifyDataSetChanged ();
+                                    ivFilter.setImageDrawable (getResources ().getDrawable (R.drawable.ic_filter_checked));
+                                }
+                            }
+                        })
+                        .show ();
+                
+    /*
+    
                 boolean wrapInScrollView = true;
                 final MaterialDialog dialog = new MaterialDialog.Builder (ExhibitorListActivity.this)
                         .customView (R.layout.dialog_filter, wrapInScrollView)
@@ -210,26 +281,27 @@ public class ExhibitorListActivity extends AppCompatActivity implements ViewPage
                     llCategory.addView (checkBox);
 
                 }
+                */
             }
         });
-
+        
         searchView.setOnSearchClickListener (new View.OnClickListener () {
             @Override
             public void onClick (View v) {
 //                Toast.makeText (ExhibitorListActivity.this, "karman open", Toast.LENGTH_SHORT).show ();
-//                ivFilter.setVisibility (View.GONE);
+                ivFilter.setVisibility (View.GONE);
                 ivBack.setVisibility (View.GONE);
 //                ivSort.setVisibility (View.GONE);
                 tvTitle.setVisibility (View.GONE);
             }
         });
-
+        
         searchView.setOnQueryTextListener (new SearchView.OnQueryTextListener () {
             @Override
             public boolean onQueryTextSubmit (String query) {
                 return true;
             }
-
+            
             @Override
             public boolean onQueryTextChange (String newText) {
                 tempExhibitorList.clear ();
@@ -252,12 +324,12 @@ public class ExhibitorListActivity extends AppCompatActivity implements ViewPage
                 return true;
             }
         });
-
+        
         searchView.setOnCloseListener (new SearchView.OnCloseListener () {
             @Override
             public boolean onClose () {
 //                Toast.makeText (ExhibitorListActivity.this, "karman close", Toast.LENGTH_SHORT).show ();
-//                ivFilter.setVisibility (View.VISIBLE);
+                ivFilter.setVisibility (View.VISIBLE);
                 ivBack.setVisibility (View.VISIBLE);
 //                ivSort.setVisibility (View.VISIBLE);
                 tvTitle.setVisibility (View.VISIBLE);
@@ -265,24 +337,24 @@ public class ExhibitorListActivity extends AppCompatActivity implements ViewPage
             }
         });
     }
-
+    
     private void initSlider () {
         for (int i = 0; i < db.getAllExhibitorBanners ().size (); i++) {
             Banner banner = db.getAllExhibitorBanners ().get (i);
             SpannableString s = new SpannableString (banner.getTitle ());
             s.setSpan (new TypefaceSpan (this, Constants.font_name), 0, s.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
+    
             DefaultSliderView defaultSliderView = new DefaultSliderView (this);
             defaultSliderView
                     .image (banner.getImage ())
                     .setScaleType (BaseSliderView.ScaleType.Fit)
                     .setOnSliderClickListener (this);
-
+    
             defaultSliderView.bundle (new Bundle ());
             defaultSliderView.getBundle ().putString ("url", banner.getUrl ());
             slider.addSlider (defaultSliderView);
         }
-
+        
         slider.setIndicatorVisibility (PagerIndicator.IndicatorVisibility.Visible);
         slider.setPresetTransformer (SliderLayout.Transformer.Default);
         slider.setCustomAnimation (new DescriptionAnimation ());
@@ -291,7 +363,7 @@ public class ExhibitorListActivity extends AppCompatActivity implements ViewPage
         slider.setCustomIndicator ((PagerIndicator) findViewById (R.id.custom_indicator));
         slider.setPresetIndicator (SliderLayout.PresetIndicators.Center_Bottom);
     }
-
+    
     private void getExhibitorList () {
         if (NetworkConnection.isNetworkAvailable (this)) {
             tvNoResult.setVisibility (View.GONE);
@@ -315,7 +387,7 @@ public class ExhibitorListActivity extends AppCompatActivity implements ViewPage
                                                     jsonObjectExhibitor.getInt (AppConfigTags.EXHIBITOR_ID),
                                                     jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_LOGO),
                                                     jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_NAME), "");
-
+    
                                             JSONArray jsonArrayStallDetails = jsonObjectExhibitor.getJSONArray (AppConfigTags.STALL_DETAILS);
                                             exhibitor.clearStallDetailList ();
                                             for (int j = 0; j < jsonArrayStallDetails.length (); j++) {
@@ -329,7 +401,7 @@ public class ExhibitorListActivity extends AppCompatActivity implements ViewPage
                                             }
                                             exhibitorList.add (i, exhibitor);
                                             exhibitorAdapter.notifyDataSetChanged ();
-                                            }
+                                        }
                                         if (jsonArrayExhibitor.length () > 0) {
 //                                            swipeRefreshLayout.setRefreshing (false);
                                         } else {
@@ -359,20 +431,20 @@ public class ExhibitorListActivity extends AppCompatActivity implements ViewPage
                             NetworkResponse response = error.networkResponse;
                             if (response != null && response.data != null) {
                                 Utils.showLog (Log.ERROR, AppConfigTags.ERROR, new String (response.data), true);
-
+    
                             }
 //                            swipeRefreshLayout.setRefreshing (false);
                             tvNoResult.setVisibility (View.VISIBLE);
                         }
                     }) {
-
+    
                 @Override
                 protected Map<String, String> getParams () throws AuthFailureError {
                     Map<String, String> params = new Hashtable<String, String> ();
                     Utils.showLog (Log.INFO, AppConfigTags.PARAMETERS_SENT_TO_THE_SERVER, "" + params, true);
                     return params;
                 }
-
+    
                 @Override
                 public Map<String, String> getHeaders () throws AuthFailureError {
                     Map<String, String> params = new HashMap<> ();
@@ -466,32 +538,31 @@ public class ExhibitorListActivity extends AppCompatActivity implements ViewPage
 //        return super.onOptionsItemSelected (item);
 //    }
 //*/
-
+    
     @Override
     public void onBackPressed () {
         finish ();
         overridePendingTransition (R.anim.slide_in_left, R.anim.slide_out_right);
     }
-
+    
     @Override
     public void onSliderClick (BaseSliderView slider) {
         Uri uri = Uri.parse ("http://" + slider.getBundle ().get ("url"));
         Intent intent = new Intent (Intent.ACTION_VIEW, uri);
         startActivity (intent);
     }
-
+    
     @Override
     public void onPageScrolled (int position, float positionOffset, int positionOffsetPixels) {
     }
-
+    
     @Override
     public void onPageSelected (int position) {
     }
-
+    
     @Override
     public void onPageScrollStateChanged (int state) {
     }
-
-
-
+    
+    
 }

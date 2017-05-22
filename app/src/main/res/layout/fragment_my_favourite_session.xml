@@ -119,7 +119,7 @@
                             android:layout_centerVertical="true"
                             android:gravity="center"
                             android:padding="@dimen/edittext_padding"
-                            android:text="@string/activity_exhibitor_list_text_no_exhibitor_found"
+                            android:text="@string/activity_session_list_text_no_session_found"
                             android:textSize="@dimen/text_size_large"
                             android:visibility="gone"/>
                     </RelativeLayout>

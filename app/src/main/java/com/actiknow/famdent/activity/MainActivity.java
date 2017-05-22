@@ -2,6 +2,7 @@ package com.actiknow.famdent.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -13,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -97,17 +99,17 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
     CoordinatorLayout clMain;
     ImageView ivVisitorCard;
     ImageView ivIndiaSupplyLogo;
-
+    
     ProgressDialog progressDialog;
     ProgressBar progressBar;
     DatabaseHandler db;
-
+    
     RecyclerView rvHomeServiceList;
     List<HomeService> homeServices = new ArrayList<> ();
     HomeServiceAdapter homeServiceAdapter;
     TextView tvRefreshData;
     private SliderLayout slider;
-
+    
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
@@ -117,13 +119,13 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
 //        checkPermissions ();
         initListener ();
         isLogin ();
-
+        
         if (! visitorDetailsPref.getBooleanPref (this, VisitorDetailsPref.LOGGED_IN_SESSION)) {
 //            checkVersionUpdate ();
         }
         db.closeDB ();
     }
-
+    
     private void initView () {
         clMain = (CoordinatorLayout) findViewById (R.id.clMain);
         rvHomeServiceList = (RecyclerView) findViewById (R.id.rvHomeServiceList);
@@ -132,18 +134,18 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
         slider = (SliderLayout) findViewById (R.id.slider);
         tvRefreshData = (TextView) findViewById (R.id.tvRefreshData);
     }
-
+    
     private void initData () {
         Bugsnag.init (this);
-
+        
         FacebookSdk.sdkInitialize (getApplicationContext ());
         AppEventsLogger.activateApp (this);
-
-
+        
+        
         visitorDetailsPref = VisitorDetailsPref.getInstance ();
         db = new DatabaseHandler (getApplicationContext ());
-
-
+        
+        
         progressDialog = new ProgressDialog (this);
         PackageInfo pInfo = null;
         try {
@@ -152,8 +154,8 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
             e.printStackTrace ();
         }
         version_code = pInfo.versionCode;
-
-
+        
+        
         homeServices.add (new HomeService (1, R.drawable.ic_list, "", "EXHIBITORS"));
         homeServices.add (new HomeService (2, R.drawable.ic_program, "", "EVENTS"));
         homeServices.add (new HomeService (3, R.drawable.ic_program, "", "SCIENTIFIC SESSIONS"));
@@ -161,19 +163,19 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
         homeServices.add (new HomeService (5, R.drawable.ic_favourite, "", "MY FAVOURITES"));
         homeServices.add (new HomeService (6, R.drawable.ic_card, "", "MY ENTRY PASS"));
         homeServices.add (new HomeService (7, R.drawable.ic_information, "", "INFORMATION"));
-
-
+        
+        
         homeServiceAdapter = new HomeServiceAdapter (this, homeServices);
         rvHomeServiceList.setAdapter (homeServiceAdapter);
         rvHomeServiceList.setHasFixedSize (true);
         rvHomeServiceList.setLayoutManager (new LinearLayoutManager (this, LinearLayoutManager.VERTICAL, false));
         rvHomeServiceList.addItemDecoration (new SimpleDividerItemDecoration (this));
         rvHomeServiceList.setItemAnimator (new DefaultItemAnimator ());
-
-
+        
+        
         Utils.setTypefaceToAllViews (this, clMain);
     }
-
+    
     private void initListener () {
         ivIndiaSupplyLogo.setOnClickListener (new View.OnClickListener () {
             @Override
@@ -181,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                 Uri uri = Uri.parse ("http://indiasupply.com");
                 Intent intent = new Intent (Intent.ACTION_VIEW, uri);
                 startActivity (intent);
-
+    
             }
         });
         ivVisitorCard.setOnClickListener (new View.OnClickListener () {
@@ -196,12 +198,12 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                 TextView tvEmail = (TextView) dialog.findViewById (R.id.tvVisitorEmail);
                 ImageView ivQRCode = (ImageView) dialog.findViewById (R.id.ivQRCode);
                 TextView tvMobile = (TextView) dialog.findViewById (R.id.tvVisitorNumber);
-
+    
                 tvID.setText (visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_ID).toUpperCase ());
                 tvName.setText (visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_NAME).toUpperCase ());
                 tvEmail.setText (visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_EMAIL));
                 tvMobile.setText (visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_MOBILE));
-
+    
                 WindowManager manager = (WindowManager) getSystemService (WINDOW_SERVICE);
                 Display display = manager.getDefaultDisplay ();
                 Point point = new Point ();
@@ -210,10 +212,10 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                 int height = point.y;
                 int smallerDimension = width < height ? width : height;
                 smallerDimension = smallerDimension * 3 / 4;
-
-
+    
+    
                 JSONObject jsonObject = new JSONObject ();
-
+    
                 try {
                     jsonObject.put (VisitorDetailsPref.VISITOR_ID, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_ID));
                     jsonObject.put (VisitorDetailsPref.VISITOR_NAME, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_NAME));
@@ -233,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                 } catch (WriterException e) {
                     Log.v ("karman", e.toString ());
                 }
-
+    
                 Utils.setTypefaceToAllViews (MainActivity.this, tvName);
 //                tvName.setTypeface (SetTypeFace.getTypeface (activity, "OCRA.otf"));
 //                tvEmail.setTypeface (SetTypeFace.getTypeface (activity, "OCRA.otf"));
@@ -241,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                 dialog.show ();
             }
         });
-    
+        
         tvRefreshData.setOnClickListener (new View.OnClickListener () {
             @Override
             public void onClick (View v) {
@@ -249,21 +251,21 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
             }
         });
     }
-
+    
     private void initSlider () {
+        slider.removeAllSliders ();
         for (int i = 0; i < db.getAllSmallBanners ().size (); i++) {
             Banner banner = db.getAllSmallBanners ().get (i);
             SpannableString s = new SpannableString (banner.getTitle ());
             s.setSpan (new TypefaceSpan (this, Constants.font_name), 0, s.length (), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
+    
             DefaultSliderView defaultSliderView = new DefaultSliderView (this);
             defaultSliderView
                     .image (banner.getImage ())
                     .setScaleType (BaseSliderView.ScaleType.Fit)
                     .setOnSliderClickListener (this);
-
-            Log.e ("karman", banner.getImage ());
-
+    
+    
             defaultSliderView.bundle (new Bundle ());
             defaultSliderView.getBundle ().putString ("url", banner.getUrl ());
             slider.addSlider (defaultSliderView);
@@ -277,144 +279,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
         slider.setCustomIndicator ((PagerIndicator) findViewById (R.id.custom_indicator));
         slider.setPresetIndicator (SliderLayout.PresetIndicators.Center_Bottom);
     }
-
-    private void checkVersionUpdate () {
-        if (NetworkConnection.isNetworkAvailable (this)) {
-            Utils.showLog (Log.INFO, "" + AppConfigTags.URL, AppConfigURL.URL_CHECK_VERSION, true);
-            StringRequest strRequest1 = new StringRequest (Request.Method.GET, AppConfigURL.URL_CHECK_VERSION,
-                    new com.android.volley.Response.Listener<String> () {
-                        @Override
-                        public void onResponse (String response) {
-                            Utils.showLog (Log.INFO, "" + AppConfigTags.SERVER_RESPONSE, response, true);
-                            if (response != null) {
-                                try {
-                                    JSONObject jsonObj = new JSONObject (response);
-                                    boolean error = jsonObj.getBoolean (AppConfigTags.ERROR);
-                                    String message = jsonObj.getString (AppConfigTags.MESSAGE);
-
-                                    if (! error) {
-                                        int db_version_code = jsonObj.getInt (AppConfigTags.VERSION_CODE);
-                                        String db_version_name = jsonObj.getString (AppConfigTags.VERSION_NAME);
-                                        String version_updated_on = jsonObj.getString (AppConfigTags.VERSION_UPDATED_ON);
-                                        int version_update_critical = jsonObj.getInt (AppConfigTags.VERSION_UPDATE_CRITICAL);
-
-                                        if (db_version_code > version_code) {
-                                            switch (version_update_critical) {
-                                                case 0:
-                                                    visitorDetailsPref.putBooleanPref (MainActivity.this, visitorDetailsPref.LOGGED_IN_SESSION, true);
-                                                    new MaterialDialog.Builder (MainActivity.this)
-                                                            .content (R.string.dialog_text_new_version_available)
-                                                            .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
-                                                            .contentColor (getResources ().getColor (R.color.app_text_color_dark))
-                                                            .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
-                                                            .typeface (SetTypeFace.getTypeface (MainActivity.this), SetTypeFace.getTypeface (MainActivity.this))
-                                                            .canceledOnTouchOutside (false)
-                                                            .cancelable (false)
-                                                            .positiveText (R.string.dialog_action_update)
-                                                            .negativeText (R.string.dialog_action_ignore)
-                                                            .onPositive (new MaterialDialog.SingleButtonCallback () {
-                                                                @Override
-                                                                public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                                    final String appPackageName = getPackageName (); // getPackageName() from Context or Activity object
-                                                                    try {
-                                                                        startActivity (new Intent (Intent.ACTION_VIEW, Uri.parse ("market://details?id=" + appPackageName)));
-                                                                    } catch (android.content.ActivityNotFoundException anfe) {
-                                                                        startActivity (new Intent (Intent.ACTION_VIEW, Uri.parse ("https://play.google.com/store/apps/details?id=" + appPackageName)));
-                                                                    }
-                                                                }
-                                                            })
-                                                            .onNegative (new MaterialDialog.SingleButtonCallback () {
-                                                                @Override
-                                                                public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                                    dialog.dismiss ();
-                                                                }
-                                                            }).show ();
-                                                    break;
-                                                case 1:
-                                                    new MaterialDialog.Builder (MainActivity.this)
-                                                            .content (R.string.dialog_text_new_version_available)
-                                                            .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
-                                                            .contentColor (getResources ().getColor (R.color.app_text_color_dark))
-                                                            .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
-                                                            .typeface (SetTypeFace.getTypeface (MainActivity.this), SetTypeFace.getTypeface (MainActivity.this))
-                                                            .canceledOnTouchOutside (false)
-                                                            .cancelable (false)
-
-                                                            .cancelListener (new DialogInterface.OnCancelListener () {
-                                                                @Override
-                                                                public void onCancel (DialogInterface dialog) {
-
-                                                                }
-                                                            })
-                                                            .positiveText (R.string.dialog_action_update)
-//                                                            .negativeText (R.string.dialog_action_close)
-                                                            .onPositive (new MaterialDialog.SingleButtonCallback () {
-                                                                @Override
-                                                                public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                                    final String appPackageName = getPackageName (); // getPackageName() from Context or Activity object
-                                                                    try {
-                                                                        startActivity (new Intent (Intent.ACTION_VIEW, Uri.parse ("market://details?id=" + appPackageName)));
-                                                                    } catch (android.content.ActivityNotFoundException anfe) {
-                                                                        startActivity (new Intent (Intent.ACTION_VIEW, Uri.parse ("https://play.google.com/store/apps/details?id=" + appPackageName)));
-                                                                    }
-                                                                }
-                                                            })
-//                                                            .onNegative (new MaterialDialog.SingleButtonCallback () {
-//                                                                @Override
-//                                                                public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-//                                                                    finish ();
-//                                                                    overridePendingTransition (R.anim.slide_in_left, R.anim.slide_out_right);
-//                                                                }
-//                                                            })
-                                                            .show ();
-                                                    break;
-                                            }
-                                        }
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace ();
-                                }
-                            } else {
-                                Utils.showLog (Log.WARN, AppConfigTags.SERVER_RESPONSE, AppConfigTags.DIDNT_RECEIVE_ANY_DATA_FROM_SERVER, true);
-                            }
-                        }
-                    }
-
-                    ,
-                    new Response.ErrorListener ()
-
-                    {
-                        @Override
-                        public void onErrorResponse (VolleyError error) {
-                            Utils.showLog (Log.ERROR, AppConfigTags.VOLLEY_ERROR, error.toString (), true);
-                        }
-                    }
-
-            )
-
-            {
-                @Override
-                protected Map<String, String> getParams () throws AuthFailureError {
-                    Map<String, String> params = new Hashtable<String, String> ();
-                    Utils.showLog (Log.INFO, AppConfigTags.PARAMETERS_SENT_TO_THE_SERVER, "" + params, true);
-                    return params;
-                }
-
-                @Override
-                public Map<String, String> getHeaders () throws AuthFailureError {
-                    Map<String, String> params = new HashMap<> ();
-                    params.put (AppConfigTags.HEADER_API_KEY, Constants.api_key);
-                    params.put (AppConfigTags.HEADER_VISITOR_LOGIN_KEY, visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY));
-                    Utils.showLog (Log.INFO, AppConfigTags.HEADERS_SENT_TO_THE_SERVER, "" + params, false);
-                    return params;
-                }
-            };
-            Utils.sendRequest (strRequest1, 60);
-        } else {
-            checkVersionUpdate ();
-        }
-    }
-
+    
     private void logOutFromDevice (final int device_id) {
         if (NetworkConnection.isNetworkAvailable (this)) {
             Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_logging_out), true);
@@ -434,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                                     visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_EMAIL, "");
                                     visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_MOBILE, "");
                                     visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY, "");
-
+    
                                     Intent intent = new Intent (MainActivity.this, LoginActivity.class);
                                     intent.setFlags (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                     startActivity (intent);
@@ -465,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                     Utils.showLog (Log.INFO, AppConfigTags.PARAMETERS_SENT_TO_THE_SERVER, "" + params, true);
                     return params;
                 }
-
+    
                 @Override
                 public Map<String, String> getHeaders () throws AuthFailureError {
                     Map<String, String> params = new HashMap<> ();
@@ -487,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
             });
         }
     }
-
+    
     private void isLogin () {
         if (visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY) == "") {
             Intent myIntent = new Intent (this, LoginActivity.class);
@@ -500,6 +365,13 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
     }
     
     private void initApplication (final int db_version) {
+        PackageInfo pInfo = null;
+        try {
+            pInfo = getPackageManager ().getPackageInfo (getPackageName (), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace ();
+        }
+        
         final JSONArray jsonArrayFavourites = new JSONArray ();
         try {
             ArrayList<Favourite> favouriteList = db.getAllFavourites ();
@@ -523,10 +395,11 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
         } catch (Exception e) {
             e.printStackTrace ();
         }
-
+    
         Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_initializing), false);
         if (NetworkConnection.isNetworkAvailable (this)) {
             Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_INIT, true);
+            final PackageInfo finalPInfo = pInfo;
             StringRequest strRequest = new StringRequest (Request.Method.POST, AppConfigURL.URL_INIT,
                     new Response.Listener<String> () {
                         @Override
@@ -539,9 +412,10 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                                     boolean error = jsonObj.getBoolean (AppConfigTags.ERROR);
                                     String message = jsonObj.getString (AppConfigTags.MESSAGE);
                                     int status = jsonObj.getInt (AppConfigTags.STATUS);
-
+    
                                     db.deleteAllBanners ();
                                     JSONArray jsonArrayBanner = jsonObj.getJSONArray (AppConfigTags.BANNERS);
+                                    ArrayList<Banner> bannerArrayList = new ArrayList<Banner> ();
                                     for (int i = 0; i < jsonArrayBanner.length (); i++) {
                                         JSONObject jsonObjectBanner = jsonArrayBanner.getJSONObject (i);
                                         Banner banner = new Banner (
@@ -551,165 +425,70 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                                                 jsonObjectBanner.getString (AppConfigTags.BANNER_URL),
                                                 jsonObjectBanner.getString (AppConfigTags.BANNER_TYPE)
                                         );
-                                        db.createBanner (banner);
+                                        bannerArrayList.add (banner);
+//                                        db.createBanner (banner);
                                     }
-
+    
+                                    db.insertAllBanners (bannerArrayList);
+                                    
                                     initSlider ();
-
+    
                                     if (! error) {
                                         switch (status) {
                                             case 1:
+                                                progressDialog.dismiss ();
                                                 break;
                                             case 2:
                                                 db.deleteAllExhibitors ();
                                                 db.deleteAllStallDetails ();
-
+    
                                                 db.deleteAllEvents ();
                                                 db.deleteAllEventSpeakers ();
                                                 db.deleteAllEventTopics ();
-
+    
                                                 db.deleteAllSessions ();
                                                 db.deleteAllSessionSpeakers ();
                                                 db.deleteAllSessionTopics ();
     
                                                 db.deleteAllCategories ();
                                                 db.deleteAllCategoryMappings ();
-    
-                                                JSONArray jsonArrayCategories = jsonObj.getJSONArray (AppConfigTags.CATEGORIES);
-                                                for (int i = 0; i < jsonArrayCategories.length (); i++) {
-                                                    JSONObject jsonObjectExhibitor = jsonArrayCategories.getJSONObject (i);
-                                                    Category category = new Category (
-                                                            jsonObjectExhibitor.getInt (AppConfigTags.CATEGORY_ID),
-                                                            jsonObjectExhibitor.getString (AppConfigTags.CATEGORY_NAME),
-                                                            jsonObjectExhibitor.getString (AppConfigTags.CATEGORY_LEVEL2),
-                                                            jsonObjectExhibitor.getString (AppConfigTags.CATEGORY_LEVEL3)
-                                                    );
-                                                    db.createCategory (category);
-                                                }
-    
-                                                JSONArray jsonArrayCategoryMappings = jsonObj.getJSONArray (AppConfigTags.CATEGORY_MAPPINGS);
-                                                for (int i = 0; i < jsonArrayCategoryMappings.length (); i++) {
-                                                    JSONObject jsonObjectExhibitor = jsonArrayCategoryMappings.getJSONObject (i);
-                                                    CategoryMapping categoryMapping = new CategoryMapping (
-                                                            jsonObjectExhibitor.getInt (AppConfigTags.CATEGORY_MAPPING_EXHIBITOR_ID),
-                                                            jsonObjectExhibitor.getInt (AppConfigTags.CATEGORY_MAPPING_CATEGORY_ID),
-                                                            jsonObjectExhibitor.getString (AppConfigTags.CATEGORY_MAPPING_EXHIBITOR_NAME)
-                                                    );
-                                                    db.createCategoryMapping (categoryMapping);
-                                                }
 
-                                                JSONArray jsonArrayExhibitor = jsonObj.getJSONArray (AppConfigTags.EXHIBITOR);
-                                                for (int i = 0; i < jsonArrayExhibitor.length (); i++) {
-                                                    JSONObject jsonObjectExhibitor = jsonArrayExhibitor.getJSONObject (i);
-                                                    ExhibitorDetail exhibitorDetail = new ExhibitorDetail (
-                                                            jsonObjectExhibitor.getInt (AppConfigTags.EXHIBITOR_ID),
-                                                            false,
-                                                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_LOGO),
-                                                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_NAME),
-                                                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_DESCRIPTION),
-                                                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_CONTACT_PERSON),
-                                                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_ADDRESS),
-                                                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_EMAIL),
-                                                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_WEBSITE),
-                                                            ""
-                                                    );
-
-                                                    ArrayList<String> contactList = new ArrayList<> ();
-                                                    JSONArray jsonArrayContacts = jsonObjectExhibitor.getJSONArray (AppConfigTags.EXHIBITOR_CONTACTS);
-                                                    for (int j = 0; j < jsonArrayContacts.length (); j++) {
-                                                        JSONObject jsonObjectContactDetail = jsonArrayContacts.getJSONObject (j);
-                                                        contactList.add (jsonObjectContactDetail.getString (AppConfigTags.CONTACT));
-                                                    }
-                                                    exhibitorDetail.setContactList (contactList);
-
-                                                    db.createExhibitor (exhibitorDetail);
-
-                                                    JSONArray jsonArrayStallDetails = jsonObjectExhibitor.getJSONArray (AppConfigTags.STALL_DETAILS);
-                                                    exhibitorDetail.clearStallDetailList ();
-                                                    for (int j = 0; j < jsonArrayStallDetails.length (); j++) {
-                                                        JSONObject jsonObjectStallDetail = jsonArrayStallDetails.getJSONObject (j);
-                                                        StallDetail stallDetail = new StallDetail (
-                                                                jsonObjectStallDetail.getString (AppConfigTags.STALL_NAME),
-                                                                jsonObjectStallDetail.getString (AppConfigTags.HALL_NUMBER),
-                                                                jsonObjectStallDetail.getString (AppConfigTags.STALL_NUMBER)
-                                                        );
-                                                        db.createExhibitorStallDetail (stallDetail, jsonObjectExhibitor.getInt (AppConfigTags.EXHIBITOR_ID));
-                                                    }
-                                                }
-
-
-                                                JSONArray jsonArrayEvent = jsonObj.getJSONArray (AppConfigTags.EVENTS);
-                                                for (int i = 0; i < jsonArrayEvent.length (); i++) {
-                                                    JSONObject jsonObjectEvent = jsonArrayEvent.getJSONObject (i);
-                                                    EventDetail eventDetail = new EventDetail (
-                                                            jsonObjectEvent.getInt (AppConfigTags.EVENT_DETAIL_ID),
-                                                            false,
-                                                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_NAME),
-                                                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_DATE),
-                                                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_TIME),
-                                                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_DURATION),
-                                                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_LOCATION),
-                                                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_FEES),
-                                                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_NOTES));
-                                                    db.createEvent (eventDetail);
-
-                                                    JSONArray jsonArraySpeakers = jsonObjectEvent.getJSONArray (AppConfigTags.EVENT_DETAIL_SPEAKERS);
-                                                    for (int j = 0; j < jsonArraySpeakers.length (); j++) {
-                                                        JSONObject jsonObjectSpeakers = jsonArraySpeakers.getJSONObject (j);
-                                                        EventSpeaker eventSpeaker = new EventSpeaker (
-                                                                jsonObjectSpeakers.getInt (AppConfigTags.EVENT_DETAIL_SPEAKER_ID),
-                                                                jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_IMAGE),
-                                                                jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_NAME),
-                                                                jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_QUALIFICATION),
-                                                                jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_EXPERIENCE)
-                                                        );
-                                                        db.createEventSpeaker (eventSpeaker, jsonObjectEvent.getInt (AppConfigTags.EVENT_DETAIL_ID));
-                                                    }
-
-                                                    JSONArray jsonArrayTopic = jsonObjectEvent.getJSONArray (AppConfigTags.EVENT_DETAIL_TOPICS);
-                                                    for (int k = 0; k < jsonArrayTopic.length (); k++) {
-                                                        JSONObject jsonObjectTopic = jsonArrayTopic.getJSONObject (k);
-                                                        db.createEventTopic (jsonObjectTopic.getString (AppConfigTags.EVENT_DETAIL_TOPIC_TEXT), jsonObjectEvent.getInt (AppConfigTags.EVENT_DETAIL_ID));
-                                                    }
-                                                }
-
-
-                                                JSONArray jsonArraySessions = jsonObj.getJSONArray (AppConfigTags.SESSIONS);
-                                                for (int i = 0; i < jsonArraySessions.length (); i++) {
-                                                    JSONObject jsonObjectSession = jsonArraySessions.getJSONObject (i);
-                                                    SessionDetail sessionDetail = new SessionDetail (
-                                                            jsonObjectSession.getInt (AppConfigTags.SESSION_DETAILS_ID),
-                                                            false,
-                                                            jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_TITLE),
-                                                            jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_DATE),
-                                                            jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_TIME),
-                                                            jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_LOCATION),
-                                                            jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_CATEGORY));
-
-                                                    db.createSession (sessionDetail);
-
-                                                    JSONArray jsonArraySpeakers = jsonObjectSession.getJSONArray (AppConfigTags.SESSION_SPEAKERS);
-                                                    for (int j = 0; j < jsonArraySpeakers.length (); j++) {
-                                                        JSONObject jsonObjectSpeakers = jsonArraySpeakers.getJSONObject (j);
-                                                        SessionSpeaker sessionSpeaker = new SessionSpeaker (
-                                                                jsonObjectSpeakers.getInt (AppConfigTags.SESSION_DETAILS_SPEAKER_ID),
-                                                                jsonObjectSpeakers.getString (AppConfigTags.SESSION_DETAILS_SPEAKER_IMAGE),
-                                                                jsonObjectSpeakers.getString (AppConfigTags.SESSION_DETAILS_SPEAKER_NAME)
-                                                        );
-                                                        db.createSessionSpeaker (sessionSpeaker, jsonObjectSpeakers.getInt (AppConfigTags.SESSION_DETAILS_SPEAKER_ID));
-                                                    }
-
-                                                    JSONArray jsonArrayTopic = jsonObjectSession.getJSONArray (AppConfigTags.SESSION_DETAILS_TOPICS);
-                                                    for (int k = 0; k < jsonArrayTopic.length (); k++) {
-                                                        JSONObject jsonObjectTopic = jsonArrayTopic.getJSONObject (k);
-                                                        db.createSessionTopic (jsonObjectTopic.getString (AppConfigTags.SESSION_DETAILS_TOPIC_TEXT), jsonObjectSession.getInt (AppConfigTags.SESSION_DETAILS_ID));
-                                                    }
-                                                }
+//                                                new insertDataInDatabase (progressDialog).execute (response);
+                                                new insertDataInDatabase (MainActivity.this, progressDialog).execute (response);
+                                                
                                                 break;
                                         }
-                                        progressDialog.dismiss ();
-                                        int db_version = jsonObj.getInt (AppConfigTags.DATABASE_VERSION);
-                                        visitorDetailsPref.putIntPref (MainActivity.this, VisitorDetailsPref.DATABASE_VERSION, db_version);
+                                        visitorDetailsPref.putIntPref (MainActivity.this, VisitorDetailsPref.DATABASE_VERSION, jsonObj.getInt (AppConfigTags.DATABASE_VERSION));
+                                        visitorDetailsPref.putStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_ID, jsonObj.getString (AppConfigTags.VISITOR_ID));
+                                        if (jsonObj.getBoolean (AppConfigTags.VERSION_UPDATE)) {
+                                            new MaterialDialog.Builder (MainActivity.this)
+                                                    .content (R.string.dialog_text_new_version_available)
+                                                    .positiveColor (getResources ().getColor (R.color.app_text_color_dark))
+                                                    .contentColor (getResources ().getColor (R.color.app_text_color_dark))
+                                                    .negativeColor (getResources ().getColor (R.color.app_text_color_dark))
+                                                    .typeface (SetTypeFace.getTypeface (MainActivity.this), SetTypeFace.getTypeface (MainActivity.this))
+                                                    .canceledOnTouchOutside (false)
+                                                    .cancelable (false)
+                                                    .positiveText (R.string.dialog_action_update)
+                                                    .negativeText (R.string.dialog_action_ignore)
+                                                    .onPositive (new MaterialDialog.SingleButtonCallback () {
+                                                        @Override
+                                                        public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                            final String appPackageName = getPackageName (); // getPackageName() from Context or Activity object
+                                                            try {
+                                                                startActivity (new Intent (Intent.ACTION_VIEW, Uri.parse ("market://details?id=" + appPackageName)));
+                                                            } catch (android.content.ActivityNotFoundException anfe) {
+                                                                startActivity (new Intent (Intent.ACTION_VIEW, Uri.parse ("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                                                            }
+                                                        }
+                                                    })
+                                                    .onNegative (new MaterialDialog.SingleButtonCallback () {
+                                                        @Override
+                                                        public void onClick (@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                            dialog.dismiss ();
+                                                        }
+                                                    }).show ();
+                                        }
                                     }
                                 } catch (Exception e) {
                                     progressDialog.dismiss ();
@@ -728,17 +507,17 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                             Utils.showLog (Log.ERROR, AppConfigTags.VOLLEY_ERROR, error.toString (), true);
                         }
                     }) {
-
+    
                 @Override
                 protected Map<String, String> getParams () throws AuthFailureError {
                     Map<String, String> params = new Hashtable<String, String> ();
                     params.put ("db_version", String.valueOf (db_version));
+                    params.put ("app_version", String.valueOf (finalPInfo.versionCode));
                     params.put ("favourites_json", jsonArrayFavourites.toString ());
                     Utils.showLog (Log.INFO, AppConfigTags.PARAMETERS_SENT_TO_THE_SERVER, "" + params, true);
                     return params;
                 }
-
-
+    
                 @Override
                 public Map<String, String> getHeaders () throws AuthFailureError {
                     Map<String, String> params = new HashMap<> ();
@@ -755,7 +534,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
 //            initApplication ();
         }
     }
-
+    
     @Override
     public void onBackPressed () {
 /*
@@ -802,7 +581,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
         visitorDetailsPref.putBooleanPref (MainActivity.this, VisitorDetailsPref.LOGGED_IN_SESSION, false);
         finish ();
     }
-
+    
     public void checkPermissions () {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission (Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED ||
@@ -842,7 +621,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
 */
         }
     }
-
+    
     @Override
     @TargetApi(23)
     public void onRequestPermissionsResult (int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -893,24 +672,236 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
             }
         }
     }
-
+    
     @Override
     public void onSliderClick (BaseSliderView slider) {
         Uri uri = Uri.parse ("http://" + slider.getBundle ().get ("url"));
         Intent intent = new Intent (Intent.ACTION_VIEW, uri);
         startActivity (intent);
     }
-
+    
     @Override
     public void onPageScrolled (int position, float positionOffset, int positionOffsetPixels) {
     }
-
+    
     @Override
     public void onPageSelected (int position) {
     }
-
+    
     @Override
     public void onPageScrollStateChanged (int state) {
     }
-
+    
+    private class insertDataInDatabase extends AsyncTask<String, Void, Void> {
+        
+        ProgressDialog pdialog2;
+        ProgressDialog pDialog;
+        Activity activity;
+        
+        insertDataInDatabase (Activity activity, ProgressDialog progressDialog) {
+            this.activity = activity;
+            pdialog2 = progressDialog;
+            pDialog = new ProgressDialog (activity);
+        }
+        
+        @Override
+        protected void onPreExecute () {
+            super.onPreExecute ();
+//            Utils.showToast (MainActivity.this, "heelo karman in onpre", true);
+//            Utils.showProgressDialog (pDialog, getResources ().getString (R.string.progress_dialog_text_initializing), false);
+            //this method will be running on UI thread
+        }
+        
+        @Override
+        protected Void doInBackground (String... params) {
+            try {
+                JSONObject jsonObj = new JSONObject (params[0]);
+                
+                JSONArray jsonArrayCategories = jsonObj.getJSONArray (AppConfigTags.CATEGORIES);
+                ArrayList<Category> categoryArrayList = new ArrayList<Category> ();
+                for (int i = 0; i < jsonArrayCategories.length (); i++) {
+                    JSONObject jsonObjectExhibitor = jsonArrayCategories.getJSONObject (i);
+                    Category category = new Category (
+                            jsonObjectExhibitor.getInt (AppConfigTags.CATEGORY_ID),
+                            jsonObjectExhibitor.getString (AppConfigTags.CATEGORY_NAME),
+                            jsonObjectExhibitor.getString (AppConfigTags.CATEGORY_LEVEL2),
+                            jsonObjectExhibitor.getString (AppConfigTags.CATEGORY_LEVEL3)
+                    );
+                    categoryArrayList.add (category);
+//                    db.createCategory (category);
+                }
+                db.insertAllCategories (categoryArrayList);
+                
+                
+                JSONArray jsonArrayCategoryMappings = jsonObj.getJSONArray (AppConfigTags.CATEGORY_MAPPINGS);
+                ArrayList<CategoryMapping> categoryMappingArrayList = new ArrayList<CategoryMapping> ();
+                for (int i = 0; i < jsonArrayCategoryMappings.length (); i++) {
+                    JSONObject jsonObjectExhibitor = jsonArrayCategoryMappings.getJSONObject (i);
+                    CategoryMapping categoryMapping = new CategoryMapping (
+                            jsonObjectExhibitor.getInt (AppConfigTags.CATEGORY_MAPPING_EXHIBITOR_ID),
+                            jsonObjectExhibitor.getInt (AppConfigTags.CATEGORY_MAPPING_CATEGORY_ID),
+                            jsonObjectExhibitor.getString (AppConfigTags.CATEGORY_MAPPING_EXHIBITOR_NAME)
+                    );
+                    categoryMappingArrayList.add (categoryMapping);
+//                    db.createCategoryMapping (categoryMapping);
+                }
+                db.insertAllCategoryMapping (categoryMappingArrayList);
+                
+                
+                JSONArray jsonArrayExhibitor = jsonObj.getJSONArray (AppConfigTags.EXHIBITOR);
+                ArrayList<ExhibitorDetail> exhibitorDetailArrayList = new ArrayList<ExhibitorDetail> ();
+                for (int i = 0; i < jsonArrayExhibitor.length (); i++) {
+                    JSONObject jsonObjectExhibitor = jsonArrayExhibitor.getJSONObject (i);
+                    ExhibitorDetail exhibitorDetail = new ExhibitorDetail (
+                            jsonObjectExhibitor.getInt (AppConfigTags.EXHIBITOR_ID),
+                            false,
+                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_LOGO),
+                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_NAME),
+                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_DESCRIPTION),
+                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_CONTACT_PERSON),
+                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_ADDRESS),
+                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_EMAIL),
+                            jsonObjectExhibitor.getString (AppConfigTags.EXHIBITOR_WEBSITE),
+                            ""
+                    );
+                    
+                    ArrayList<String> contactList = new ArrayList<> ();
+                    JSONArray jsonArrayContacts = jsonObjectExhibitor.getJSONArray (AppConfigTags.EXHIBITOR_CONTACTS);
+                    for (int j = 0; j < jsonArrayContacts.length (); j++) {
+                        JSONObject jsonObjectContactDetail = jsonArrayContacts.getJSONObject (j);
+                        contactList.add (jsonObjectContactDetail.getString (AppConfigTags.CONTACT));
+                    }
+                    exhibitorDetail.setContactList (contactList);
+                    
+                    exhibitorDetailArrayList.add (exhibitorDetail);
+//                    db.createExhibitor (exhibitorDetail);
+                    
+                    JSONArray jsonArrayStallDetails = jsonObjectExhibitor.getJSONArray (AppConfigTags.STALL_DETAILS);
+                    ArrayList<StallDetail> stallDetailArrayList = new ArrayList<StallDetail> ();
+                    exhibitorDetail.clearStallDetailList ();
+                    for (int j = 0; j < jsonArrayStallDetails.length (); j++) {
+                        JSONObject jsonObjectStallDetail = jsonArrayStallDetails.getJSONObject (j);
+                        StallDetail stallDetail = new StallDetail (
+                                jsonObjectStallDetail.getString (AppConfigTags.STALL_NAME),
+                                jsonObjectStallDetail.getString (AppConfigTags.HALL_NUMBER),
+                                jsonObjectStallDetail.getString (AppConfigTags.STALL_NUMBER)
+                        );
+                        stallDetailArrayList.add (stallDetail);
+//                        db.createExhibitorStallDetail (stallDetail, jsonObjectExhibitor.getInt (AppConfigTags.EXHIBITOR_ID));
+                    }
+                    db.insertAllStallDetails (stallDetailArrayList, jsonObjectExhibitor.getInt (AppConfigTags.EXHIBITOR_ID));
+                }
+                db.insertAllExhibitors (exhibitorDetailArrayList);
+                
+                
+                JSONArray jsonArrayEvent = jsonObj.getJSONArray (AppConfigTags.EVENTS);
+                ArrayList<EventDetail> eventDetailArrayList = new ArrayList<EventDetail> ();
+                for (int i = 0; i < jsonArrayEvent.length (); i++) {
+                    JSONObject jsonObjectEvent = jsonArrayEvent.getJSONObject (i);
+                    EventDetail eventDetail = new EventDetail (
+                            jsonObjectEvent.getInt (AppConfigTags.EVENT_DETAIL_ID),
+                            false,
+                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_NAME),
+                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_DATE),
+                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_TIME),
+                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_DURATION),
+                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_LOCATION),
+                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_FEES),
+                            jsonObjectEvent.getString (AppConfigTags.EVENT_DETAIL_NOTES));
+                    
+                    eventDetailArrayList.add (eventDetail);
+//                    db.createEvent (eventDetail);
+                    
+                    JSONArray jsonArraySpeakers = jsonObjectEvent.getJSONArray (AppConfigTags.EVENT_DETAIL_SPEAKERS);
+                    ArrayList<EventSpeaker> eventSpeakerArrayList = new ArrayList<EventSpeaker> ();
+                    for (int j = 0; j < jsonArraySpeakers.length (); j++) {
+                        JSONObject jsonObjectSpeakers = jsonArraySpeakers.getJSONObject (j);
+                        EventSpeaker eventSpeaker = new EventSpeaker (
+                                jsonObjectSpeakers.getInt (AppConfigTags.EVENT_DETAIL_SPEAKER_ID),
+                                jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_IMAGE),
+                                jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_NAME),
+                                jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_QUALIFICATION),
+                                jsonObjectSpeakers.getString (AppConfigTags.EVENT_DETAIL_SPEAKER_EXPERIENCE)
+                        );
+                        eventSpeakerArrayList.add (eventSpeaker);
+//                        db.createEventSpeaker (eventSpeaker, jsonObjectEvent.getInt (AppConfigTags.EVENT_DETAIL_ID));
+                    }
+                    db.insertAllEventSpeakers (eventSpeakerArrayList, jsonObjectEvent.getInt (AppConfigTags.EVENT_DETAIL_ID));
+                    
+                    
+                    JSONArray jsonArrayTopic = jsonObjectEvent.getJSONArray (AppConfigTags.EVENT_DETAIL_TOPICS);
+                    ArrayList<String> eventTopicList = new ArrayList<String> ();
+                    for (int k = 0; k < jsonArrayTopic.length (); k++) {
+                        JSONObject jsonObjectTopic = jsonArrayTopic.getJSONObject (k);
+                        eventTopicList.add (jsonObjectTopic.getString (AppConfigTags.EVENT_DETAIL_TOPIC_TEXT));
+//                        db.createEventTopic (jsonObjectTopic.getString (AppConfigTags.EVENT_DETAIL_TOPIC_TEXT), jsonObjectEvent.getInt (AppConfigTags.EVENT_DETAIL_ID));
+                    }
+                    db.insertAllEventTopics (eventTopicList, jsonObjectEvent.getInt (AppConfigTags.EVENT_DETAIL_ID));
+                }
+                db.insertAllEvents (eventDetailArrayList);
+                
+                
+                JSONArray jsonArraySessions = jsonObj.getJSONArray (AppConfigTags.SESSIONS);
+                ArrayList<SessionDetail> sessionDetailArrayList = new ArrayList<SessionDetail> ();
+                for (int i = 0; i < jsonArraySessions.length (); i++) {
+                    JSONObject jsonObjectSession = jsonArraySessions.getJSONObject (i);
+                    SessionDetail sessionDetail = new SessionDetail (
+                            jsonObjectSession.getInt (AppConfigTags.SESSION_DETAILS_ID),
+                            false,
+                            jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_TITLE),
+                            jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_DATE),
+                            jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_TIME),
+                            jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_LOCATION),
+                            jsonObjectSession.getString (AppConfigTags.SESSION_DETAILS_CATEGORY));
+                    
+                    sessionDetailArrayList.add (sessionDetail);
+//                    db.createSession (sessionDetail);
+                    
+                    JSONArray jsonArraySpeakers = jsonObjectSession.getJSONArray (AppConfigTags.SESSION_SPEAKERS);
+                    ArrayList<SessionSpeaker> sessionSpeakerArrayList = new ArrayList<SessionSpeaker> ();
+                    for (int j = 0; j < jsonArraySpeakers.length (); j++) {
+                        JSONObject jsonObjectSpeakers = jsonArraySpeakers.getJSONObject (j);
+                        SessionSpeaker sessionSpeaker = new SessionSpeaker (
+                                jsonObjectSpeakers.getInt (AppConfigTags.SESSION_DETAILS_SPEAKER_ID),
+                                jsonObjectSpeakers.getString (AppConfigTags.SESSION_DETAILS_SPEAKER_IMAGE),
+                                jsonObjectSpeakers.getString (AppConfigTags.SESSION_DETAILS_SPEAKER_NAME)
+                        );
+                        sessionSpeakerArrayList.add (sessionSpeaker);
+//                        db.createSessionSpeaker (sessionSpeaker, jsonObjectSpeakers.getInt (AppConfigTags.SESSION_DETAILS_ID));
+                    }
+                    db.insertAllSessionSpeakers (sessionSpeakerArrayList, jsonObjectSession.getInt (AppConfigTags.SESSION_DETAILS_ID));
+                    
+                    JSONArray jsonArrayTopic = jsonObjectSession.getJSONArray (AppConfigTags.SESSION_DETAILS_TOPICS);
+                    ArrayList<String> sessionTopicList = new ArrayList<String> ();
+                    for (int k = 0; k < jsonArrayTopic.length (); k++) {
+                        JSONObject jsonObjectTopic = jsonArrayTopic.getJSONObject (k);
+                        sessionTopicList.add (jsonObjectTopic.getString (AppConfigTags.SESSION_DETAILS_TOPIC_TEXT));
+//                        db.createSessionTopic (jsonObjectTopic.getString (AppConfigTags.SESSION_DETAILS_TOPIC_TEXT), jsonObjectSession.getInt (AppConfigTags.SESSION_DETAILS_ID));
+                    }
+                    db.insertAllSessionTopics (sessionTopicList, jsonObjectSession.getInt (AppConfigTags.SESSION_DETAILS_ID));
+                }
+                db.insertAllSessions (sessionDetailArrayList);
+                
+            } catch (JSONException e) {
+                e.printStackTrace ();
+            }
+            return null;
+        }
+        
+        //        @Override
+//        protected void onProgressUpdate (Integer... progress) {
+//            Utils.showLog (Log.ERROR,"progress ",  "" + progress[0], true);
+//            Utils.showToast (activity, "progress " + progress[0], false);
+//            setProgressPercent (progress[0]);
+//        }
+        @Override
+        protected void onPostExecute (Void result) {
+//            Utils.showToast (MainActivity.this, "heelo karman in onpost", true);
+//            pDialog.dismiss ();
+            pdialog2.dismiss ();
+            Utils.showSnackBar (activity, clMain, "Data Updated Successfully", Snackbar.LENGTH_SHORT, null, null);
+            super.onPostExecute (result);
+        }
+        
+    }
 }

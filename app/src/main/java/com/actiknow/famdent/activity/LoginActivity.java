@@ -752,7 +752,18 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onClick (View widget) {
-            Toast.makeText (getApplicationContext (), "Position " + pos + " clicked!", Toast.LENGTH_LONG).show ();
+            switch (pos) {
+                case 1:
+                    Uri uri = Uri.parse ("https://www.indiasupply.com/terms-of-use/");
+                    Intent intent = new Intent (Intent.ACTION_VIEW, uri);
+                    startActivity (intent);
+                    break;
+                case 2:
+                    Uri uri2 = Uri.parse ("https://www.indiasupply.com/privacy-policy-cookie-restriction-mode/");
+                    Intent intent2 = new Intent (Intent.ACTION_VIEW, uri2);
+                    startActivity (intent2);
+                    break;
+            }
         }
 
     }

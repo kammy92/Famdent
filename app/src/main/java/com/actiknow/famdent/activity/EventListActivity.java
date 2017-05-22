@@ -118,7 +118,7 @@ private SliderLayout slider;
         rvProgrammesList.addItemDecoration (new SimpleDividerItemDecoration (this));
         rvProgrammesList.setItemAnimator (new DefaultItemAnimator ());
     
-        searchView.setQueryHint (Html.fromHtml ("<font color = #aaffffff>" + "Search" + "</font>"));
+        searchView.setQueryHint (Html.fromHtml ("<font color = #ffffff>" + "Search" + "</font>"));
         Utils.setTypefaceToAllViews (this, ivBack);
     }
 

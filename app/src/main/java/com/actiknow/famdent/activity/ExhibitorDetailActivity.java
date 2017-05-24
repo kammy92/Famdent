@@ -422,7 +422,7 @@ public class ExhibitorDetailActivity extends AppCompatActivity {
         tvFullAddress.setText ("Stall :" + exhibitorDetail.getAddress ());
         tvContactPerson.setText (exhibitorDetail.getContact_person ());
         tvEmail.setText (Html.fromHtml ("<u><font color='blue'>" + exhibitorDetail.getEmail () + "</font></u>"), TextView.BufferType.SPANNABLE);
-        tvWebsite.setText (Html.fromHtml ("<u><font color='blue'>" + "Click here" + "</font></u>"), TextView.BufferType.SPANNABLE);
+        tvWebsite.setText (Html.fromHtml ("<u><font color='blue'>" + "For offers click here" + "</font></u>"), TextView.BufferType.SPANNABLE);
         tvNotes.setText (exhibitorDetail.getNotes ());
 
         for (int i = 0; i < exhibitorDetail.getContactList ().size (); i++) {

@@ -1,7 +1,7 @@
 package com.actiknow.famdent.utils;
 
 public class AppConfigURL {
-    public static String version = "v1.2.3";
+    public static String version = "v1.2.4";
     //    public static String BASE_URL = "https://project-famdent-cammy92.c9users.io/api/" + version + "/";
     public static String BASE_URL = "http://famdent.indiasupply.com/api/" + version + "/";
 

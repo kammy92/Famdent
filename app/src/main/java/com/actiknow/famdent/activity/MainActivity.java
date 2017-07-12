@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
             defaultSliderView.getBundle ().putString ("url", banner.getUrl ());
             slider.addSlider (defaultSliderView);
         }
-
+    
         slider.setIndicatorVisibility (PagerIndicator.IndicatorVisibility.Visible);
         slider.setPresetTransformer (SliderLayout.Transformer.Default);
         slider.setCustomAnimation (new DescriptionAnimation ());
@@ -280,6 +280,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
         slider.setPresetIndicator (SliderLayout.PresetIndicators.Center_Bottom);
     }
     
+    /*
     private void logOutFromDevice (final int device_id) {
         if (NetworkConnection.isNetworkAvailable (this)) {
             Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_logging_out), true);
@@ -352,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
             });
         }
     }
-    
+    */
     private void isLogin () {
         if (visitorDetailsPref.getStringPref (MainActivity.this, VisitorDetailsPref.VISITOR_LOGIN_KEY) == "") {
             Intent myIntent = new Intent (this, LoginActivity.class);
@@ -396,7 +397,10 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
             e.printStackTrace ();
         }
     
-        Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_initializing), false);
+        if (db_version == 0) {
+            Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_initializing), false);
+        }
+        
         if (NetworkConnection.isNetworkAvailable (this)) {
             Utils.showLog (Log.INFO, AppConfigTags.URL, AppConfigURL.URL_INIT, true);
             final PackageInfo finalPInfo = pInfo;
@@ -454,7 +458,7 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                                                 db.deleteAllCategoryMappings ();
 
 //                                                new insertDataInDatabase (progressDialog).execute (response);
-                                                new insertDataInDatabase (MainActivity.this, progressDialog).execute (response);
+                                                new insertDataInDatabase (MainActivity.this, progressDialog, db_version).execute (response);
                                                 
                                                 break;
                                         }
@@ -697,9 +701,11 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
         ProgressDialog pdialog2;
         ProgressDialog pDialog;
         Activity activity;
-        
-        insertDataInDatabase (Activity activity, ProgressDialog progressDialog) {
+        int db_ver;
+    
+        insertDataInDatabase (Activity activity, ProgressDialog progressDialog, int db_version) {
             this.activity = activity;
+            this.db_ver = db_version;
             pdialog2 = progressDialog;
             pDialog = new ProgressDialog (activity);
         }
@@ -707,13 +713,14 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
         @Override
         protected void onPreExecute () {
             super.onPreExecute ();
-//            Utils.showToast (MainActivity.this, "heelo karman in onpre", true);
-//            Utils.showProgressDialog (pDialog, getResources ().getString (R.string.progress_dialog_text_initializing), false);
-            //this method will be running on UI thread
+            if (db_ver != 0) {
+                Utils.showProgressDialog (pDialog, getResources ().getString (R.string.progress_dialog_text_initializing), false);
+            }
         }
         
         @Override
         protected Void doInBackground (String... params) {
+            final String json_response = params[0];
             try {
                 JSONObject jsonObj = new JSONObject (params[0]);
                 
@@ -883,6 +890,19 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
                 db.insertAllSessions (sessionDetailArrayList);
                 
             } catch (JSONException e) {
+                runOnUiThread (new Runnable () {
+                    @Override
+                    public void run () {
+                        Utils.showSnackBar (activity, clMain, "Error occurred, please refresh data", Snackbar.LENGTH_LONG, null, null);
+//                        Utils.showSnackBar (activity, clMain, "Error occurred, please refresh data", Snackbar.LENGTH_LONG, "RETRY", new View.OnClickListener () {
+//                            @Override
+//                            public void onClick (View v) {
+//                                Utils.showProgressDialog (progressDialog, getResources ().getString (R.string.progress_dialog_text_initializing), false);
+//                                new insertDataInDatabase (activity, progressDialog).execute (json_response);
+//                            }
+//                        });
+                    }
+                });
                 e.printStackTrace ();
             }
             return null;
@@ -897,8 +917,11 @@ public class MainActivity extends AppCompatActivity implements ViewPagerEx.OnPag
         @Override
         protected void onPostExecute (Void result) {
 //            Utils.showToast (MainActivity.this, "heelo karman in onpost", true);
-//            pDialog.dismiss ();
-            pdialog2.dismiss ();
+            if (db_ver == 0) {
+                pdialog2.dismiss ();
+            } else {
+                pDialog.dismiss ();
+            }
             Utils.showSnackBar (activity, clMain, "Data Updated Successfully", Snackbar.LENGTH_SHORT, null, null);
             super.onPostExecute (result);
         }
